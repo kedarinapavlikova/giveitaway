@@ -29,28 +29,73 @@
   --font-body: 'DM Sans', sans-serif;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--font-body); background: var(--cream); color: var(--charcoal); min-height: 100vh; }
+body { font-family: var(--font-body); background: var(--cream); color: var(--charcoal); min-height: 100vh; padding-bottom: 0; }
+@media (max-width: 600px) { body { padding-bottom: 70px; } }
 
 nav {
   background: var(--white);
   border-bottom: 1px solid #EDE9E3;
-  padding: 0 1.5rem;
+  padding: 0 1.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 60px;
   position: sticky; top: 0; z-index: 100;
 }
-.logo { font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: var(--papaya-mid); letter-spacing: -0.5px; cursor: pointer; }
+.logo { font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: var(--papaya-mid); letter-spacing: -0.5px; cursor: pointer; flex-shrink: 0; }
 .logo span { color: var(--lagoon); }
 .logo em { font-style: normal; font-weight: 700; }
-.nav-links { display: flex; gap: 0.4rem; align-items: center; }
+.nav-links { display: flex; gap: 0.3rem; align-items: center; }
 .nav-btn { background: none; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.83rem; font-weight: 500; color: var(--gray); padding: 0.4rem 0.85rem; border-radius: 20px; transition: all 0.15s; }
 .nav-btn:hover, .nav-btn.active { background: var(--papaya-light); color: var(--papaya-dark); }
 .nav-btn.msg-btn { position: relative; }
 .msg-dot { position: absolute; top: 5px; right: 8px; width: 7px; height: 7px; background: var(--lagoon); border-radius: 50%; }
-.post-btn { background: var(--papaya-mid); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.83rem; font-weight: 600; padding: 0.45rem 1.1rem; border-radius: 20px; transition: all 0.15s; }
+.post-btn { background: var(--papaya-mid); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.83rem; font-weight: 600; padding: 0.45rem 1.1rem; border-radius: 20px; transition: all 0.15s; white-space: nowrap; }
 .post-btn:hover { background: var(--papaya-dark); transform: translateY(-1px); }
+.nav-support-btn { color: var(--lagoon-dark); font-weight: 600; border: 1.5px solid var(--lagoon); border-radius: 20px; padding: 0.4rem 0.85rem; margin-right: 6px; font-family: var(--font-body); font-size: 0.83rem; background: none; cursor: none; white-space: nowrap; transition: all 0.15s; }
+.nav-support-btn:hover { background: var(--lagoon-light); }
+@media (max-width: 600px) {
+  .nav-links { display: none; }
+  .nav-support-btn { display: none; }
+  .post-btn { display: none; }
+}
+
+/* BOTTOM TAB BAR */
+.bottom-nav { display: none; }
+@media (max-width: 600px) {
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 64px;
+    background: var(--white);
+    border-top: 1px solid #EDE9E3;
+    z-index: 100;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 0.5rem;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .tab-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; background: none; border: none; cursor: pointer;
+    font-family: var(--font-body); font-size: 0.62rem; font-weight: 500;
+    color: var(--gray); padding: 0.4rem 0; transition: color 0.15s;
+    position: relative;
+  }
+  .tab-btn.active { color: var(--papaya-mid); }
+  .tab-btn svg { width: 22px; height: 22px; }
+  .tab-post-btn {
+    flex: 0 0 56px; width: 56px; height: 56px; border-radius: 50%;
+    background: var(--papaya-mid); color: white; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(255,138,101,0.45);
+    transition: all 0.15s; margin-bottom: 8px;
+    font-size: 1.5rem; line-height: 1;
+  }
+  .tab-post-btn:hover { background: var(--papaya-dark); transform: scale(1.06); }
+  .tab-msg-dot { position: absolute; top: 4px; right: calc(50% - 14px); width: 7px; height: 7px; background: var(--lagoon); border-radius: 50%; }
+}
 
 .hero { background: var(--papaya-mid); padding: 1.1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .hero-text { color: white; }
@@ -223,9 +268,32 @@ nav {
     <button class="nav-btn msg-btn" id="nav-msgs" onclick="showView('messages')">Messages<span class="msg-dot"></span></button>
     <button class="nav-btn" id="nav-profile" onclick="showView('profile')">My Stuff</button>
   </div>
-  <button class="nav-btn" onclick="openModal('supporter-modal')" style="color:var(--lagoon-dark);font-weight:600;border:1.5px solid var(--lagoon);border-radius:20px;padding:0.4rem 0.85rem;margin-right:6px">✦ Support</button>
-  <button class="post-btn" onclick="openPostModal()">+ Post Item</button>
+  <div style="display:flex;align-items:center;gap:0">
+    <button class="nav-support-btn" onclick="openModal('supporter-modal')">✦ Support</button>
+    <button class="post-btn" onclick="openPostModal()">+ Post Item</button>
+  </div>
 </nav>
+
+<div class="bottom-nav">
+  <button class="tab-btn" id="tab-browse" onclick="showView('feed')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Browse
+  </button>
+  <button class="tab-btn" id="tab-msgs" onclick="showView('messages')" style="position:relative">
+    <span class="tab-msg-dot" id="tab-msg-dot"></span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Messages
+  </button>
+  <button class="tab-post-btn" onclick="openPostModal()" aria-label="Post item">+</button>
+  <button class="tab-btn" id="tab-support" onclick="openModal('supporter-modal')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    Support
+  </button>
+  <button class="tab-btn" id="tab-profile" onclick="showView('profile')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    My Stuff
+  </button>
+</div>
 
 <!-- FEED VIEW -->
 <div id="view-feed">
@@ -718,7 +786,10 @@ function showView(v) {
   });
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   const map = {feed:'nav-browse',messages:'nav-msgs',profile:'nav-profile'};
-  document.getElementById(map[v]).classList.add('active');
+  if (map[v] && document.getElementById(map[v])) document.getElementById(map[v]).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  const tabMap = {feed:'tab-browse',messages:'tab-msgs',profile:'tab-profile'};
+  if (tabMap[v] && document.getElementById(tabMap[v])) document.getElementById(tabMap[v]).classList.add('active');
   if (v==='messages') renderThreadList();
 }
 
