@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GiveItAway</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --papaya: #FFAB91;
+  --papaya-light: #FFF0EB;
+  --papaya-dark: #E64A19;
+  --papaya-mid: #FF8A65;
+  --lagoon: #00BFA5;
+  --lagoon-light: #E0F2F1;
+  --lagoon-dark: #00796B;
+  --lagoon-mid: #00A896;
+  --cream: #FAF9F6;
+  --charcoal: #2D2D2D;
+  --gray: #888;
+  --gray-light: #F0EDE8;
+  --gray-mid: #D4D0CB;
+  --white: #FFFFFF;
+  --shadow: 0 2px 14px rgba(0,0,0,0.07);
+  --shadow-hover: 0 8px 28px rgba(0,0,0,0.12);
+  --radius: 16px;
+  --radius-sm: 12px;
+  --font-display: 'Fraunces', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-body); background: var(--cream); color: var(--charcoal); min-height: 100vh; }
+
+nav {
+  background: var(--white);
+  border-bottom: 1px solid #EDE9E3;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo { font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: var(--papaya-mid); letter-spacing: -0.5px; cursor: pointer; }
+.logo span { color: var(--lagoon); }
+.logo em { font-style: normal; font-weight: 700; }
+.nav-links { display: flex; gap: 0.4rem; align-items: center; }
+.nav-btn { background: none; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.83rem; font-weight: 500; color: var(--gray); padding: 0.4rem 0.85rem; border-radius: 20px; transition: all 0.15s; }
+.nav-btn:hover, .nav-btn.active { background: var(--papaya-light); color: var(--papaya-dark); }
+.nav-btn.msg-btn { position: relative; }
+.msg-dot { position: absolute; top: 5px; right: 8px; width: 7px; height: 7px; background: var(--lagoon); border-radius: 50%; }
+.post-btn { background: var(--papaya-mid); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.83rem; font-weight: 600; padding: 0.45rem 1.1rem; border-radius: 20px; transition: all 0.15s; }
+.post-btn:hover { background: var(--papaya-dark); transform: translateY(-1px); }
+
+.hero { background: var(--papaya-mid); padding: 1.1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.hero-text { color: white; }
+.hero-text h1 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; }
+.hero-text p { font-size: 0.83rem; opacity: 0.9; margin-top: 2px; }
+.hero-stats { display: flex; gap: 1.5rem; }
+.stat { text-align: center; color: white; }
+.stat-num { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; line-height: 1; }
+.stat-label { font-size: 0.7rem; opacity: 0.85; margin-top: 2px; }
+
+.search-bar-wrap { background: var(--white); border-bottom: 1px solid #EDE9E3; padding: 0.75rem 1.5rem; display: flex; gap: 0.6rem; align-items: center; }
+.search-input-wrap { position: relative; flex: 1; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--gray); pointer-events: none; }
+.search-input { width: 100%; background: var(--gray-light); border: none; border-radius: 24px; font-family: var(--font-body); font-size: 0.88rem; color: var(--charcoal); padding: 0.55rem 0.9rem 0.55rem 2.2rem; outline: none; transition: box-shadow 0.15s; }
+.search-input:focus { box-shadow: 0 0 0 2px var(--papaya); }
+.search-input::placeholder { color: var(--gray); }
+.clear-search { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: var(--gray-mid); border: none; cursor: pointer; width: 18px; height: 18px; border-radius: 50%; font-size: 10px; display: none; align-items: center; justify-content: center; color: var(--charcoal); }
+.clear-search.show { display: flex; }
+.area-select { background: var(--gray-light); border: none; border-radius: 24px; font-family: var(--font-body); font-size: 0.83rem; color: var(--charcoal); padding: 0.55rem 0.9rem; outline: none; cursor: pointer; min-width: 0; width: 160px; flex-shrink: 0; transition: box-shadow 0.15s; }
+.area-select:focus { box-shadow: 0 0 0 2px var(--lagoon); }
+
+.filters { background: var(--white); padding: 0.6rem 1.5rem; border-bottom: 1px solid #EDE9E3; display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none; }
+.filters::-webkit-scrollbar { display: none; }
+.filter-chip { white-space: nowrap; flex-shrink: 0; background: var(--gray-light); border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.78rem; font-weight: 500; color: var(--charcoal); padding: 0.32rem 0.85rem; border-radius: 20px; transition: all 0.15s; }
+.filter-chip:hover { background: var(--papaya-light); color: var(--papaya-dark); }
+.filter-chip.active { background: var(--papaya-mid); color: white; }
+
+.main { padding: 1.25rem 1.5rem; max-width: 1100px; margin: 0 auto; }
+.feed-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.section-label { font-size: 0.73rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--gray); }
+.search-result-info { font-size: 0.8rem; color: var(--lagoon-dark); font-weight: 500; }
+
+.masonry { columns: 3; column-gap: 1rem; }
+@media (max-width: 860px) { .masonry { columns: 2; } }
+@media (max-width: 520px) { .masonry { columns: 1; } }
+
+.card { break-inside: avoid; background: var(--white); border-radius: var(--radius); margin-bottom: 1rem; overflow: hidden; box-shadow: var(--shadow); transition: all 0.2s; cursor: pointer; position: relative; }
+.card:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px); }
+.card-img-placeholder { width: 100%; display: flex; align-items: center; justify-content: center; }
+.card-body { padding: 0.8rem 1rem 0.9rem; }
+.card-title { font-weight: 600; font-size: 0.93rem; margin-bottom: 0.3rem; color: var(--charcoal); line-height: 1.35; }
+.card-title mark { background: #FFF3CD; border-radius: 3px; padding: 0 2px; }
+.card-desc-preview { font-size: 0.78rem; color: var(--gray); margin-bottom: 0.5rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-location { font-size: 0.76rem; color: var(--gray); display: flex; align-items: center; gap: 4px; margin-bottom: 0.55rem; }
+.card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 0.7rem; }
+.tag { font-size: 0.7rem; font-weight: 500; padding: 2px 8px; border-radius: 20px; }
+.tag-size { background: var(--papaya-light); color: #BF360C; }
+.tag-condition { background: var(--lagoon-light); color: var(--lagoon-dark); }
+.tag-category { background: #EDE7F6; color: #4527A0; }
+.tag-pickup { background: #FFF8E1; color: #E65100; }
+.card-footer { display: flex; align-items: center; justify-content: space-between; }
+.giver { display: flex; align-items: center; gap: 7px; }
+.avatar { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 600; color: white; flex-shrink: 0; }
+.giver-name { font-size: 0.76rem; color: var(--gray); }
+.claim-btn { background: var(--papaya-mid); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.76rem; font-weight: 600; padding: 0.32rem 0.85rem; border-radius: 20px; transition: all 0.15s; white-space: nowrap; }
+.claim-btn:hover { background: var(--papaya-dark); }
+.new-badge { position: absolute; top: 9px; right: 9px; background: var(--lagoon); color: white; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; }
+
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--gray); grid-column: 1/-1; }
+.empty-state .big { font-size: 3rem; margin-bottom: 0.5rem; }
+
+/* MODAL BASE */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(45,45,45,0.5); z-index: 200; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--white); border-radius: var(--radius); width: 100%; max-width: 540px; padding: 1.6rem; animation: modalIn 0.18s ease; margin: auto; }
+@keyframes modalIn { from { opacity:0; transform: scale(0.96) translateY(8px); } to { opacity:1; transform: none; } }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.4rem; }
+.modal-title { font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--charcoal); }
+.close-btn { background: var(--gray-light); border: none; cursor: pointer; width: 30px; height: 30px; border-radius: 50%; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; color: var(--charcoal); transition: background 0.12s; }
+.close-btn:hover { background: var(--gray-mid); }
+.form-group { margin-bottom: 1rem; }
+.form-label { font-size: 0.8rem; font-weight: 600; color: var(--charcoal); margin-bottom: 0.38rem; display: block; }
+.form-label .req { color: var(--papaya-mid); margin-left: 2px; }
+.form-input, .form-select, .form-textarea { width: 100%; background: var(--gray-light); border: none; border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 0.88rem; color: var(--charcoal); padding: 0.6rem 0.9rem; outline: none; transition: box-shadow 0.15s; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { box-shadow: 0 0 0 2px var(--papaya); }
+.form-textarea { resize: vertical; min-height: 75px; }
+.hint { font-size: 0.73rem; color: var(--gray); margin-top: 4px; }
+.size-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(82px, 1fr)); gap: 5px; }
+.size-chip { background: var(--gray-light); border: 1.5px solid transparent; border-radius: 9px; padding: 0.38rem 0.4rem; text-align: center; cursor: pointer; font-size: 0.76rem; font-weight: 500; transition: all 0.12s; user-select: none; }
+.size-chip:hover { border-color: var(--papaya); }
+.size-chip.selected { background: var(--papaya-light); border-color: var(--papaya-mid); color: var(--papaya-dark); }
+.pickup-grid { display: flex; gap: 7px; flex-wrap: wrap; }
+.pickup-chip { background: var(--gray-light); border: 1.5px solid transparent; border-radius: 10px; padding: 0.45rem 0.9rem; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.12s; user-select: none; }
+.pickup-chip:hover { border-color: var(--lagoon); }
+.pickup-chip.selected { background: var(--lagoon-light); border-color: var(--lagoon); color: var(--lagoon-dark); }
+.submit-btn { width: 100%; background: var(--papaya-mid); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.95rem; font-weight: 600; padding: 0.8rem; border-radius: var(--radius-sm); margin-top: 0.4rem; transition: all 0.15s; }
+.submit-btn:hover { background: var(--papaya-dark); transform: translateY(-1px); }
+
+/* CLAIM MODAL */
+.claim-preview { background: var(--papaya-light); border-radius: var(--radius-sm); padding: 0.9rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 12px; }
+.claim-emoji { font-size: 2.2rem; }
+.claim-detail h3 { font-weight: 600; font-size: 0.92rem; }
+.claim-detail p { font-size: 0.78rem; color: var(--gray); margin-top: 2px; }
+.send-wrap { display: flex; gap: 8px; }
+.send-btn { background: var(--lagoon); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.83rem; font-weight: 600; padding: 0 1.1rem; border-radius: var(--radius-sm); white-space: nowrap; transition: background 0.15s; }
+.send-btn:hover { background: var(--lagoon-dark); }
+
+/* MESSAGES VIEW */
+.msg-view { padding: 1.25rem 1.5rem; max-width: 760px; margin: 0 auto; }
+.msg-back { background: none; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.83rem; color: var(--lagoon-dark); font-weight: 600; padding: 0; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 5px; }
+.thread-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.5rem; }
+.thread-item { background: var(--white); border-radius: var(--radius-sm); padding: 0.9rem 1rem; display: flex; align-items: center; gap: 12px; cursor: pointer; box-shadow: var(--shadow); transition: all 0.15s; border: 1.5px solid transparent; }
+.thread-item:hover { border-color: var(--papaya); transform: translateX(3px); }
+.thread-item.unread { border-color: var(--lagoon); }
+.thread-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; color: white; flex-shrink: 0; }
+.thread-info { flex: 1; min-width: 0; }
+.thread-name { font-weight: 600; font-size: 0.88rem; color: var(--charcoal); }
+.thread-item-title { font-size: 0.76rem; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.thread-preview { font-size: 0.78rem; color: var(--gray); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.thread-meta { text-align: right; flex-shrink: 0; }
+.thread-time { font-size: 0.7rem; color: var(--gray); }
+.unread-dot { width: 8px; height: 8px; background: var(--lagoon); border-radius: 50%; margin: 4px auto 0; }
+
+.chat-window { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.chat-header { background: var(--gray-light); padding: 0.85rem 1rem; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #EDE9E3; }
+.chat-back { background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--charcoal); padding: 0; margin-right: 2px; }
+.chat-item-info { flex: 1; }
+.chat-item-name { font-weight: 600; font-size: 0.88rem; }
+.chat-item-sub { font-size: 0.73rem; color: var(--gray); }
+.chat-status { font-size: 0.7rem; background: var(--lagoon-light); color: var(--lagoon-dark); padding: 2px 9px; border-radius: 20px; font-weight: 500; }
+.chat-messages { padding: 1rem; min-height: 240px; max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.msg-bubble-wrap { display: flex; gap: 7px; align-items: flex-end; }
+.msg-bubble-wrap.mine { flex-direction: row-reverse; }
+.bubble-avatar { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 600; color: white; flex-shrink: 0; }
+.bubble { max-width: 72%; padding: 0.55rem 0.85rem; border-radius: 14px; font-size: 0.83rem; line-height: 1.45; }
+.bubble.theirs { background: var(--gray-light); color: var(--charcoal); border-bottom-left-radius: 4px; }
+.bubble.mine { background: var(--lagoon); color: white; border-bottom-right-radius: 4px; }
+.bubble-time { font-size: 0.65rem; color: var(--gray); margin-top: 2px; text-align: right; }
+.chat-input-row { display: flex; gap: 8px; padding: 0.75rem 1rem; border-top: 1px solid #EDE9E3; }
+.chat-input { flex: 1; background: var(--gray-light); border: none; border-radius: 20px; font-family: var(--font-body); font-size: 0.85rem; color: var(--charcoal); padding: 0.5rem 1rem; outline: none; transition: box-shadow 0.15s; }
+.chat-input:focus { box-shadow: 0 0 0 2px var(--lagoon); }
+.chat-send { background: var(--lagoon); color: white; border: none; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: background 0.15s; flex-shrink: 0; }
+.chat-send:hover { background: var(--lagoon-dark); }
+
+/* TOAST */
+.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--lagoon); color: white; border-radius: 24px; padding: 0.7rem 1.4rem; font-weight: 600; font-size: 0.88rem; z-index: 300; transition: transform 0.3s ease; box-shadow: 0 4px 20px rgba(0,191,165,0.35); white-space: nowrap; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.supporter-banner { background: var(--lagoon-light); border: 1px solid #B2DFDB; border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.supporter-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 700; padding: 2px 9px; border-radius: 20px; letter-spacing: 0.03em; vertical-align: middle; margin-left: 5px; }
+.badge-neighbour { background: var(--lagoon-light); color: var(--lagoon-dark); border: 1px solid var(--lagoon); }
+.badge-champion { background: var(--papaya-light); color: #BF360C; border: 1px solid var(--papaya-mid); }
+.badge-founding { background: #FFF8E1; color: #E65100; border: 1px solid #FFB300; }
+.tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 1.1rem 0; }
+@media (max-width: 500px) { .tier-grid { grid-template-columns: 1fr; } }
+.tier-card { border: 1.5px solid var(--gray-mid); border-radius: var(--radius-sm); padding: 1rem 0.9rem; cursor: pointer; transition: all 0.15s; text-align: center; position: relative; background: var(--white); }
+.tier-card:hover { border-color: var(--lagoon); transform: translateY(-2px); box-shadow: var(--shadow); }
+.tier-card.selected { border-color: var(--lagoon); border-width: 2px; background: var(--lagoon-light); }
+.popular-label { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); background: var(--papaya-mid); color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 10px; border-radius: 20px; white-space: nowrap; }
+.tier-emoji { font-size: 1.5rem; margin-bottom: 4px; }
+.tier-price { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--charcoal); line-height: 1; }
+.tier-price span { font-size: 0.75rem; font-weight: 400; color: var(--gray); }
+.tier-name { font-size: 0.8rem; font-weight: 600; color: var(--charcoal); margin: 4px 0 8px; }
+.tier-perk { font-size: 0.72rem; color: var(--gray); line-height: 1.55; text-align: left; }
+.tier-perk div { display: flex; gap: 5px; margin-bottom: 2px; }
+.check { color: var(--lagoon); font-weight: 700; flex-shrink: 0; }
+.supporter-cta { width: 100%; background: var(--lagoon); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.92rem; font-weight: 600; padding: 0.75rem; border-radius: var(--radius-sm); margin-top: 0.75rem; transition: all 0.15s; }
+.supporter-cta:hover { background: var(--lagoon-dark); transform: translateY(-1px); }
+.supporter-why { background: var(--gray-light); border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin: 0.75rem 0 1rem; font-size: 0.8rem; color: var(--charcoal); line-height: 1.65; }
+.feed-supporter-strip { background: var(--lagoon); color: white; text-align: center; padding: 0.55rem 1.5rem; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+.feed-supporter-strip:hover { background: var(--lagoon-dark); }
+.feed-supporter-strip strong { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="showView('feed')">Give<em>It</em><span>Away</span></div>
+  <div class="nav-links">
+    <button class="nav-btn active" id="nav-browse" onclick="showView('feed')">Browse</button>
+    <button class="nav-btn msg-btn" id="nav-msgs" onclick="showView('messages')">Messages<span class="msg-dot"></span></button>
+    <button class="nav-btn" id="nav-profile" onclick="showView('profile')">My Stuff</button>
+  </div>
+  <button class="nav-btn" onclick="openModal('supporter-modal')" style="color:var(--lagoon-dark);font-weight:600;border:1.5px solid var(--lagoon);border-radius:20px;padding:0.4rem 0.85rem;margin-right:6px">✦ Support</button>
+  <button class="post-btn" onclick="openPostModal()">+ Post Item</button>
+</nav>
+
+<!-- FEED VIEW -->
+<div id="view-feed">
+  <div class="hero">
+    <div class="hero-text">
+      <h1>Free stuff. Real neighbours. <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="white" aria-hidden="true" style="vertical-align:-2px;display:inline-block"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></h1>
+      <p>Kelowna & area — no cash, no catch, just community.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num" id="stat-items">24</div><div class="stat-label">available</div></div>
+      <div class="stat"><div class="stat-num">138</div><div class="stat-label">given away</div></div>
+      <div class="stat"><div class="stat-num">61</div><div class="stat-label">givers</div></div>
+    </div>
+  </div>
+
+  <div class="feed-supporter-strip" id="supporter-strip" onclick="openModal('supporter-modal')">
+    <strong>GiveItAway runs on community love.</strong> Support us for $3/mo and get a ✦ on your profile.
+  </div>
+
+  <div class="search-bar-wrap">
+    <div class="search-input-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" type="text" id="search-input" placeholder="Search items, descriptions…" oninput="handleSearch()">
+      <button class="clear-search" id="clear-btn" onclick="clearSearch()">✕</button>
+    </div>
+    <select class="area-select" id="area-select" onchange="handleSearch()">
+      <option value="all">All areas</option>
+      <option>Lower Mission</option>
+      <option>Pandosy Village</option>
+      <option>Rutland</option>
+      <option>Glenmore</option>
+      <option>Black Mountain</option>
+      <option>Dilworth</option>
+      <option>SE Kelowna</option>
+      <option>Rutland North</option>
+    </select>
+  </div>
+
+  <div class="filters">
+    <button class="filter-chip active" onclick="filterCategory(this,'all')">All</button>
+    <button class="filter-chip" onclick="filterCategory(this,'Kids Clothes')">👕 Kids Clothes</button>
+    <button class="filter-chip" onclick="filterCategory(this,'Gear')">🧺 Gear</button>
+    <button class="filter-chip" onclick="filterCategory(this,'Toys')">🧸 Toys</button>
+    <button class="filter-chip" onclick="filterCategory(this,'Bikes')">🚲 Bikes</button>
+    <button class="filter-chip" onclick="filterCategory(this,'Books')">📚 Books</button>
+    <button class="filter-chip" onclick="filterCategory(this,'Sports')">⚽ Sports</button>
+    <button class="filter-chip" onclick="filterCategory(this,'Other')">✨ Other</button>
+  </div>
+
+  <div class="main">
+    <div class="feed-meta">
+      <div class="section-label" id="feed-label">24 items near you</div>
+      <div class="search-result-info" id="search-info"></div>
+    </div>
+    <div class="masonry" id="feed"></div>
+  </div>
+</div>
+
+<!-- MESSAGES VIEW -->
+<div id="view-messages" style="display:none">
+  <div class="msg-view">
+    <div id="thread-list-view">
+      <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;margin-bottom:1.1rem;color:var(--charcoal)">Messages</div>
+      <div class="section-label" style="margin-bottom:0.75rem">Active conversations</div>
+      <div class="thread-list" id="thread-list"></div>
+    </div>
+    <div id="chat-view" style="display:none">
+      <button class="msg-back" onclick="showThreadList()">← Back to messages</button>
+      <div class="chat-window">
+        <div class="chat-header">
+          <div class="thread-avatar" id="chat-avatar" style="width:36px;height:36px;font-size:0.75rem"></div>
+          <div class="chat-item-info">
+            <div class="chat-item-name" id="chat-name"></div>
+            <div class="chat-item-sub" id="chat-item-title"></div>
+          </div>
+          <span class="chat-status">Active</span>
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input-row">
+          <input class="chat-input" type="text" id="chat-input-box" placeholder="Message…" onkeydown="if(event.key==='Enter')sendChatMsg()">
+          <button class="chat-send" onclick="sendChatMsg()">↑</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE VIEW -->
+<div id="view-profile" style="display:none">
+  <div class="main" style="max-width:680px">
+    <div style="background:var(--white);border-radius:var(--radius);padding:1.4rem;margin-bottom:1.25rem;box-shadow:var(--shadow);display:flex;align-items:center;gap:1rem;">
+      <div class="avatar" style="width:52px;height:52px;font-size:1.1rem;background:var(--papaya-mid)">ME</div>
+      <div style="flex:1">
+        <div style="font-family:var(--font-display);font-size:1.15rem;font-weight:700;display:flex;align-items:center;flex-wrap:wrap;gap:4px">Your Profile <span id="profile-badge" style="display:none"></span></div>
+        <div style="font-size:0.8rem;color:var(--gray);margin-top:2px">Lower Mission, Kelowna · Member since 2025</div>
+        <div style="margin-top:6px;display:flex;gap:7px;flex-wrap:wrap;">
+          <span class="tag tag-condition">👍 4.9 giver rating</span>
+          <span class="tag tag-size" id="profile-count">0 items posted</span>
+        </div>
+      </div>
+    </div>
+    <div id="supporter-profile-banner" style="display:block">
+      <div class="supporter-banner">
+        <div>
+          <div style="font-weight:600;font-size:0.92rem;margin-bottom:3px">Keep GiveItAway free for everyone 💚</div>
+          <div style="font-size:0.8rem;color:var(--lagoon-dark)">Optional supporters keep the lights on. $3/mo. Cancel anytime. No pressure at all.</div>
+        </div>
+        <button class="post-btn" style="background:var(--lagoon);white-space:nowrap;flex-shrink:0" onclick="openModal('supporter-modal')">✦ Become a supporter</button>
+      </div>
+    </div>
+    <div id="supporter-profile-active" style="display:none">
+      <div class="supporter-banner" style="background:var(--lagoon-light)">
+        <div>
+          <div style="font-weight:600;font-size:0.92rem;margin-bottom:3px">You're a GiveItAway supporter ✦</div>
+          <div style="font-size:0.8rem;color:var(--lagoon-dark)" id="supporter-tier-label">Thank you — you're keeping this community alive.</div>
+        </div>
+        <button class="nav-btn" style="font-size:0.78rem;color:var(--gray)" onclick="openModal('supporter-modal')">Manage</button>
+      </div>
+    </div>
+    <div class="empty-state">
+      <div class="big">📦</div>
+      <p style="font-weight:600;margin-bottom:6px">Nothing posted yet!</p>
+      <p style="font-size:0.85rem">Hit "+ Post Item" and make someone's day.</p>
+      <button class="post-btn" style="margin-top:1rem" onclick="openPostModal()">+ Post your first item</button>
+    </div>
+  </div>
+</div>
+
+<!-- POST MODAL -->
+<div class="modal-overlay" id="post-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Post an item</div>
+      <button class="close-btn" onclick="closeModal('post-modal')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Item title <span class="req">*</span></label>
+      <input class="form-input" type="text" placeholder="e.g. Bundle of 3-6m onesies" id="post-title">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Category <span class="req">*</span></label>
+      <select class="form-select" id="post-category" onchange="toggleSizes()">
+        <option value="">Select a category</option>
+        <option>Kids Clothes</option><option>Gear</option><option>Toys</option>
+        <option>Bikes</option><option>Books</option><option>Sports</option><option>Other</option>
+      </select>
+    </div>
+    <div class="form-group" id="size-section" style="display:none">
+      <label class="form-label">Size(s) — select all that apply <span class="req">*</span></label>
+      <div class="size-grid" id="size-chips"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Condition <span class="req">*</span></label>
+      <select class="form-select" id="post-condition">
+        <option value="">Select condition</option>
+        <option>New (never used)</option><option>Like New</option><option>Good</option><option>Well Loved</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Pickup options <span class="req">*</span></label>
+      <div class="pickup-grid">
+        <div class="pickup-chip" onclick="this.classList.toggle('selected')">🚪 Porch Pickup</div>
+        <div class="pickup-chip" onclick="this.classList.toggle('selected')">🤝 Meetup</div>
+        <div class="pickup-chip" onclick="this.classList.toggle('selected')">📦 Drop Off</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Location <span class="req">*</span></label>
+      <input class="form-input" type="text" placeholder="e.g. Gordon Dr & KLO Rd, Kelowna" id="post-location">
+      <div class="hint">Be specific — intersection or neighbourhood so people can plan!</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Neighbourhood <span class="req">*</span></label>
+      <select class="form-select" id="post-neighbourhood">
+        <option value="">Select neighbourhood</option>
+        <option>Lower Mission</option><option>Pandosy Village</option><option>Rutland</option>
+        <option>Glenmore</option><option>Black Mountain</option><option>Dilworth</option>
+        <option>SE Kelowna</option><option>Rutland North</option><option>Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-textarea" placeholder="Colours, brand, how many pieces, anything helpful…" id="post-desc"></textarea>
+    </div>
+    <button class="submit-btn" onclick="submitPost()">Give it away! &#10084;</button>
+  </div>
+</div>
+
+<!-- CLAIM MODAL -->
+<div class="modal-overlay" id="claim-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title">I want this!</div>
+      <button class="close-btn" onclick="closeModal('claim-modal')">✕</button>
+    </div>
+    <div class="claim-preview">
+      <div class="claim-emoji" id="claim-emoji">👕</div>
+      <div class="claim-detail">
+        <h3 id="claim-title"></h3>
+        <p id="claim-location"></p>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Message to the giver</label>
+      <div class="send-wrap">
+        <input class="form-input" type="text" id="claim-msg" value="Hi! I'd love this — when's a good time to pick it up?">
+        <button class="send-btn" onclick="sendClaim()">Send</button>
+      </div>
+    </div>
+    <div class="hint">No money ever changes hands. The giver picks who gets it. 💚</div>
+  </div>
+</div>
+
+<!-- SUPPORTER MODAL -->
+<div class="modal-overlay" id="supporter-modal">
+  <div class="modal" style="max-width:520px" id="supporter-modal-inner">
+    <div class="modal-header">
+      <div class="modal-title" id="supporter-modal-title">Support GiveItAway ✦</div>
+      <button class="close-btn" onclick="closeModal('supporter-modal')">✕</button>
+    </div>
+    <div id="supporter-step-pick">
+      <div class="supporter-why">
+        🌿 GiveItAway is free to use — always. No ads, no selling your data, no cash for items. Ever.<br><br>
+        Optional supporters help pay for hosting, keep the community moderated, and eventually help us expand to new cities. If you love what we're building, a few dollars a month makes a huge difference.
+      </div>
+      <div class="tier-grid">
+        <div class="tier-card" id="tier-neighbour" onclick="selectTier('neighbour')">
+          <div class="tier-emoji">🤝</div>
+          <div class="tier-price">$3<span>/mo</span></div>
+          <div class="tier-name">Neighbour</div>
+          <div class="tier-perk">
+            <div><span class="check">✦</span><span>Profile badge</span></div>
+            <div><span class="check">✦</span><span>Warm fuzzies</span></div>
+            <div><span class="check">✦</span><span>Priority support</span></div>
+          </div>
+        </div>
+        <div class="tier-card" id="tier-champion" onclick="selectTier('champion')" style="border-color:var(--papaya-mid)">
+          <div class="popular-label">Most popular</div>
+          <div class="tier-emoji">🌟</div>
+          <div class="tier-price">$7<span>/mo</span></div>
+          <div class="tier-name">Champion</div>
+          <div class="tier-perk">
+            <div><span class="check">✦</span><span>Everything above</span></div>
+            <div><span class="check">✦</span><span>Champion badge</span></div>
+            <div><span class="check">✦</span><span>Name in credits</span></div>
+            <div><span class="check">✦</span><span>Early features</span></div>
+          </div>
+        </div>
+        <div class="tier-card" id="tier-founding" onclick="selectTier('founding')">
+          <div class="tier-emoji">🏅</div>
+          <div class="tier-price">$15<span>/mo</span></div>
+          <div class="tier-name">Founding Giver</div>
+          <div class="tier-perk">
+            <div><span class="check">✦</span><span>Everything above</span></div>
+            <div><span class="check">✦</span><span>Gold founder badge</span></div>
+            <div><span class="check">✦</span><span>Direct input on features</span></div>
+            <div><span class="check">✦</span><span>Forever founding status</span></div>
+          </div>
+        </div>
+      </div>
+      <button class="supporter-cta" id="supporter-cta-btn" onclick="goToPayStep()" disabled>Select a tier to continue</button>
+      <div style="text-align:center;margin-top:0.6rem;font-size:0.72rem;color:var(--gray)">Cancel anytime. No pressure. You're already a hero for using the app. 💚</div>
+    </div>
+    <div id="supporter-step-pay" style="display:none">
+      <div style="background:var(--lagoon-light);border-radius:var(--radius-sm);padding:0.9rem 1rem;margin-bottom:1.1rem;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-weight:600;font-size:0.88rem" id="pay-tier-name">Neighbour — $3/mo</div>
+          <div style="font-size:0.75rem;color:var(--lagoon-dark);margin-top:2px">Recurring · cancel anytime</div>
+        </div>
+        <button style="background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--lagoon-dark);font-weight:600" onclick="backToPick()">← Change</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Name on card</label>
+        <input class="form-input" type="text" placeholder="Jane Smith" id="pay-name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Card number</label>
+        <input class="form-input" type="text" placeholder="4242 4242 4242 4242" id="pay-card" maxlength="19" oninput="formatCard(this)">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-group">
+          <label class="form-label">Expiry</label>
+          <input class="form-input" type="text" placeholder="MM/YY" maxlength="5">
+        </div>
+        <div class="form-group">
+          <label class="form-label">CVC</label>
+          <input class="form-input" type="text" placeholder="123" maxlength="3">
+        </div>
+      </div>
+      <button class="supporter-cta" onclick="completeSupport()">Subscribe — <span id="pay-btn-label">$3/mo</span></button>
+      <div style="text-align:center;margin-top:0.6rem;font-size:0.72rem;color:var(--gray)">🔒 Secure · Powered by Stripe · Cancel anytime</div>
+    </div>
+    <div id="supporter-step-done" style="display:none;text-align:center;padding:1rem 0">
+      <div style="font-size:3rem;margin-bottom:0.75rem">🎉</div>
+      <div style="font-family:var(--font-display);font-size:1.25rem;font-weight:700;margin-bottom:0.5rem">You're amazing.</div>
+      <div style="font-size:0.88rem;color:var(--gray);margin-bottom:1.25rem;line-height:1.6">Your <strong id="done-tier-name">Neighbour</strong> badge is now live on your profile.<br>Thank you for keeping GiveItAway going. 💚</div>
+      <button class="supporter-cta" onclick="closeModal('supporter-modal')">Back to the feed</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SIZES = ['Preemie','Newborn','0–3m','3–6m','6–12m','12m','12–18m','18–24m','2T','3T','4T','5T','6','7','8','10','12','14','16'];
+const COLORS = ['#FF8A65','#00BFA5','#5C6BC0','#AB47BC','#26A69A','#EF5350','#42A5F5','#66BB6A'];
+
+const LISTINGS = [
+  {id:1,title:'Bundle of 3-6m onesies (12 pcs)',category:'Kids Clothes',sizes:['3–6m'],condition:'Like New',pickup:['Porch Pickup'],location:'Pandosy & KLO Rd',neighbourhood:'Pandosy Village',desc:"Carter's and Old Navy mix. Mostly white and yellow. Smoke-free home.",emoji:'👕',giver:'Sarah M.',giverColor:'#FF8A65',isNew:true},
+  {id:2,title:'Baby Bjorn bouncer seat',category:'Gear',sizes:[],condition:'Good',pickup:['Meetup','Porch Pickup'],location:'Springfield Rd & Spall Rd',neighbourhood:'Rutland',desc:'The classic one. Faded slightly but totally functional. Saved our lives for 4 months.',emoji:'🪑',giver:'Jordan K.',giverColor:'#00BFA5',isNew:true},
+  {id:3,title:'Pile of 2T summer clothes',category:'Kids Clothes',sizes:['2T'],condition:'Good',pickup:['Porch Pickup'],location:'Gordon Dr & Raymer Ave',neighbourhood:'Lower Mission',desc:'About 15 pieces — shorts, tees, one dress. All washed and ready to go!',emoji:'☀️',giver:'Priya L.',giverColor:'#5C6BC0',isNew:false},
+  {id:4,title:'Wooden puzzle set (3 puzzles)',category:'Toys',sizes:[],condition:'Like New',pickup:['Meetup'],location:'Banks Rd & Sexsmith Rd',neighbourhood:'Black Mountain',desc:'Melissa & Doug farm, alphabet, and number puzzles. All pieces present and accounted for.',emoji:'🧩',giver:'Tom W.',giverColor:'#AB47BC',isNew:false},
+  {id:5,title:'12-18m snowsuit — barely used',category:'Kids Clothes',sizes:['12–18m'],condition:'Like New',pickup:['Porch Pickup','Drop Off'],location:'Harvey Ave & Cooper Rd',neighbourhood:'Glenmore',desc:'Columbia brand. Navy blue. Used maybe 3 times — kid grew out of it so fast!',emoji:'🧥',giver:'Amy F.',giverColor:'#EF5350',isNew:true},
+  {id:6,title:'Balance bike for 2-4 year olds',category:'Bikes',sizes:[],condition:'Good',pickup:['Meetup'],location:'Lakeshore Rd & Eldorado Rd',neighbourhood:'Lower Mission',desc:'Strider style, green. Some scratches on the frame but wheels are solid and ready to roll.',emoji:'🚲',giver:'Dani C.',giverColor:'#42A5F5',isNew:false},
+  {id:7,title:'0-3m sleeper bundle (8 pcs)',category:'Kids Clothes',sizes:['0–3m'],condition:'New (never used)',pickup:['Porch Pickup'],location:'Dilworth Dr & Stremel Rd',neighbourhood:'Dilworth',desc:'Never worn! Baby came out way bigger than expected. Tags still on 4 of them.',emoji:'🌙',giver:'Marcus B.',giverColor:'#66BB6A',isNew:true},
+  {id:8,title:'Toddler backpack — Wildkin brand',category:'Gear',sizes:[],condition:'Good',pickup:['Porch Pickup','Meetup'],location:'Benvoulin Rd & KLO Rd',neighbourhood:'SE Kelowna',desc:'Owl design. Great shape overall, tiny stain inside the front pocket.',emoji:'🎒',giver:'Sarah M.',giverColor:'#FF8A65',isNew:false},
+  {id:9,title:'4T-5T mixed clothing lot (20 pcs)',category:'Kids Clothes',sizes:['4T','5T'],condition:'Good',pickup:['Porch Pickup'],location:'Glenmore Dr & Valley Rd',neighbourhood:'Glenmore',desc:'All washed. Mix of brands. Great for daycare wear!',emoji:'👗',giver:'Robin T.',giverColor:'#EF5350',isNew:false},
+  {id:10,title:'Baby monitor — Motorola video',category:'Gear',sizes:[],condition:'Good',pickup:['Meetup'],location:'Sexsmith Rd & McCurdy Rd',neighbourhood:'Rutland',desc:'Video and audio. Works great. Just upgrading to a newer model.',emoji:'📷',giver:'Jordan K.',giverColor:'#00BFA5',isNew:false},
+  {id:11,title:'Hockey skates size 12 kids',category:'Sports',sizes:['12'],condition:'Good',pickup:['Porch Pickup','Meetup'],location:'Hollywood Rd & Ziprick Rd',neighbourhood:'Rutland North',desc:'CCM brand. Good edge still on them. Great for a first-time skater.',emoji:'⛸️',giver:'Pete H.',giverColor:'#5C6BC0',isNew:true},
+  {id:12,title:'Box of board books (20+ books)',category:'Books',sizes:[],condition:'Good',pickup:['Porch Pickup'],location:'Casorso Rd & Gordon Dr',neighbourhood:'Lower Mission',desc:'Mix of classics — Hungry Caterpillar, Goodnight Moon, full Sandra Boynton set. Kids loved every one.',emoji:'📚',giver:'Priya L.',giverColor:'#5C6BC0',isNew:false},
+];
+
+const THREADS = [
+  {id:1,name:'Jordan K.',color:'#00BFA5',itemTitle:'Baby Bjorn bouncer seat',emoji:'🪑',unread:true,messages:[
+    {from:'them',text:"Hi! Is the bouncer still available?",time:'Yesterday 2:14pm'},
+    {from:'me',text:"Yes it is! Come grab it anytime.",time:'Yesterday 2:31pm'},
+    {from:'them',text:"Amazing! Can I do porch pickup tomorrow morning?",time:'Yesterday 3:02pm'},
+  ]},
+  {id:2,name:'Amy F.',color:'#EF5350',itemTitle:'0-3m sleeper bundle',emoji:'🌙',unread:false,messages:[
+    {from:'them',text:"Hey these are so cute, would love them for my newborn!",time:'Mon 11:20am'},
+    {from:'me',text:"They're yours! Leaving on the porch — 47 Lakeview Cres.",time:'Mon 12:05pm'},
+    {from:'them',text:"Just grabbed them, thank you so much!! 💚",time:'Mon 12:47pm'},
+  ]},
+  {id:3,name:'Robin T.',color:'#EF5350',itemTitle:'Box of board books',emoji:'📚',unread:true,messages:[
+    {from:'them',text:"Are all 20 books there? Missing any?",time:'Today 9:03am'},
+  ]},
+];
+
+let activeCategory = 'all';
+let searchQuery = '';
+let areaFilter = 'all';
+let claimTarget = null;
+let activeThread = null;
+let userPostCount = 0;
+
+function highlight(text, query) {
+  if (!query) return text;
+  const re = new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')', 'gi');
+  return text.replace(re, '<mark>$1</mark>');
+}
+
+function renderFeed(items) {
+  const feed = document.getElementById('feed');
+  const query = searchQuery.toLowerCase();
+  feed.innerHTML = '';
+  if (!items.length) {
+    feed.innerHTML = '<div class="empty-state"><div class="big">🌿</div><p style="font-weight:600">Nothing found!</p><p style="font-size:0.85rem;margin-top:5px">Try a different search or area.</p></div>';
+    return;
+  }
+  items.forEach(item => {
+    const initials = item.giver.split(' ').map(w=>w[0]).join('').toUpperCase();
+    const sizeTags = item.sizes.map(s=>`<span class="tag tag-size">${s}</span>`).join('');
+    const pickupTags = item.pickup.map(p=>`<span class="tag tag-pickup">${p}</span>`).join('');
+    const h = 110 + (item.id * 37 % 80);
+    const titleHL = highlight(item.title, query);
+    const descHL = highlight(item.desc, query);
+    feed.innerHTML += `
+      <div class="card" onclick="openClaim(${item.id})">
+        ${item.isNew ? '<div class="new-badge">New</div>' : ''}
+        <div class="card-img-placeholder" style="height:${h}px;background:linear-gradient(135deg,var(--papaya-light) 0%,var(--lagoon-light) 100%);font-size:${Math.round(h*0.38)}px">${item.emoji}</div>
+        <div class="card-body">
+          <div class="card-title">${titleHL}</div>
+          ${query ? `<div class="card-desc-preview">${descHL}</div>` : ''}
+          <div class="card-location">📍 ${item.location}</div>
+          <div class="card-tags">
+            <span class="tag tag-category">${item.category}</span>
+            ${sizeTags}
+            <span class="tag tag-condition">${item.condition}</span>
+            ${pickupTags}
+          </div>
+          <div class="card-footer">
+            <div class="giver">
+              <div class="avatar" style="background:${item.giverColor}">${initials}</div>
+              <span class="giver-name">${item.giver}</span>
+            </div>
+            <button class="claim-btn" onclick="event.stopPropagation();openClaim(${item.id})">I want this!</button>
+          </div>
+        </div>
+      </div>`;
+  });
+}
+
+function getFiltered() {
+  const q = searchQuery.toLowerCase();
+  return LISTINGS.filter(l => {
+    const matchCat = activeCategory === 'all' || l.category === activeCategory;
+    const matchArea = areaFilter === 'all' || l.neighbourhood === areaFilter;
+    const matchSearch = !q || l.title.toLowerCase().includes(q) || l.desc.toLowerCase().includes(q);
+    return matchCat && matchArea && matchSearch;
+  });
+}
+
+function updateFeed() {
+  const filtered = getFiltered();
+  const parts = [];
+  if (activeCategory !== 'all') parts.push(activeCategory);
+  if (areaFilter !== 'all') parts.push(areaFilter);
+  const base = parts.length ? parts.join(' · ') : 'All areas';
+  document.getElementById('feed-label').textContent = `${filtered.length} item${filtered.length!==1?'s':''} · ${base}`;
+  document.getElementById('search-info').textContent = searchQuery ? `Searching "${searchQuery}"` : '';
+  renderFeed(filtered);
+}
+
+function handleSearch() {
+  searchQuery = document.getElementById('search-input').value.trim();
+  areaFilter = document.getElementById('area-select').value;
+  const clearBtn = document.getElementById('clear-btn');
+  clearBtn.classList.toggle('show', searchQuery.length > 0);
+  updateFeed();
+}
+
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  searchQuery = '';
+  document.getElementById('clear-btn').classList.remove('show');
+  updateFeed();
+}
+
+function filterCategory(el, cat) {
+  activeCategory = cat;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  updateFeed();
+}
+
+function openClaim(id) {
+  claimTarget = LISTINGS.find(l=>l.id===id);
+  document.getElementById('claim-title').textContent = claimTarget.title;
+  document.getElementById('claim-location').textContent = '📍 '+claimTarget.location+' · '+claimTarget.neighbourhood;
+  document.getElementById('claim-emoji').textContent = claimTarget.emoji;
+  document.getElementById('claim-modal').classList.add('open');}
+
+function sendClaim() {
+  closeModal('claim-modal');
+  showToast('✅ Message sent! The giver will reach out soon.');
+  setTimeout(()=>{ document.querySelector('.msg-dot').style.display='block'; }, 500);
+}
+
+function openPostModal() { openModal('post-modal'); buildSizeChips(); }
+
+function buildSizeChips() {
+  const grid = document.getElementById('size-chips');
+  if (grid.children.length) return;
+  SIZES.forEach(s => {
+    const d = document.createElement('div');
+    d.className = 'size-chip';
+    d.textContent = s;
+    d.onclick = () => d.classList.toggle('selected');
+    grid.appendChild(d);
+  });
+}
+
+function toggleSizes() {
+  document.getElementById('size-section').style.display =
+    document.getElementById('post-category').value === 'Kids Clothes' ? 'block' : 'none';
+}
+
+function submitPost() {
+  const title = document.getElementById('post-title').value.trim();
+  const loc = document.getElementById('post-location').value.trim();
+  const cat = document.getElementById('post-category').value;
+  const cond = document.getElementById('post-condition').value;
+  const hood = document.getElementById('post-neighbourhood').value;
+  const pickups = [...document.querySelectorAll('.pickup-chip.selected')];
+  if (!title||!loc||!cat||!cond||!hood||!pickups.length) {
+    showToast('⚠️ Fill in all required fields!','#E64A19'); return;
+  }
+  closeModal('post-modal');
+  userPostCount++;
+  document.getElementById('stat-items').textContent = 24 + userPostCount;
+  document.getElementById('profile-count').textContent = `${userPostCount} item${userPostCount!==1?'s':''} posted`;
+  showToast('🎉 Posted! Someone out there is going to love this.');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function showView(v) {
+  ['feed','messages','profile'].forEach(name => {
+    document.getElementById('view-'+name).style.display = v===name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const map = {feed:'nav-browse',messages:'nav-msgs',profile:'nav-profile'};
+  document.getElementById(map[v]).classList.add('active');
+  if (v==='messages') renderThreadList();
+}
+
+function renderThreadList() {
+  const list = document.getElementById('thread-list');
+  list.innerHTML = '';
+  THREADS.forEach(t => {
+    const initials = t.name.split(' ').map(w=>w[0]).join('');
+    const last = t.messages[t.messages.length-1];
+    list.innerHTML += `
+      <div class="thread-item ${t.unread?'unread':''}" onclick="openThread(${t.id})">
+        <div class="thread-avatar" style="background:${t.color}">${initials}</div>
+        <div class="thread-info">
+          <div class="thread-name">${t.name}</div>
+          <div class="thread-item-title">${t.emoji} ${t.itemTitle}</div>
+          <div class="thread-preview">${last.from==='me'?'You: ':''}${last.text}</div>
+        </div>
+        <div class="thread-meta">
+          <div class="thread-time">${last.time}</div>
+          ${t.unread ? '<div class="unread-dot"></div>' : ''}
+        </div>
+      </div>`;
+  });
+}
+
+function openThread(id) {
+  activeThread = THREADS.find(t=>t.id===id);
+  activeThread.unread = false;
+  document.getElementById('thread-list-view').style.display = 'none';
+  document.getElementById('chat-view').style.display = 'block';
+  const initials = activeThread.name.split(' ').map(w=>w[0]).join('');
+  const av = document.getElementById('chat-avatar');
+  av.textContent = initials;
+  av.style.background = activeThread.color;
+  document.getElementById('chat-name').textContent = activeThread.name;
+  document.getElementById('chat-item-title').textContent = activeThread.emoji + ' ' + activeThread.itemTitle;
+  renderMessages();
+}
+
+function renderMessages() {
+  const box = document.getElementById('chat-messages');
+  box.innerHTML = '';
+  activeThread.messages.forEach(m => {
+    const isMine = m.from === 'me';
+    const initials = isMine ? 'ME' : activeThread.name.split(' ').map(w=>w[0]).join('');
+    const color = isMine ? '#AAAAAA' : activeThread.color;
+    box.innerHTML += `
+      <div class="msg-bubble-wrap ${isMine?'mine':''}">
+        <div class="bubble-avatar" style="background:${color}">${initials}</div>
+        <div>
+          <div class="bubble ${isMine?'mine':'theirs'}">${m.text}</div>
+          <div class="bubble-time">${m.time}</div>
+        </div>
+      </div>`;
+  });
+  box.scrollTop = box.scrollHeight;
+}
+
+function sendChatMsg() {
+  const input = document.getElementById('chat-input-box');
+  const text = input.value.trim();
+  if (!text) return;
+  activeThread.messages.push({from:'me',text,time:'Just now'});
+  input.value = '';
+  renderMessages();
+}
+
+function showThreadList() {
+  document.getElementById('chat-view').style.display = 'none';
+  document.getElementById('thread-list-view').style.display = 'block';
+  renderThreadList();
+}
+
+function showToast(msg, color) {
+  const t = document.getElementById('toast');
+  t.style.background = color || 'var(--lagoon)';
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', function(e){ if(e.target===this) this.classList.remove('open'); });
+});
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  if (id === 'supporter-modal' && !isSupporter) {
+    document.getElementById('supporter-step-pick').style.display = 'block';
+    document.getElementById('supporter-step-pay').style.display = 'none';
+    document.getElementById('supporter-step-done').style.display = 'none';
+    document.getElementById('supporter-modal-title').textContent = 'Support GiveItAway ✦';
+  }
+}
+
+let selectedTier = null;
+let isSupporter = false;
+const TIERS = {
+  neighbour: { name:'Neighbour', price:'$3/mo', badge:'✦ Neighbour', badgeClass:'badge-neighbour' },
+  champion:  { name:'Champion',  price:'$7/mo', badge:'✦ Champion',  badgeClass:'badge-champion' },
+  founding:  { name:'Founding Giver', price:'$15/mo', badge:'✦ Founding Giver', badgeClass:'badge-founding' },
+};
+
+function selectTier(tier) {
+  selectedTier = tier;
+  document.querySelectorAll('.tier-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('tier-'+tier).classList.add('selected');
+  const btn = document.getElementById('supporter-cta-btn');
+  btn.disabled = false;
+  btn.textContent = `Continue with ${TIERS[tier].name} — ${TIERS[tier].price}`;
+}
+
+function goToPayStep() {
+  if (!selectedTier) return;
+  document.getElementById('supporter-step-pick').style.display = 'none';
+  document.getElementById('supporter-step-pay').style.display = 'block';
+  document.getElementById('pay-tier-name').textContent = `${TIERS[selectedTier].name} — ${TIERS[selectedTier].price}`;
+  document.getElementById('pay-btn-label').textContent = TIERS[selectedTier].price;
+}
+
+function backToPick() {
+  document.getElementById('supporter-step-pay').style.display = 'none';
+  document.getElementById('supporter-step-pick').style.display = 'block';
+}
+
+function formatCard(input) {
+  let v = input.value.replace(/\D/g,'').substring(0,16);
+  input.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+
+function completeSupport() {
+  const name = document.getElementById('pay-name').value.trim();
+  const card = document.getElementById('pay-card').value.trim();
+  if (!name || card.replace(/\s/g,'').length < 16) {
+    showToast('⚠️ Please fill in your card details', '#E64A19'); return;
+  }
+  isSupporter = true;
+  const t = TIERS[selectedTier];
+  document.getElementById('supporter-step-pay').style.display = 'none';
+  document.getElementById('supporter-step-done').style.display = 'block';
+  document.getElementById('done-tier-name').textContent = t.name;
+  document.getElementById('supporter-modal-title').textContent = 'You\'re a supporter! ✦';
+  const badge = document.getElementById('profile-badge');
+  badge.innerHTML = `<span class="supporter-badge ${t.badgeClass}">${t.badge}</span>`;
+  badge.style.display = 'inline';
+  document.getElementById('supporter-profile-banner').style.display = 'none';
+  document.getElementById('supporter-profile-active').style.display = 'block';
+  document.getElementById('supporter-tier-label').textContent = `${t.name} · ${t.price} · Thank you so much.`;
+  document.getElementById('supporter-strip').innerHTML = `<strong>✦ You're a GiveItAway supporter!</strong> Thank you for keeping this community alive. 💚`;
+  document.getElementById('supporter-strip').style.background = 'var(--lagoon-dark)';
+}
+
+updateFeed();
+</script>
+</body>
+</html>
