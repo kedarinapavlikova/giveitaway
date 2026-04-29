@@ -98,6 +98,14 @@ nav {
 }
 
 .hero { background: var(--papaya-mid); padding: 1.1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+@media (max-width: 600px) {
+  .hero { padding: 0.6rem 1rem; gap: 0.5rem; }
+  .hero-text h1 { font-size: 1rem; }
+  .hero-text p { display: none; }
+  .hero-stats { gap: 0.9rem; }
+  .stat-num { font-size: 1.1rem; }
+  .stat-label { font-size: 0.6rem; }
+}
 .hero-text { color: white; }
 .hero-text h1 { font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; }
 .hero-text p { font-size: 0.83rem; opacity: 0.9; margin-top: 2px; }
@@ -114,7 +122,7 @@ nav {
 .search-input::placeholder { color: var(--gray); }
 .clear-search { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: var(--gray-mid); border: none; cursor: pointer; width: 18px; height: 18px; border-radius: 50%; font-size: 10px; display: none; align-items: center; justify-content: center; color: var(--charcoal); }
 .clear-search.show { display: flex; }
-.area-select { background: var(--gray-light); border: none; border-radius: 24px; font-family: var(--font-body); font-size: 0.83rem; color: var(--charcoal); padding: 0.55rem 0.9rem; outline: none; cursor: pointer; min-width: 0; width: 160px; flex-shrink: 0; transition: box-shadow 0.15s; }
+.area-select { background: var(--gray-light); border: none; border-radius: 24px; font-family: var(--font-body); font-size: 0.83rem; color: var(--charcoal); padding: 0.55rem 2rem 0.55rem 0.9rem; outline: none; cursor: pointer; min-width: 0; width: 160px; flex-shrink: 0; transition: box-shadow 0.15s; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.75rem center; }
 .area-select:focus { box-shadow: 0 0 0 2px var(--lagoon); }
 
 .filters { background: var(--white); padding: 0.6rem 1.5rem; border-bottom: 1px solid #EDE9E3; display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none; }
@@ -233,6 +241,20 @@ nav {
 /* TOAST */
 .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--lagoon); color: white; border-radius: 24px; padding: 0.7rem 1.4rem; font-weight: 600; font-size: 0.88rem; z-index: 300; transition: transform 0.3s ease; box-shadow: 0 4px 20px rgba(0,191,165,0.35); white-space: nowrap; }
 .toast.show { transform: translateX(-50%) translateY(0); }
+@media (max-width: 600px) { .toast { bottom: 5rem; } }
+
+/* FEEDBACK */
+.feedback-fab { position: fixed; bottom: 1.5rem; right: 1.25rem; z-index: 150; background: var(--white); border: 1.5px solid var(--lagoon); border-radius: 24px; padding: 0.45rem 0.9rem; font-family: var(--font-body); font-size: 0.78rem; font-weight: 600; color: var(--lagoon-dark); cursor: pointer; box-shadow: 0 2px 12px rgba(0,191,165,0.2); transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
+.feedback-fab:hover { background: var(--lagoon-light); transform: translateY(-2px); }
+@media (max-width: 600px) { .feedback-fab { bottom: 5rem; right: 1rem; } }
+.rating-row { display: flex; gap: 8px; margin: 0.5rem 0 0.25rem; }
+.rating-chip { flex: 1; background: var(--gray-light); border: 1.5px solid transparent; border-radius: 10px; padding: 0.5rem 0.25rem; text-align: center; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.12s; user-select: none; }
+.rating-chip:hover { border-color: var(--lagoon); }
+.rating-chip.selected { background: var(--lagoon-light); border-color: var(--lagoon); color: var(--lagoon-dark); }
+.tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0.5rem 0; }
+.tag-chip { background: var(--gray-light); border: 1.5px solid transparent; border-radius: 20px; padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.76rem; font-weight: 500; transition: all 0.12s; user-select: none; }
+.tag-chip:hover { border-color: var(--papaya-mid); }
+.tag-chip.selected { background: var(--papaya-light); border-color: var(--papaya-mid); color: #BF360C; }
 .supporter-banner { background: var(--lagoon-light); border: 1px solid #B2DFDB; border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .supporter-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 700; padding: 2px 9px; border-radius: 20px; letter-spacing: 0.03em; vertical-align: middle; margin-left: 5px; }
 .badge-neighbour { background: var(--lagoon-light); color: var(--lagoon-dark); border: 1px solid var(--lagoon); }
@@ -595,6 +617,68 @@ nav {
   </div>
 </div>
 
+<!-- FEEDBACK FAB -->
+<button class="feedback-fab" onclick="openModal('feedback-modal')">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  Beta feedback
+</button>
+
+<!-- FEEDBACK MODAL -->
+<div class="modal-overlay" id="feedback-modal">
+  <div class="modal" style="max-width:460px">
+    <div id="feedback-step-form">
+      <div class="modal-header">
+        <div class="modal-title">Share your thoughts 💬</div>
+        <button class="close-btn" onclick="closeModal('feedback-modal')">✕</button>
+      </div>
+      <div style="font-size:0.8rem;color:var(--gray);margin-bottom:1rem;line-height:1.5">This is a beta — your feedback directly shapes what gets built next. Nothing is too small!</div>
+
+      <div class="form-group">
+        <label class="form-label">How's your experience so far?</label>
+        <div class="rating-row">
+          <div class="rating-chip" onclick="selectRating(this,'😕')">😕<br><span style="font-size:0.65rem">Rough</span></div>
+          <div class="rating-chip" onclick="selectRating(this,'😐')">😐<br><span style="font-size:0.65rem">Okay</span></div>
+          <div class="rating-chip" onclick="selectRating(this,'🙂')">🙂<br><span style="font-size:0.65rem">Good</span></div>
+          <div class="rating-chip" onclick="selectRating(this,'🤩')">🤩<br><span style="font-size:0.65rem">Love it</span></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">What area are you flagging?</label>
+        <div class="tag-row" id="feedback-tags">
+          <div class="tag-chip" onclick="this.classList.toggle('selected')">Posting an item</div>
+          <div class="tag-chip" onclick="this.classList.toggle('selected')">Claiming an item</div>
+          <div class="tag-chip" onclick="this.classList.toggle('selected')">Messaging</div>
+          <div class="tag-chip" onclick="this.classList.toggle('selected')">Search &amp; filters</div>
+          <div class="tag-chip" onclick="this.classList.toggle('selected')">Mobile experience</div>
+          <div class="tag-chip" onclick="this.classList.toggle('selected')">Missing feature</div>
+          <div class="tag-chip" onclick="this.classList.toggle('selected')">Something broken</div>
+          <div class="tag-chip" onclick="this.classList.toggle('selected')">Just a thought</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tell us more</label>
+        <textarea class="form-textarea" id="feedback-text" placeholder="What would make this better? What's missing? What do you love?"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Your name or email <span style="color:var(--gray);font-weight:400">(optional — only if you want a reply)</span></label>
+        <input class="form-input" type="text" id="feedback-contact" placeholder="e.g. Sarah or sarah@email.com">
+      </div>
+
+      <button class="submit-btn" style="background:var(--lagoon)" onclick="submitFeedback()">Send feedback 💚</button>
+    </div>
+
+    <div id="feedback-step-done" style="display:none;text-align:center;padding:1.5rem 0">
+      <div style="font-size:3rem;margin-bottom:0.75rem">💚</div>
+      <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;margin-bottom:0.5rem">Thank you so much!</div>
+      <div style="font-size:0.85rem;color:var(--gray);line-height:1.6;margin-bottom:1.25rem">Every piece of feedback makes GiveItAway better for the whole community.</div>
+      <button class="supporter-cta" onclick="closeModal('feedback-modal')">Back to browsing</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -602,18 +686,18 @@ const SIZES = ['Preemie','Newborn','0–3m','3–6m','6–12m','12m','12–18m',
 const COLORS = ['#FF8A65','#00BFA5','#5C6BC0','#AB47BC','#26A69A','#EF5350','#42A5F5','#66BB6A'];
 
 const LISTINGS = [
-  {id:1,title:'Bundle of 3-6m onesies (12 pcs)',category:'Kids Clothes',sizes:['3–6m'],condition:'Like New',pickup:['Porch Pickup'],location:'Pandosy & KLO Rd',neighbourhood:'Pandosy Village',desc:"Carter's and Old Navy mix. Mostly white and yellow. Smoke-free home.",emoji:'👕',giver:'Sarah M.',giverColor:'#FF8A65',isNew:true},
-  {id:2,title:'Baby Bjorn bouncer seat',category:'Gear',sizes:[],condition:'Good',pickup:['Meetup','Porch Pickup'],location:'Springfield Rd & Spall Rd',neighbourhood:'Rutland',desc:'The classic one. Faded slightly but totally functional. Saved our lives for 4 months.',emoji:'🪑',giver:'Jordan K.',giverColor:'#00BFA5',isNew:true},
-  {id:3,title:'Pile of 2T summer clothes',category:'Kids Clothes',sizes:['2T'],condition:'Good',pickup:['Porch Pickup'],location:'Gordon Dr & Raymer Ave',neighbourhood:'Lower Mission',desc:'About 15 pieces — shorts, tees, one dress. All washed and ready to go!',emoji:'☀️',giver:'Priya L.',giverColor:'#5C6BC0',isNew:false},
-  {id:4,title:'Wooden puzzle set (3 puzzles)',category:'Toys',sizes:[],condition:'Like New',pickup:['Meetup'],location:'Banks Rd & Sexsmith Rd',neighbourhood:'Black Mountain',desc:'Melissa & Doug farm, alphabet, and number puzzles. All pieces present and accounted for.',emoji:'🧩',giver:'Tom W.',giverColor:'#AB47BC',isNew:false},
-  {id:5,title:'12-18m snowsuit — barely used',category:'Kids Clothes',sizes:['12–18m'],condition:'Like New',pickup:['Porch Pickup','Drop Off'],location:'Harvey Ave & Cooper Rd',neighbourhood:'Glenmore',desc:'Columbia brand. Navy blue. Used maybe 3 times — kid grew out of it so fast!',emoji:'🧥',giver:'Amy F.',giverColor:'#EF5350',isNew:true},
-  {id:6,title:'Balance bike for 2-4 year olds',category:'Bikes',sizes:[],condition:'Good',pickup:['Meetup'],location:'Lakeshore Rd & Eldorado Rd',neighbourhood:'Lower Mission',desc:'Strider style, green. Some scratches on the frame but wheels are solid and ready to roll.',emoji:'🚲',giver:'Dani C.',giverColor:'#42A5F5',isNew:false},
-  {id:7,title:'0-3m sleeper bundle (8 pcs)',category:'Kids Clothes',sizes:['0–3m'],condition:'New (never used)',pickup:['Porch Pickup'],location:'Dilworth Dr & Stremel Rd',neighbourhood:'Dilworth',desc:'Never worn! Baby came out way bigger than expected. Tags still on 4 of them.',emoji:'🌙',giver:'Marcus B.',giverColor:'#66BB6A',isNew:true},
-  {id:8,title:'Toddler backpack — Wildkin brand',category:'Gear',sizes:[],condition:'Good',pickup:['Porch Pickup','Meetup'],location:'Benvoulin Rd & KLO Rd',neighbourhood:'SE Kelowna',desc:'Owl design. Great shape overall, tiny stain inside the front pocket.',emoji:'🎒',giver:'Sarah M.',giverColor:'#FF8A65',isNew:false},
-  {id:9,title:'4T-5T mixed clothing lot (20 pcs)',category:'Kids Clothes',sizes:['4T','5T'],condition:'Good',pickup:['Porch Pickup'],location:'Glenmore Dr & Valley Rd',neighbourhood:'Glenmore',desc:'All washed. Mix of brands. Great for daycare wear!',emoji:'👗',giver:'Robin T.',giverColor:'#EF5350',isNew:false},
-  {id:10,title:'Baby monitor — Motorola video',category:'Gear',sizes:[],condition:'Good',pickup:['Meetup'],location:'Sexsmith Rd & McCurdy Rd',neighbourhood:'Rutland',desc:'Video and audio. Works great. Just upgrading to a newer model.',emoji:'📷',giver:'Jordan K.',giverColor:'#00BFA5',isNew:false},
-  {id:11,title:'Hockey skates size 12 kids',category:'Sports',sizes:['12'],condition:'Good',pickup:['Porch Pickup','Meetup'],location:'Hollywood Rd & Ziprick Rd',neighbourhood:'Rutland North',desc:'CCM brand. Good edge still on them. Great for a first-time skater.',emoji:'⛸️',giver:'Pete H.',giverColor:'#5C6BC0',isNew:true},
-  {id:12,title:'Box of board books (20+ books)',category:'Books',sizes:[],condition:'Good',pickup:['Porch Pickup'],location:'Casorso Rd & Gordon Dr',neighbourhood:'Lower Mission',desc:'Mix of classics — Hungry Caterpillar, Goodnight Moon, full Sandra Boynton set. Kids loved every one.',emoji:'📚',giver:'Priya L.',giverColor:'#5C6BC0',isNew:false},
+  {id:1,title:'Bundle of 3-6m onesies (12 pcs)',category:'Kids Clothes',sizes:['3–6m'],condition:'Like New',pickup:['Porch Pickup'],location:'Pandosy & KLO Rd',neighbourhood:'Pandosy Village',desc:"Carter's and Old Navy mix. Mostly white and yellow. Smoke-free home.",photo:'https://picsum.photos/seed/onesies/600/400',giver:'Sarah M.',giverColor:'#FF8A65',isNew:true},
+  {id:2,title:'Baby Bjorn bouncer seat',category:'Gear',sizes:[],condition:'Good',pickup:['Meetup','Porch Pickup'],location:'Springfield Rd & Spall Rd',neighbourhood:'Rutland',desc:'The classic one. Faded slightly but totally functional. Saved our lives for 4 months.',photo:'https://picsum.photos/seed/bouncer/600/400',giver:'Jordan K.',giverColor:'#00BFA5',isNew:true},
+  {id:3,title:'Pile of 2T summer clothes',category:'Kids Clothes',sizes:['2T'],condition:'Good',pickup:['Porch Pickup'],location:'Gordon Dr & Raymer Ave',neighbourhood:'Lower Mission',desc:'About 15 pieces — shorts, tees, one dress. All washed and ready to go!',photo:'https://picsum.photos/seed/summerclothes/600/400',giver:'Priya L.',giverColor:'#5C6BC0',isNew:false},
+  {id:4,title:'Wooden puzzle set (3 puzzles)',category:'Toys',sizes:[],condition:'Like New',pickup:['Meetup'],location:'Banks Rd & Sexsmith Rd',neighbourhood:'Black Mountain',desc:'Melissa & Doug farm, alphabet, and number puzzles. All pieces present and accounted for.',photo:'https://picsum.photos/seed/puzzles/600/400',giver:'Tom W.',giverColor:'#AB47BC',isNew:false},
+  {id:5,title:'12-18m snowsuit — barely used',category:'Kids Clothes',sizes:['12–18m'],condition:'Like New',pickup:['Porch Pickup','Drop Off'],location:'Harvey Ave & Cooper Rd',neighbourhood:'Glenmore',desc:'Columbia brand. Navy blue. Used maybe 3 times — kid grew out of it so fast!',photo:'https://picsum.photos/seed/snowsuit/600/400',giver:'Amy F.',giverColor:'#EF5350',isNew:true},
+  {id:6,title:'Balance bike for 2-4 year olds',category:'Bikes',sizes:[],condition:'Good',pickup:['Meetup'],location:'Lakeshore Rd & Eldorado Rd',neighbourhood:'Lower Mission',desc:'Strider style, green. Some scratches on the frame but wheels are solid and ready to roll.',photo:'https://picsum.photos/seed/bike/600/400',giver:'Dani C.',giverColor:'#42A5F5',isNew:false},
+  {id:7,title:'0-3m sleeper bundle (8 pcs)',category:'Kids Clothes',sizes:['0–3m'],condition:'New (never used)',pickup:['Porch Pickup'],location:'Dilworth Dr & Stremel Rd',neighbourhood:'Dilworth',desc:'Never worn! Baby came out way bigger than expected. Tags still on 4 of them.',photo:'https://picsum.photos/seed/sleepers/600/400',giver:'Marcus B.',giverColor:'#66BB6A',isNew:true},
+  {id:8,title:'Toddler backpack — Wildkin brand',category:'Gear',sizes:[],condition:'Good',pickup:['Porch Pickup','Meetup'],location:'Benvoulin Rd & KLO Rd',neighbourhood:'SE Kelowna',desc:'Owl design. Great shape overall, tiny stain inside the front pocket.',photo:'https://picsum.photos/seed/backpack/600/400',giver:'Sarah M.',giverColor:'#FF8A65',isNew:false},
+  {id:9,title:'4T-5T mixed clothing lot (20 pcs)',category:'Kids Clothes',sizes:['4T','5T'],condition:'Good',pickup:['Porch Pickup'],location:'Glenmore Dr & Valley Rd',neighbourhood:'Glenmore',desc:'All washed. Mix of brands. Great for daycare wear!',photo:'https://picsum.photos/seed/lotclothes/600/400',giver:'Robin T.',giverColor:'#EF5350',isNew:false},
+  {id:10,title:'Baby monitor — Motorola video',category:'Gear',sizes:[],condition:'Good',pickup:['Meetup'],location:'Sexsmith Rd & McCurdy Rd',neighbourhood:'Rutland',desc:'Video and audio. Works great. Just upgrading to a newer model.',photo:'https://picsum.photos/seed/monitor/600/400',giver:'Jordan K.',giverColor:'#00BFA5',isNew:false},
+  {id:11,title:'Hockey skates size 12 kids',category:'Sports',sizes:['12'],condition:'Good',pickup:['Porch Pickup','Meetup'],location:'Hollywood Rd & Ziprick Rd',neighbourhood:'Rutland North',desc:'CCM brand. Good edge still on them. Great for a first-time skater.',photo:'https://picsum.photos/seed/skates/600/400',giver:'Pete H.',giverColor:'#5C6BC0',isNew:true},
+  {id:12,title:'Box of board books (20+ books)',category:'Books',sizes:[],condition:'Good',pickup:['Porch Pickup'],location:'Casorso Rd & Gordon Dr',neighbourhood:'Lower Mission',desc:'Mix of classics — Hungry Caterpillar, Goodnight Moon, full Sandra Boynton set. Kids loved every one.',photo:'https://picsum.photos/seed/books/600/400',giver:'Priya L.',giverColor:'#5C6BC0',isNew:false},
 ];
 
 const THREADS = [
@@ -658,12 +742,15 @@ function renderFeed(items) {
     const sizeTags = item.sizes.map(s=>`<span class="tag tag-size">${s}</span>`).join('');
     const pickupTags = item.pickup.map(p=>`<span class="tag tag-pickup">${p}</span>`).join('');
     const h = 110 + (item.id * 37 % 80);
+    const imgHTML = item.photo
+      ? `<img src="${item.photo}" alt="" style="width:100%;height:${h}px;object-fit:cover;display:block" loading="lazy" onerror="this.style.display='none'">`
+      : `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--papaya-light),var(--lagoon-light))"></div>`;
     const titleHL = highlight(item.title, query);
     const descHL = highlight(item.desc, query);
     feed.innerHTML += `
       <div class="card" onclick="openClaim(${item.id})">
         ${item.isNew ? '<div class="new-badge">New</div>' : ''}
-        <div class="card-img-placeholder" style="height:${h}px;background:linear-gradient(135deg,var(--papaya-light) 0%,var(--lagoon-light) 100%);font-size:${Math.round(h*0.38)}px">${item.emoji}</div>
+        ${imgHTML}
         <div class="card-body">
           <div class="card-title">${titleHL}</div>
           ${query ? `<div class="card-desc-preview">${descHL}</div>` : ''}
@@ -883,6 +970,33 @@ function openModal(id) {
     document.getElementById('supporter-step-done').style.display = 'none';
     document.getElementById('supporter-modal-title').textContent = 'Support GiveItAway ✦';
   }
+  if (id === 'feedback-modal') {
+    document.getElementById('feedback-step-form').style.display = 'block';
+    document.getElementById('feedback-step-done').style.display = 'none';
+    document.querySelectorAll('.rating-chip').forEach(c=>c.classList.remove('selected'));
+    document.querySelectorAll('.tag-chip').forEach(c=>c.classList.remove('selected'));
+    document.getElementById('feedback-text').value = '';
+    document.getElementById('feedback-contact').value = '';
+  }
+}
+
+let selectedRating = null;
+function selectRating(el, val) {
+  selectedRating = val;
+  document.querySelectorAll('.rating-chip').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function submitFeedback() {
+  const text = document.getElementById('feedback-text').value.trim();
+  const tags = [...document.querySelectorAll('.tag-chip.selected')].map(c=>c.textContent).join(', ');
+  const contact = document.getElementById('feedback-contact').value.trim();
+  if (!text && !selectedRating) {
+    showToast('⚠️ Add a rating or a note first!', '#E64A19'); return;
+  }
+  console.log('FEEDBACK', { rating: selectedRating, tags, text, contact });
+  document.getElementById('feedback-step-form').style.display = 'none';
+  document.getElementById('feedback-step-done').style.display = 'block';
 }
 
 let selectedTier = null;
