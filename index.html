@@ -67,35 +67,37 @@ nav {
     display: flex;
     position: fixed;
     bottom: 0; left: 0; right: 0;
-    height: 64px;
     background: var(--white);
     border-top: 1px solid #EDE9E3;
     z-index: 100;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-around;
-    padding: 0 0.5rem;
-    padding-bottom: env(safe-area-inset-bottom);
+    padding: 8px 0.5rem 0;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    height: auto;
+    min-height: 60px;
   }
   .tab-btn {
-    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
     gap: 3px; background: none; border: none; cursor: pointer;
-    font-family: var(--font-body); font-size: 0.62rem; font-weight: 500;
-    color: var(--gray); padding: 0.4rem 0; transition: color 0.15s;
+    font-family: var(--font-body); font-size: 0.6rem; font-weight: 500;
+    color: var(--gray); padding: 0; transition: color 0.15s;
     position: relative;
   }
   .tab-btn.active { color: var(--papaya-mid); }
-  .tab-btn svg { width: 22px; height: 22px; }
+  .tab-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
   .tab-post-btn {
-    flex: 0 0 56px; width: 56px; height: 56px; border-radius: 50%;
+    flex: 0 0 50px; width: 50px; height: 50px; border-radius: 50%;
     background: var(--papaya-mid); color: white; border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 14px rgba(255,138,101,0.45);
-    transition: all 0.15s; margin-bottom: 8px;
-    font-size: 1.5rem; line-height: 1;
+    transition: all 0.15s; margin-top: -18px;
+    font-size: 1.4rem; line-height: 1; flex-shrink: 0;
   }
   .tab-post-btn:hover { background: var(--papaya-dark); transform: scale(1.06); }
-  .tab-msg-dot { position: absolute; top: 4px; right: calc(50% - 14px); width: 7px; height: 7px; background: var(--lagoon); border-radius: 50%; }
+  .tab-msg-dot { position: absolute; top: -2px; right: 10px; width: 7px; height: 7px; background: var(--lagoon); border-radius: 50%; border: 1.5px solid white; }
 }
+body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 
 .hero { background: var(--papaya-mid); padding: 1.1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 @media (max-width: 600px) {
@@ -241,7 +243,7 @@ nav {
 /* TOAST */
 .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--lagoon); color: white; border-radius: 24px; padding: 0.7rem 1.4rem; font-weight: 600; font-size: 0.88rem; z-index: 300; transition: transform 0.3s ease; box-shadow: 0 4px 20px rgba(0,191,165,0.35); white-space: nowrap; }
 .toast.show { transform: translateX(-50%) translateY(0); }
-@media (max-width: 600px) { .toast { bottom: 5rem; } }
+@media (max-width: 600px) { .toast { bottom: 5.5rem; font-size: 0.8rem; padding: 0.6rem 1.1rem; } }
 
 /* FEEDBACK */
 .feedback-fab { position: fixed; bottom: 1.5rem; right: 1.25rem; z-index: 150; background: var(--white); border: 1.5px solid var(--lagoon); border-radius: 24px; padding: 0.45rem 0.9rem; font-family: var(--font-body); font-size: 0.78rem; font-weight: 600; color: var(--lagoon-dark); cursor: pointer; box-shadow: 0 2px 12px rgba(0,191,165,0.2); transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
@@ -289,6 +291,7 @@ nav {
     <button class="nav-btn active" id="nav-browse" onclick="showView('feed')">Browse</button>
     <button class="nav-btn msg-btn" id="nav-msgs" onclick="showView('messages')">Messages<span class="msg-dot"></span></button>
     <button class="nav-btn" id="nav-profile" onclick="showView('profile')">My Stuff</button>
+    <button class="nav-btn" id="nav-about" onclick="showView('about')">About</button>
   </div>
   <div style="display:flex;align-items:center;gap:0">
     <button class="nav-support-btn" onclick="openModal('supporter-modal')">✦ Support</button>
@@ -314,6 +317,10 @@ nav {
   <button class="tab-btn" id="tab-profile" onclick="showView('profile')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     My Stuff
+  </button>
+  <button class="tab-btn" id="tab-about" onclick="showView('about')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    About
   </button>
 </div>
 
@@ -356,7 +363,8 @@ nav {
 
   <div class="filters">
     <button class="filter-chip active" onclick="filterCategory(this,'all')">All</button>
-    <button class="filter-chip" onclick="filterCategory(this,'Kids Clothes')">👕 Kids Clothes</button>
+    <button class="filter-chip" onclick="filterCategory(this,'Clothes')">👕 Clothes</button>
+    <button class="filter-chip" onclick="filterCategory(this,'Shoes')">👟 Shoes</button>
     <button class="filter-chip" onclick="filterCategory(this,'Gear')">🧺 Gear</button>
     <button class="filter-chip" onclick="filterCategory(this,'Toys')">🧸 Toys</button>
     <button class="filter-chip" onclick="filterCategory(this,'Bikes')">🚲 Bikes</button>
@@ -444,6 +452,49 @@ nav {
   </div>
 </div>
 
+<!-- ABOUT VIEW -->
+<div id="view-about" style="display:none">
+  <div class="main" style="max-width:680px">
+    <div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:1.25rem">
+      <div style="background:linear-gradient(135deg,var(--papaya-light) 0%,var(--lagoon-light) 100%);padding:2rem 1.5rem 1rem;display:flex;align-items:flex-end;gap:1.25rem;flex-wrap:wrap">
+        <img src="data:image/jpeg;base64,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" alt="Founder" style="width:90px;height:90px;border-radius:50%;object-fit:cover;object-position:center top;border:3px solid white;box-shadow:0 2px 12px rgba(0,0,0,0.12);flex-shrink:0">
+        <div>
+          <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;color:var(--charcoal)">Hey, I'm Keddy 👋</div>
+          <div style="font-size:0.82rem;color:var(--lagoon-dark);font-weight:500;margin-top:2px">Founder · Kelowna, BC</div>
+        </div>
+      </div>
+      <div style="padding:1.25rem 1.5rem">
+        <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">When I was pregnant with my daughter, I got my first box of hand-me-downs from a friend — shout out to Rachel I. We hadn't even seen each other in ages. She lived in another city. But we re-bonded over our babies, and she went out of her way to give me a ton of awesome baby clothes, and even a bassinet. That kind of generosity stays with you.</p>
+        <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">When I was pregnant with my daughter Rosie, I got my first box of hand-me-downs from a friend (shout out to Rachel I!). We hadn't even seen each other in ages — she lived in another city — but we re-bonded over our babies, and she went out of her way to send me a ton of awesome clothes and even a bassinet. This interaction set the tone for how I'd approach dressing my kids for years to come.</p>
+        <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">Over the next few years I became a mildly obsessed kids-clothing-bargain-finder. Have you seen the prices of new kids clothes? Have you seen how fast they either ruin something with one good outdoor play session, or simply grow out of it? I was keeping eyes on all the apps for hot deals — but it was exhausting. Conversations abandoned when I realised I couldn't commit to a pickup. Scrambling for cash I never carry. Getting overstimulated trying to input an e-transfer and sending it to the wrong email. Trying to sell my own things and getting ghosted, lowballed, or just... nothing.</p>
+        <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">Fortunately I had great friends to keep the clothing karma going. My former boss still sends boxes of hand-me-downs for Rosie. I give almost everything Rosie outgrows to my neighbour — and once she grows out of them, I get them back and pass them on to another friend. I raid my nephew's closet for gear for my son Jordie. I am basically a one-woman operation trying to make kids' clothing and gear more cyclical.</p>
+        <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">This is all to say: I wanted to build a better system. I've been to the second hand shops plenty of times only to either be offered $1.17 for 40 pieces of kids clothing, or have awesome pieces rejected due to tiny imperfections. We all know these clothes are still totally wearable (and honestly, they reduce my anxiety because I don't care if my kids continue to destroy them). But they won't sell on Marketplace either. You can donate them, but there's no guarantee they won't end up in landfill anyway — and it's still effort on your part with no real connection at the end of it.</p>
+        <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">Direct, person-to-person giving is different. I've had so many genuine connections through giving and receiving kids' things — the kind where you end up chatting on the porch for twenty minutes and exchanging numbers. It makes parenting a little easier. It makes your community feel real. And it keeps good stuff out of the bin.</p>
+        <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">There's something genuinely joyful about getting a bag of hand-me-downs. Finding a piece that becomes your kid's absolute favourite — the hoodie they refuse to take off, the dress that somehow captures their whole personality. Clothing is how little kids start to express who they are, and it doesn't have to cost a fortune (or anything) for that to happen.</p>
+        <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1.25rem">GiveItAway is built for exactly that. No price tags. No negotiations. No awkward lowball offers. Just neighbours passing things on to people who'll actually use them — and maybe making a friend along the way.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="tag tag-condition">🌿 Zero waste mission</span>
+          <span class="tag tag-size">👧 Built for Rosie & Jordie</span>
+          <span class="tag tag-category">📍 Kelowna, BC</span>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.25rem 1.5rem;margin-bottom:1.25rem">
+      <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:0.75rem">The rules — always</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:10px;align-items:flex-start;font-size:0.85rem;line-height:1.5"><span style="color:var(--lagoon);font-weight:700;flex-shrink:0">✦</span><span>No money ever changes hands — ever. Not $1, not a trade for cash.</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;font-size:0.85rem;line-height:1.5"><span style="color:var(--lagoon);font-weight:700;flex-shrink:0">✦</span><span>Givers choose who receives — based on vibe, not speed.</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;font-size:0.85rem;line-height:1.5"><span style="color:var(--lagoon);font-weight:700;flex-shrink:0">✦</span><span>Be kind. This is a community, not a marketplace.</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;font-size:0.85rem;line-height:1.5"><span style="color:var(--lagoon);font-weight:700;flex-shrink:0">✦</span><span>Location required on every listing — so pickups are actually possible.</span></div>
+      </div>
+    </div>
+    <div style="text-align:center;padding:0.5rem 0 1rem">
+      <button class="post-btn" style="background:var(--lagoon)" onclick="openModal('supporter-modal')">✦ Support GiveItAway</button>
+      <div style="font-size:0.75rem;color:var(--gray);margin-top:8px">Optional. $3/mo keeps the lights on.</div>
+    </div>
+  </div>
+</div>
+
 <!-- POST MODAL -->
 <div class="modal-overlay" id="post-modal">
   <div class="modal">
@@ -459,7 +510,7 @@ nav {
       <label class="form-label">Category <span class="req">*</span></label>
       <select class="form-select" id="post-category" onchange="toggleSizes()">
         <option value="">Select a category</option>
-        <option>Kids Clothes</option><option>Gear</option><option>Toys</option>
+        <option>Clothes</option><option>Shoes</option><option>Gear</option><option>Toys</option>
         <option>Bikes</option><option>Books</option><option>Sports</option><option>Other</option>
       </select>
     </div>
@@ -497,10 +548,21 @@ nav {
       </select>
     </div>
     <div class="form-group">
+      <label class="form-label">Photo <span style="color:var(--gray);font-weight:400">(recommended)</span></label>
+      <div id="photo-drop" onclick="document.getElementById('photo-file').click()" style="background:var(--gray-light);border:2px dashed var(--gray-mid);border-radius:var(--radius-sm);padding:1.25rem;text-align:center;cursor:pointer;transition:border-color 0.15s">
+        <div id="photo-preview" style="display:none;margin-bottom:8px"><img id="photo-img" style="max-height:140px;border-radius:8px;object-fit:cover"></div>
+        <div id="photo-placeholder">
+          <div style="font-size:1.5rem;margin-bottom:4px">📷</div>
+          <div style="font-size:0.8rem;color:var(--gray)">Tap to add a photo</div>
+        </div>
+        <input type="file" id="photo-file" accept="image/*" style="display:none" onchange="previewPhoto(this)">
+      </div>
+    </div>
+    <div class="form-group">
       <label class="form-label">Description</label>
       <textarea class="form-textarea" placeholder="Colours, brand, how many pieces, anything helpful…" id="post-desc"></textarea>
     </div>
-    <button class="submit-btn" onclick="submitPost()">Give it away! &#10084;</button>
+    <button class="submit-btn" onclick="submitPost()">Give it away!</button>
   </div>
 </div>
 
@@ -521,11 +583,14 @@ nav {
     <div class="form-group">
       <label class="form-label">Message to the giver</label>
       <div class="send-wrap">
-        <input class="form-input" type="text" id="claim-msg" value="Hi! I'd love this — when's a good time to pick it up?">
-        <button class="send-btn" onclick="sendClaim()">Send</button>
+        <textarea class="form-input" id="claim-msg" rows="3" maxlength="300" style="resize:none;padding-right:0" oninput="updateClaimCount(this)">Hi! I'd love this — when's a good time to pick it up?</textarea>
       </div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px">
+        <span class="hint">Keep it friendly — first come isn't always first served!</span>
+        <span id="claim-count" style="font-size:0.72rem;color:var(--gray)">253/300</span>
+      </div>
+      <button class="send-btn" style="width:100%;margin-top:8px;padding:0.6rem" onclick="sendClaim()">Send message</button>
     </div>
-    <div class="hint">No money ever changes hands. The giver picks who gets it. 💚</div>
   </div>
 </div>
 
@@ -683,21 +748,22 @@ nav {
 
 <script>
 const SIZES = ['Preemie','Newborn','0–3m','3–6m','6–12m','12m','12–18m','18–24m','2T','3T','4T','5T','6','7','8','10','12','14','16'];
+const SHOE_SIZES = ['Infant 0–1','Infant 1–4','4T–5T','6T–7T','8T–9T','10T–12T','1C','2C','3C','4C','5C','6C','7C','8C','9C','10C','11C','12C'];
 const COLORS = ['#FF8A65','#00BFA5','#5C6BC0','#AB47BC','#26A69A','#EF5350','#42A5F5','#66BB6A'];
 
 const LISTINGS = [
-  {id:1,title:'Bundle of 3-6m onesies (12 pcs)',category:'Kids Clothes',sizes:['3–6m'],condition:'Like New',pickup:['Porch Pickup'],location:'Pandosy & KLO Rd',neighbourhood:'Pandosy Village',desc:"Carter's and Old Navy mix. Mostly white and yellow. Smoke-free home.",photo:'https://picsum.photos/seed/onesies/600/400',giver:'Sarah M.',giverColor:'#FF8A65',isNew:true},
-  {id:2,title:'Baby Bjorn bouncer seat',category:'Gear',sizes:[],condition:'Good',pickup:['Meetup','Porch Pickup'],location:'Springfield Rd & Spall Rd',neighbourhood:'Rutland',desc:'The classic one. Faded slightly but totally functional. Saved our lives for 4 months.',photo:'https://picsum.photos/seed/bouncer/600/400',giver:'Jordan K.',giverColor:'#00BFA5',isNew:true},
-  {id:3,title:'Pile of 2T summer clothes',category:'Kids Clothes',sizes:['2T'],condition:'Good',pickup:['Porch Pickup'],location:'Gordon Dr & Raymer Ave',neighbourhood:'Lower Mission',desc:'About 15 pieces — shorts, tees, one dress. All washed and ready to go!',photo:'https://picsum.photos/seed/summerclothes/600/400',giver:'Priya L.',giverColor:'#5C6BC0',isNew:false},
-  {id:4,title:'Wooden puzzle set (3 puzzles)',category:'Toys',sizes:[],condition:'Like New',pickup:['Meetup'],location:'Banks Rd & Sexsmith Rd',neighbourhood:'Black Mountain',desc:'Melissa & Doug farm, alphabet, and number puzzles. All pieces present and accounted for.',photo:'https://picsum.photos/seed/puzzles/600/400',giver:'Tom W.',giverColor:'#AB47BC',isNew:false},
-  {id:5,title:'12-18m snowsuit — barely used',category:'Kids Clothes',sizes:['12–18m'],condition:'Like New',pickup:['Porch Pickup','Drop Off'],location:'Harvey Ave & Cooper Rd',neighbourhood:'Glenmore',desc:'Columbia brand. Navy blue. Used maybe 3 times — kid grew out of it so fast!',photo:'https://picsum.photos/seed/snowsuit/600/400',giver:'Amy F.',giverColor:'#EF5350',isNew:true},
-  {id:6,title:'Balance bike for 2-4 year olds',category:'Bikes',sizes:[],condition:'Good',pickup:['Meetup'],location:'Lakeshore Rd & Eldorado Rd',neighbourhood:'Lower Mission',desc:'Strider style, green. Some scratches on the frame but wheels are solid and ready to roll.',photo:'https://picsum.photos/seed/bike/600/400',giver:'Dani C.',giverColor:'#42A5F5',isNew:false},
-  {id:7,title:'0-3m sleeper bundle (8 pcs)',category:'Kids Clothes',sizes:['0–3m'],condition:'New (never used)',pickup:['Porch Pickup'],location:'Dilworth Dr & Stremel Rd',neighbourhood:'Dilworth',desc:'Never worn! Baby came out way bigger than expected. Tags still on 4 of them.',photo:'https://picsum.photos/seed/sleepers/600/400',giver:'Marcus B.',giverColor:'#66BB6A',isNew:true},
-  {id:8,title:'Toddler backpack — Wildkin brand',category:'Gear',sizes:[],condition:'Good',pickup:['Porch Pickup','Meetup'],location:'Benvoulin Rd & KLO Rd',neighbourhood:'SE Kelowna',desc:'Owl design. Great shape overall, tiny stain inside the front pocket.',photo:'https://picsum.photos/seed/backpack/600/400',giver:'Sarah M.',giverColor:'#FF8A65',isNew:false},
-  {id:9,title:'4T-5T mixed clothing lot (20 pcs)',category:'Kids Clothes',sizes:['4T','5T'],condition:'Good',pickup:['Porch Pickup'],location:'Glenmore Dr & Valley Rd',neighbourhood:'Glenmore',desc:'All washed. Mix of brands. Great for daycare wear!',photo:'https://picsum.photos/seed/lotclothes/600/400',giver:'Robin T.',giverColor:'#EF5350',isNew:false},
-  {id:10,title:'Baby monitor — Motorola video',category:'Gear',sizes:[],condition:'Good',pickup:['Meetup'],location:'Sexsmith Rd & McCurdy Rd',neighbourhood:'Rutland',desc:'Video and audio. Works great. Just upgrading to a newer model.',photo:'https://picsum.photos/seed/monitor/600/400',giver:'Jordan K.',giverColor:'#00BFA5',isNew:false},
-  {id:11,title:'Hockey skates size 12 kids',category:'Sports',sizes:['12'],condition:'Good',pickup:['Porch Pickup','Meetup'],location:'Hollywood Rd & Ziprick Rd',neighbourhood:'Rutland North',desc:'CCM brand. Good edge still on them. Great for a first-time skater.',photo:'https://picsum.photos/seed/skates/600/400',giver:'Pete H.',giverColor:'#5C6BC0',isNew:true},
-  {id:12,title:'Box of board books (20+ books)',category:'Books',sizes:[],condition:'Good',pickup:['Porch Pickup'],location:'Casorso Rd & Gordon Dr',neighbourhood:'Lower Mission',desc:'Mix of classics — Hungry Caterpillar, Goodnight Moon, full Sandra Boynton set. Kids loved every one.',photo:'https://picsum.photos/seed/books/600/400',giver:'Priya L.',giverColor:'#5C6BC0',isNew:false},
+  {id:1,title:'Bundle of 3-6m onesies (12 pcs)',category:'Clothes',sizes:['3–6m'],condition:'Like New',pickup:['Porch Pickup'],location:'Pandosy & KLO Rd',neighbourhood:'Pandosy Village',desc:"Carter's and Old Navy mix. Mostly white and yellow. Smoke-free home.",photo:null,emoji:'👕',giver:'Sarah M.',giverColor:'#FF8A65',isNew:true},
+  {id:2,title:'Baby Bjorn bouncer seat',category:'Gear',sizes:[],condition:'Good',pickup:['Meetup','Porch Pickup'],location:'Springfield Rd & Spall Rd',neighbourhood:'Rutland',desc:'The classic one. Faded slightly but totally functional. Saved our lives for 4 months.',photo:null,emoji:'🪑',giver:'Jordan K.',giverColor:'#00BFA5',isNew:true},
+  {id:3,title:'Pile of 2T summer clothes',category:'Clothes',sizes:['2T'],condition:'Good',pickup:['Porch Pickup'],location:'Gordon Dr & Raymer Ave',neighbourhood:'Lower Mission',desc:'About 15 pieces — shorts, tees, one dress. All washed and ready to go!',photo:null,emoji:'☀️',giver:'Priya L.',giverColor:'#5C6BC0',isNew:false},
+  {id:4,title:'Wooden puzzle set (3 puzzles)',category:'Toys',sizes:[],condition:'Like New',pickup:['Meetup'],location:'Banks Rd & Sexsmith Rd',neighbourhood:'Black Mountain',desc:'Melissa & Doug farm, alphabet, and number puzzles. All pieces present and accounted for.',photo:null,emoji:'🧩',giver:'Tom W.',giverColor:'#AB47BC',isNew:false},
+  {id:5,title:'12-18m snowsuit — barely used',category:'Clothes',sizes:['12–18m'],condition:'Like New',pickup:['Porch Pickup','Drop Off'],location:'Harvey Ave & Cooper Rd',neighbourhood:'Glenmore',desc:'Columbia brand. Navy blue. Used maybe 3 times — kid grew out of it so fast!',photo:null,emoji:'🧥',giver:'Amy F.',giverColor:'#EF5350',isNew:true},
+  {id:6,title:'Balance bike for 2-4 year olds',category:'Bikes',sizes:[],condition:'Good',pickup:['Meetup'],location:'Lakeshore Rd & Eldorado Rd',neighbourhood:'Lower Mission',desc:'Strider style, green. Some scratches on the frame but wheels are solid and ready to roll.',photo:null,emoji:'🚲',giver:'Dani C.',giverColor:'#42A5F5',isNew:false},
+  {id:7,title:'0-3m sleeper bundle (8 pcs)',category:'Clothes',sizes:['0–3m'],condition:'New (never used)',pickup:['Porch Pickup'],location:'Dilworth Dr & Stremel Rd',neighbourhood:'Dilworth',desc:'Never worn! Baby came out way bigger than expected. Tags still on 4 of them.',photo:null,emoji:'🌙',giver:'Marcus B.',giverColor:'#66BB6A',isNew:true},
+  {id:8,title:'Toddler backpack — Wildkin brand',category:'Gear',sizes:[],condition:'Good',pickup:['Porch Pickup','Meetup'],location:'Benvoulin Rd & KLO Rd',neighbourhood:'SE Kelowna',desc:'Owl design. Great shape overall, tiny stain inside the front pocket.',photo:null,emoji:'🎒',giver:'Sarah M.',giverColor:'#FF8A65',isNew:false},
+  {id:9,title:'4T-5T mixed clothing lot (20 pcs)',category:'Clothes',sizes:['4T','5T'],condition:'Good',pickup:['Porch Pickup'],location:'Glenmore Dr & Valley Rd',neighbourhood:'Glenmore',desc:'All washed. Mix of brands. Great for daycare wear!',photo:null,emoji:'👗',giver:'Robin T.',giverColor:'#EF5350',isNew:false},
+  {id:10,title:'Baby monitor — Motorola video',category:'Gear',sizes:[],condition:'Good',pickup:['Meetup'],location:'Sexsmith Rd & McCurdy Rd',neighbourhood:'Rutland',desc:'Video and audio. Works great. Just upgrading to a newer model.',photo:null,emoji:'📷',giver:'Jordan K.',giverColor:'#00BFA5',isNew:false},
+  {id:11,title:'Hockey skates size 12',category:'Sports',sizes:['12'],condition:'Good',pickup:['Porch Pickup','Meetup'],location:'Hollywood Rd & Ziprick Rd',neighbourhood:'Rutland North',desc:'CCM brand. Good edge still on them. Great for a first-time skater.',photo:null,emoji:'⛸️',giver:'Pete H.',giverColor:'#5C6BC0',isNew:true},
+  {id:12,title:'Box of board books (20+ books)',category:'Books',sizes:[],condition:'Good',pickup:['Porch Pickup'],location:'Casorso Rd & Gordon Dr',neighbourhood:'Lower Mission',desc:'Mix of classics — Hungry Caterpillar, Goodnight Moon, full Sandra Boynton set.',photo:null,emoji:'📚',giver:'Priya L.',giverColor:'#5C6BC0',isNew:false},
 ];
 
 const THREADS = [
@@ -742,9 +808,7 @@ function renderFeed(items) {
     const sizeTags = item.sizes.map(s=>`<span class="tag tag-size">${s}</span>`).join('');
     const pickupTags = item.pickup.map(p=>`<span class="tag tag-pickup">${p}</span>`).join('');
     const h = 110 + (item.id * 37 % 80);
-    const imgHTML = item.photo
-      ? `<img src="${item.photo}" alt="" style="width:100%;height:${h}px;object-fit:cover;display:block" loading="lazy" onerror="this.style.display='none'">`
-      : `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--papaya-light),var(--lagoon-light))"></div>`;
+    const imgHTML = `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--papaya-light) 0%,var(--lagoon-light) 100%);font-size:${Math.round(h*0.36)}px">${item.emoji}</div>`;
     const titleHL = highlight(item.title, query);
     const descHL = highlight(item.desc, query);
     feed.innerHTML += `
@@ -831,21 +895,27 @@ function sendClaim() {
 
 function openPostModal() { openModal('post-modal'); buildSizeChips(); }
 
-function buildSizeChips() {
-  const grid = document.getElementById('size-chips');
-  if (grid.children.length) return;
-  SIZES.forEach(s => {
-    const d = document.createElement('div');
-    d.className = 'size-chip';
-    d.textContent = s;
-    d.onclick = () => d.classList.toggle('selected');
-    grid.appendChild(d);
-  });
-}
+function buildSizeChips() { /* handled by toggleSizes now */ }
 
 function toggleSizes() {
-  document.getElementById('size-section').style.display =
-    document.getElementById('post-category').value === 'Kids Clothes' ? 'block' : 'none';
+  const cat = document.getElementById('post-category').value;
+  const section = document.getElementById('size-section');
+  const grid = document.getElementById('size-chips');
+  if (cat === 'Clothes' || cat === 'Shoes') {
+    section.style.display = 'block';
+    grid.innerHTML = '';
+    const sizes = cat === 'Shoes' ? SHOE_SIZES : SIZES;
+    sizes.forEach(s => {
+      const d = document.createElement('div');
+      d.className = 'size-chip';
+      d.textContent = s;
+      d.onclick = () => d.classList.toggle('selected');
+      grid.appendChild(d);
+    });
+  } else {
+    section.style.display = 'none';
+    grid.innerHTML = '';
+  }
 }
 
 function submitPost() {
@@ -868,16 +938,37 @@ function submitPost() {
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 function showView(v) {
-  ['feed','messages','profile'].forEach(name => {
+  ['feed','messages','profile','about'].forEach(name => {
     document.getElementById('view-'+name).style.display = v===name ? 'block' : 'none';
   });
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  const map = {feed:'nav-browse',messages:'nav-msgs',profile:'nav-profile'};
+  const map = {feed:'nav-browse',messages:'nav-msgs',profile:'nav-profile',about:'nav-about'};
   if (map[v] && document.getElementById(map[v])) document.getElementById(map[v]).classList.add('active');
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  const tabMap = {feed:'tab-browse',messages:'tab-msgs',profile:'tab-profile'};
+  const tabMap = {feed:'tab-browse',messages:'tab-msgs',profile:'tab-profile',about:'tab-about'};
   if (tabMap[v] && document.getElementById(tabMap[v])) document.getElementById(tabMap[v]).classList.add('active');
   if (v==='messages') renderThreadList();
+  try { localStorage.setItem('gia_view', v); } catch(e){}
+  const t = document.getElementById('toast');
+  t.classList.remove('show');
+}
+
+function updateClaimCount(el) {
+  const remaining = 300 - el.value.length;
+  const counter = document.getElementById('claim-count');
+  counter.textContent = `${el.value.length}/300`;
+  counter.style.color = remaining < 30 ? '#E64A19' : 'var(--gray)';
+}
+
+function previewPhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('photo-img').src = e.target.result;
+    document.getElementById('photo-preview').style.display = 'block';
+    document.getElementById('photo-placeholder').style.display = 'none';
+  };
+  reader.readAsDataURL(input.files[0]);
 }
 
 function renderThreadList() {
@@ -1057,6 +1148,51 @@ function completeSupport() {
 }
 
 updateFeed();
+try {
+  const saved = localStorage.getItem('gia_view');
+  if (saved && ['feed','messages','profile','about'].includes(saved)) showView(saved);
+} catch(e) {}
+
+const _origSubmitPost = submitPost;
+submitPost = function() {
+  const title = document.getElementById('post-title').value.trim();
+  const loc = document.getElementById('post-location').value.trim();
+  const cat = document.getElementById('post-category').value;
+  const cond = document.getElementById('post-condition').value;
+  const hood = document.getElementById('post-neighbourhood').value;
+  const pickups = [...document.querySelectorAll('.pickup-chip.selected')];
+  if (!title||!loc||!cat||!cond||!hood||!pickups.length) {
+    showToast('⚠️ Fill in all required fields!','#E64A19'); return;
+  }
+  const photoSrc = document.getElementById('photo-img').src || null;
+  const sizes = [...document.querySelectorAll('.size-chip.selected')].map(c=>c.textContent);
+  const newItem = {
+    id: Date.now(), title, category:cat, sizes, condition:cond,
+    pickup: pickups.map(p=>p.textContent.trim()),
+    location: loc, neighbourhood: hood,
+    desc: document.getElementById('post-desc').value.trim(),
+    photo: photoSrc && photoSrc.startsWith('data:') ? photoSrc : null,
+    emoji:'🆕', giver:'You', giverColor:'#FF8A65', isNew:true
+  };
+  LISTINGS.unshift(newItem);
+  userPostCount++;
+  document.getElementById('stat-items').textContent = 24 + userPostCount;
+  document.getElementById('profile-count').textContent = `${userPostCount} item${userPostCount!==1?'s':''} posted`;
+  closeModal('post-modal');
+  updateFeed();
+  showToast('🎉 Posted! Someone out there is going to love this.');
+  document.getElementById('post-title').value='';
+  document.getElementById('post-location').value='';
+  document.getElementById('post-desc').value='';
+  document.getElementById('post-category').value='';
+  document.getElementById('post-condition').value='';
+  document.getElementById('post-neighbourhood').value='';
+  document.querySelectorAll('.pickup-chip.selected').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.size-chip.selected').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('size-section').style.display='none';
+  document.getElementById('photo-preview').style.display='none';
+  document.getElementById('photo-placeholder').style.display='block';
+};
 </script>
 </body>
 </html>
