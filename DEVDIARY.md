@@ -112,5 +112,84 @@ Tried to write a fallback image handler using nested HTML inside an `onerror` st
 
 ---
 
+
+---
+
+## Session 2 — May 1, 2025
+
+**Time:** ~3 hours  
+**Versions shipped:** v7, v8, v9  
+**Bugs squashed:** 8+  
+**Money spent:** C$6.79 (domain!)  
+
+### What we built
+
+- About page with founder story, real photo, and Keds signature with scrappy SVG heart
+- Shoes category with child shoe sizing (Infant → 12C) — sizes auto-swap based on category
+- Photo upload field in post form — tap to select, preview before submitting
+- Posted items now appear at top of feed instantly
+- Claim message upgraded to textarea with 300 char live counter
+- Removed "the giver picks who gets it" — was giving favouritism vibes
+- localStorage routing — refresh now stays on current page
+- Mobile footer: About removed, Support added. About lives in desktop nav only
+- Footer note added with Support link and "Made in Kelowna by Keds"
+- "Free kids stuff." added to hero headline for immediate clarity
+- "Kids Clothes" → "Clothes" — kids is implied in the category
+- Beta feedback widget added (floating button, emoji rating, tag chips, free text)
+- Supabase project created — Canada Central 🍁, Healthy, API key saved
+
+### Design decisions
+
+- **"Kids" in category:** Removed — implied. But kept in the hero headline ("Free kids stuff.") where a first-time visitor needs it.
+- **Mobile footer:** Support tab replaces About tab. About accessible via desktop nav only — less critical for mobile use case.
+- **Claim copy:** Removed "the giver picks who gets it" — too much like favouritism. Replaced with "Keep it friendly!"
+- **Founder bio:** Written by Keddy, barely edited. The line "I am basically a one-woman operation trying to make kids' clothing and gear more cyclical" is the tagline. Someone put it on a tote bag.
+
+### Bugs & struggles
+
+**Bug 1 — "Ryan" on the About page**  
+Named the founder "Ryan" — that's the husband. Corrected immediately. Ryan was not available for comment.
+
+**Bug 2 — Bio duplication**  
+About text kept appearing twice due to multiple str_replace edits layering. Fixed by replacing the entire block cleanly. Verified with `grep -c "When I was pregnant" = 1`.
+
+**Bug 3 — Domain giveitaway.ca taken**  
+Someone is sitting on it. Pivoted to `giveitawayapp.com` — C$6.79 with promo code NEWCOM679. Honestly a better domain anyway.
+
+**Bug 4 — Namecheap had old DNS records**  
+URL Redirect Record + old A + CNAME were conflicting. Deleted all three, added fresh A record (`216.198.79.1`) and CNAME (`8a16a48f7ce0bda6.vercel-dns-017.com.`). Both went green within minutes.
+
+### Milestones
+
+- 🎉 `giveitawayapp.com` purchased, DNS configured, live at a real domain
+- 🗄️ Supabase project spun up — Canada Central, publishable key saved, ready to wire in Session 3
+
+### Backlog additions
+
+- **Karma / points system** — earn points for giving, completely meaningless but deeply satisfying. Emoji tiers + fun messaging on each give. (Phase 2)
+- **Queue / waitlist** — show position in line for a claimed item. (Phase 2)
+
+---
+
+## Progress Update
+
+```
+[█████████████░░░░░░░░░░░] 52%
+
+✅ Prototype    ✅ Live URL    ✅ Beta users   ✅ Domain
+🟡 Database     ⬜ Auth        ⬜ Photos       ⬜ Launch
+```
+
+---
+
+## Session 3 — To Do
+
+- [ ] Wire Supabase to the app
+- [ ] User login + sign up flow
+- [ ] Listings save to real database
+- [ ] Photos stored in Supabase storage
+- [ ] Real messages between users
+- [ ] Triage beta feedback
+- [ ] Update progress bar to ~70%
 *"The best way to predict the future is to create it."*  
 *Total cost to ship a live marketplace app: $0 and one afternoon.*
