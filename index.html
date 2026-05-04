@@ -1046,11 +1046,31 @@ let currentProfile = null;
 // Load Supabase SDK dynamically — won't block page if CDN is unavailable
 function loadSupabase() {
   return new Promise((resolve) => {
-    if (window.supabase) { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); resolve(); return; }
+    // Already loaded
+    if (window.supabase && window.supabase.createClient) {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      resolve(); return;
+    }
+    // Inject script tag
     const s = document.createElement('script');
     s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-    s.onload = () => { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); resolve(); };
-    s.onerror = () => { console.warn('Supabase CDN unavailable — running in offline mode'); resolve(); };
+    s.onerror = () => { console.warn('Supabase CDN unavailable'); resolve(); };
+    s.onload = () => {
+      // Poll until createClient is available (can take a tick after onload)
+      let attempts = 0;
+      const check = () => {
+        if (window.supabase && window.supabase.createClient) {
+          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          resolve();
+        } else if (attempts++ < 20) {
+          setTimeout(check, 100);
+        } else {
+          console.warn('Supabase did not initialise in time');
+          resolve();
+        }
+      };
+      check();
+    };
     document.head.appendChild(s);
   });
 }
@@ -1128,14 +1148,22 @@ async function handleSignUp() {
     const { data, error } = await supabase.auth.signUp({ email, password,
       options: { data: { name, neighbourhood } }
     });
+    console.log('SignUp result:', JSON.stringify({ data: data?.user?.id, error: error?.message }));
     if (error) throw error;
-    document.getElementById('auth-signup-form').style.display = 'none';
-    document.getElementById('confirm-email').textContent = email;
-    document.getElementById('auth-confirm-form').style.display = 'block';
-    document.getElementById('auth-title').textContent = 'Almost there!';
+    if (data?.user) {
+      hideLoading();
+      document.getElementById('auth-signup-form').style.display = 'none';
+      document.getElementById('confirm-email').textContent = email;
+      document.getElementById('auth-confirm-form').style.display = 'block';
+      document.getElementById('auth-title').textContent = 'Almost there!';
+    } else {
+      throw new Error('No user returned — please try again');
+    }
   } catch(e) {
+    console.error('SignUp error:', e);
+    hideLoading();
     showAuthError(e.message || 'Sign up failed — please try again');
-  } finally { hideLoading(); }
+  }
 }
 
 async function handleSignOut() {
@@ -1601,6 +1629,17 @@ function openModal(id) {
     document.querySelectorAll('.tag-chip').forEach(c=>c.classList.remove('selected'));
     document.getElementById('feedback-text').value = '';
     document.getElementById('feedback-contact').value = '';
+  }
+  if (id === 'auth-modal') {
+    document.getElementById('auth-confirm-form').style.display = 'none';
+    document.getElementById('auth-signin-form').style.display = 'block';
+    document.getElementById('auth-signup-form').style.display = 'none';
+    document.getElementById('tab-signin').classList.add('active');
+    document.getElementById('tab-signup').classList.remove('active');
+    document.getElementById('auth-title').textContent = 'Welcome to GiveItAway 🌿';
+    document.getElementById('auth-error').classList.remove('show');
+    // Pre-load Supabase so it's ready when user hits submit
+    if (!supabase) loadSupabase();
   }
 }
 
