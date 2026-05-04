@@ -193,3 +193,90 @@ URL Redirect Record + old A + CNAME were conflicting. Deleted all three, added f
 - [ ] Update progress bar to ~70%
 *"The best way to predict the future is to create it."*  
 *Total cost to ship a live marketplace app: $0 and one afternoon.*
+
+----
+---
+ 
+## Session 3 — May 2–3, 2025
+ 
+**Time:** ~2 hours
+**Versions shipped:** v10, v11
+**Bugs squashed:** 5+
+**Special guest:** Katie C. (Debrand) — beta tester & potential community mod 🏅
+ 
+### What we built
+ 
+- FAQ page — 7 questions covering: is it free, what to post, condition grades, location, who gets the item, reporting, and the supporter program
+- Community Standards page — non-negotiables, mission, removal policy, note from Keds
+- Terms & Privacy page — plain language beta version with "full legal terms coming" banner
+- Condition info icon — ⓘ button next to condition field in post form. Hover (desktop) or tap (mobile) shows grade descriptions + wash reminder. Closes on outside click.
+- Maternity category — filter chip, post form dropdown, XS–3X sizing. Auto-swaps size grid on category select.
+- Toast upgraded — auto-dismisses after 3 seconds AND has an ✕ close button. Clears on page navigation.
+- Sticky site footer — sits at true bottom of content on all pages. Links: About · FAQ · Community Standards · Terms & Privacy · Feedback.
+- About page copy finalised in Keddy's own voice. "How we do things around here" replaces "The rules — always."
+ 
+### Bugs fixed
+ 
+**Bug 1 — Duplicate Support tab in mobile footer**
+Extra tab sneaked in from layered edits. Fixed: Browse / Messages / + / Support / My Stuff. One instance only.
+ 
+**Bug 2 — + button not floating above bar**
+Was sitting inside the flex row. Fixed by wrapping in a spacer div with absolute positioning. Now properly elevated with white border ring and shadow.
+ 
+**Bug 3 — Tab bar padding imbalance**
+Top and bottom padding were unequal, making icons look top-heavy. Fixed with symmetric 10px padding and centered alignment.
+ 
+**Bug 4 — Unread dot misplaced**
+Moved to true upper-right of message icon with white border.
+ 
+**Bug 5 — Footer not sticky on Messages page**
+Footer was floating just below the message threads with blank space below. Fixed with proper `site-footer` CSS class.
+ 
+### Design decisions
+ 
+- **"Who gets the item?" FAQ** — reworded to neutral marketplace language. "OPs are asked to triage requests and make appropriate arrangements." Removes any favouritism implication.
+- **Wash reminder** — lives at pickup, not at posting. Kept in condition tooltip and FAQ. Post form stays light.
+- **T&Cs** — placeholder pages for now, full legal copy before any payments go live.
+- **Footer** — Support link removed, About added. Cleaner, less repetitive.
+ 
+### Community input — Katie C. (Debrand)
+ 
+Katie works in secondhand fashion and provided sharp beta feedback:
+- Suggested condition grade descriptions → acted on (info icon tooltip)
+- Suggested onboarding walkthrough with community standards → pinned for Session 4 (needs auth first)
+- Reminded us that bed bugs are real and people genuinely don't wash items → wash reminder added
+ 
+> "You'd be surprised how many people don't wash their items before they give them away and bed bugs are crazy." — Katie C., telling it like it is. 🐛
+ 
+Katie is a strong community mod candidate.
+ 
+### Backlog additions
+ 
+- Onboarding/sign-up walkthrough with community standards (needs auth — Session 4)
+- Full T&C + Privacy Policy copy (before Stripe integration)
+- FAQ link in post form under condition field — "not sure which to pick? See FAQ"
+ 
+---
+ 
+## Progress Update
+ 
+```
+[████████████████░░░░░░░░] 62%
+ 
+✅ Prototype    ✅ Live URL      ✅ Beta users    ✅ Domain
+🟡 Database     🟡 Content/FAQ   ⬜ Auth          ⬜ Launch
+```
+ 
+---
+ 
+## Session 4 — To Do
+ 
+- [ ] Wire Supabase to the app
+- [ ] User login + sign up flow
+- [ ] Listings save to real database
+- [ ] Photos stored in Supabase storage
+- [ ] Real messages between users
+- [ ] Onboarding community agreement screen
+- [ ] Triage more beta feedback
+- [ ] Update progress bar to ~75%
+ 
