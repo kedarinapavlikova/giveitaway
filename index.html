@@ -145,6 +145,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 .masonry { columns: 3; column-gap: 1rem; }
 @media (max-width: 860px) { .masonry { columns: 2; } }
 @media (max-width: 520px) { .masonry { columns: 1; } }
+.masonry:empty + .empty-state, .masonry .empty-state { column-span: all; -webkit-column-span: all; }
 
 .card { break-inside: avoid; background: var(--white); border-radius: var(--radius); margin-bottom: 1rem; overflow: hidden; box-shadow: var(--shadow); transition: all 0.2s; cursor: pointer; position: relative; }
 .card:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px); }
@@ -168,8 +169,8 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 .claim-btn:hover { background: var(--papaya-dark); }
 .new-badge { position: absolute; top: 9px; right: 9px; background: var(--lagoon); color: white; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; }
 
-.empty-state { text-align: center; padding: 3rem 1rem; color: var(--gray); grid-column: 1/-1; }
-.empty-state .big { font-size: 3rem; margin-bottom: 0.5rem; }
+.empty-state { text-align: center; padding: 4rem 1rem; color: var(--gray); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 40vh; width: 100%; column-span: all; -webkit-column-span: all; }
+.empty-state .big { font-size: 3.5rem; margin-bottom: 0.75rem; }
 
 /* MODAL BASE */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(45,45,45,0.5); z-index: 200; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; }
@@ -341,8 +342,8 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
   <div class="logo" onclick="showView('feed')">Give<em>It</em><span>Away</span></div>
   <div class="nav-links">
     <button class="nav-btn active" id="nav-browse" onclick="showView('feed')">Browse</button>
-    <button class="nav-btn msg-btn" id="nav-msgs" onclick="if(!requireAuth('view messages'))return;showView('messages')">Messages<span class="msg-dot"></span></button>
-    <button class="nav-btn" id="nav-profile" onclick="showView('profile')">My Stuff</button>
+    <button class="nav-btn msg-btn" id="nav-msgs" onclick="if(!requireAuth('view messages'))return;showView('messages')" style="display:none">Messages<span class="msg-dot"></span></button>
+    <button class="nav-btn" id="nav-profile" onclick="showView('profile')" style="display:none">My Stuff</button>
     <button class="nav-btn" id="nav-about" onclick="showView('about')">About</button>
   </div>
   <div style="display:flex;align-items:center;gap:6px">
@@ -359,7 +360,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Browse
   </button>
-  <button class="tab-btn" id="tab-msgs" onclick="if(!requireAuth('view messages'))return;showView('messages')" style="position:relative">
+  <button class="tab-btn" id="tab-msgs" onclick="if(!requireAuth('view messages'))return;showView('messages')" style="position:relative;display:none">
     <span class="tab-msg-dot" id="tab-msg-dot"></span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     Messages
@@ -371,7 +372,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
     Support
   </button>
-  <button class="tab-btn" id="tab-profile" onclick="showView('profile')">
+  <button class="tab-btn" id="tab-profile" onclick="showView('profile')" style="display:none">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     My Stuff
   </button>
@@ -429,7 +430,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 
   <div class="main">
     <div class="feed-meta">
-      <div class="section-label" id="feed-label">Loading...</div>
+      <div class="section-label" id="feed-label"></div>
       <div class="search-result-info" id="search-info"></div>
     </div>
     <div class="masonry" id="feed"></div>
@@ -1036,7 +1037,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 <script>
 // ── SUPABASE INIT ──────────────────────────────────────────
 const SUPABASE_URL = 'https://rpqyszpzyivypbfykakg.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_jT6NVwOSItdaWZR8Gv05pQ_fb84m8Mq5f3VbNMr';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwcXlzenB6eWl2eXBiZnlrYWtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NDA3OTUsImV4cCI6MjA5MzIxNjc5NX0.akRGbFRN1kcjDbpt_IAjYA3dWylTeEwjIu3TU7yGMOQ';
 
 let supabase = null;
 let currentUser = null;
@@ -1160,15 +1161,26 @@ async function loadUserProfile(user) {
 
 function updateAuthUI(user, profile) {
   const area = document.getElementById('nav-auth-area');
+  const authNavItems = ['nav-msgs', 'nav-profile', 'tab-msgs', 'tab-profile'];
+
   if (user && profile) {
+    // Show nav items
+    authNavItems.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = '';
+    });
     const initials = (profile.name || 'U').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
     area.innerHTML = `
       <div style="display:flex;align-items:center;gap:8px">
         <div class="user-avatar" title="${profile.name}" onclick="showView('profile')">${initials}</div>
         <button class="nav-btn" onclick="handleSignOut()" style="font-size:0.75rem;color:var(--gray)">Sign out</button>
       </div>`;
-    document.getElementById('profile-name-display') && (document.getElementById('profile-name-display').textContent = profile.name);
   } else {
+    // Hide nav items
+    authNavItems.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
     area.innerHTML = `<button class="post-btn" style="background:var(--lagoon);margin-right:6px" onclick="openModal('auth-modal')">Sign in</button>`;
   }
 }
@@ -1233,36 +1245,8 @@ const SIZES = ['Preemie','Newborn','0–3m','3–6m','6–12m','12m','12–18m',
 const SHOE_SIZES = ['Infant 0–1','Infant 1–4','4T–5T','6T–7T','8T–9T','10T–12T','1C','2C','3C','4C','5C','6C','7C','8C','9C','10C','11C','12C'];
 const COLORS = ['#FF8A65','#00BFA5','#5C6BC0','#AB47BC','#26A69A','#EF5350','#42A5F5','#66BB6A'];
 
-const LISTINGS = [
-  {id:1,title:'Bundle of 3-6m onesies (12 pcs)',category:'Clothes',sizes:['3–6m'],condition:'Like New',pickup:['Porch Pickup'],location:'Pandosy & KLO Rd',neighbourhood:'Pandosy Village',desc:"Carter's and Old Navy mix. Mostly white and yellow. Smoke-free home.",photo:null,emoji:'👕',giver:'Sarah M.',giverColor:'#FF8A65',isNew:true},
-  {id:2,title:'Baby Bjorn bouncer seat',category:'Gear',sizes:[],condition:'Good',pickup:['Meetup','Porch Pickup'],location:'Springfield Rd & Spall Rd',neighbourhood:'Rutland',desc:'The classic one. Faded slightly but totally functional. Saved our lives for 4 months.',photo:null,emoji:'🪑',giver:'Jordan K.',giverColor:'#00BFA5',isNew:true},
-  {id:3,title:'Pile of 2T summer clothes',category:'Clothes',sizes:['2T'],condition:'Good',pickup:['Porch Pickup'],location:'Gordon Dr & Raymer Ave',neighbourhood:'Lower Mission',desc:'About 15 pieces — shorts, tees, one dress. All washed and ready to go!',photo:null,emoji:'☀️',giver:'Priya L.',giverColor:'#5C6BC0',isNew:false},
-  {id:4,title:'Wooden puzzle set (3 puzzles)',category:'Toys',sizes:[],condition:'Like New',pickup:['Meetup'],location:'Banks Rd & Sexsmith Rd',neighbourhood:'Black Mountain',desc:'Melissa & Doug farm, alphabet, and number puzzles. All pieces present and accounted for.',photo:null,emoji:'🧩',giver:'Tom W.',giverColor:'#AB47BC',isNew:false},
-  {id:5,title:'12-18m snowsuit — barely used',category:'Clothes',sizes:['12–18m'],condition:'Like New',pickup:['Porch Pickup','Drop Off'],location:'Harvey Ave & Cooper Rd',neighbourhood:'Glenmore',desc:'Columbia brand. Navy blue. Used maybe 3 times — kid grew out of it so fast!',photo:null,emoji:'🧥',giver:'Amy F.',giverColor:'#EF5350',isNew:true},
-  {id:6,title:'Balance bike for 2-4 year olds',category:'Bikes',sizes:[],condition:'Good',pickup:['Meetup'],location:'Lakeshore Rd & Eldorado Rd',neighbourhood:'Lower Mission',desc:'Strider style, green. Some scratches on the frame but wheels are solid and ready to roll.',photo:null,emoji:'🚲',giver:'Dani C.',giverColor:'#42A5F5',isNew:false},
-  {id:7,title:'0-3m sleeper bundle (8 pcs)',category:'Clothes',sizes:['0–3m'],condition:'New (never used)',pickup:['Porch Pickup'],location:'Dilworth Dr & Stremel Rd',neighbourhood:'Dilworth',desc:'Never worn! Baby came out way bigger than expected. Tags still on 4 of them.',photo:null,emoji:'🌙',giver:'Marcus B.',giverColor:'#66BB6A',isNew:true},
-  {id:8,title:'Toddler backpack — Wildkin brand',category:'Gear',sizes:[],condition:'Good',pickup:['Porch Pickup','Meetup'],location:'Benvoulin Rd & KLO Rd',neighbourhood:'SE Kelowna',desc:'Owl design. Great shape overall, tiny stain inside the front pocket.',photo:null,emoji:'🎒',giver:'Sarah M.',giverColor:'#FF8A65',isNew:false},
-  {id:9,title:'4T-5T mixed clothing lot (20 pcs)',category:'Clothes',sizes:['4T','5T'],condition:'Good',pickup:['Porch Pickup'],location:'Glenmore Dr & Valley Rd',neighbourhood:'Glenmore',desc:'All washed. Mix of brands. Great for daycare wear!',photo:null,emoji:'👗',giver:'Robin T.',giverColor:'#EF5350',isNew:false},
-  {id:10,title:'Baby monitor — Motorola video',category:'Gear',sizes:[],condition:'Good',pickup:['Meetup'],location:'Sexsmith Rd & McCurdy Rd',neighbourhood:'Rutland',desc:'Video and audio. Works great. Just upgrading to a newer model.',photo:null,emoji:'📷',giver:'Jordan K.',giverColor:'#00BFA5',isNew:false},
-  {id:11,title:'Hockey skates size 12',category:'Sports',sizes:['12'],condition:'Good',pickup:['Porch Pickup','Meetup'],location:'Hollywood Rd & Ziprick Rd',neighbourhood:'Rutland North',desc:'CCM brand. Good edge still on them. Great for a first-time skater.',photo:null,emoji:'⛸️',giver:'Pete H.',giverColor:'#5C6BC0',isNew:true},
-  {id:12,title:'Box of board books (20+ books)',category:'Books',sizes:[],condition:'Good',pickup:['Porch Pickup'],location:'Casorso Rd & Gordon Dr',neighbourhood:'Lower Mission',desc:'Mix of classics — Hungry Caterpillar, Goodnight Moon, full Sandra Boynton set.',photo:null,emoji:'📚',giver:'Priya L.',giverColor:'#5C6BC0',isNew:false},
-];
-
-const THREADS = [
-  {id:1,name:'Jordan K.',color:'#00BFA5',itemTitle:'Baby Bjorn bouncer seat',emoji:'🪑',unread:true,messages:[
-    {from:'them',text:"Hi! Is the bouncer still available?",time:'Yesterday 2:14pm'},
-    {from:'me',text:"Yes it is! Come grab it anytime.",time:'Yesterday 2:31pm'},
-    {from:'them',text:"Amazing! Can I do porch pickup tomorrow morning?",time:'Yesterday 3:02pm'},
-  ]},
-  {id:2,name:'Amy F.',color:'#EF5350',itemTitle:'0-3m sleeper bundle',emoji:'🌙',unread:false,messages:[
-    {from:'them',text:"Hey these are so cute, would love them for my newborn!",time:'Mon 11:20am'},
-    {from:'me',text:"They're yours! Leaving on the porch — 47 Lakeview Cres.",time:'Mon 12:05pm'},
-    {from:'them',text:"Just grabbed them, thank you so much!! 💚",time:'Mon 12:47pm'},
-  ]},
-  {id:3,name:'Robin T.',color:'#EF5350',itemTitle:'Box of board books',emoji:'📚',unread:true,messages:[
-    {from:'them',text:"Are all 20 books there? Missing any?",time:'Today 9:03am'},
-  ]},
-];
+const LISTINGS = [];
+const THREADS = [];
 
 let activeCategory = 'all';
 let searchQuery = '';
@@ -1712,6 +1696,9 @@ function toggleConditionTooltip() {
 
 // ── INIT ──────────────────────────────────────────────────
 async function initApp() {
+  // Show feed immediately with sample data while DB loads
+  updateFeed();
+
   // Load Supabase first (won't block if CDN fails)
   await loadSupabase();
 
@@ -1738,7 +1725,7 @@ async function initApp() {
 
       // Load real listings — with 5s timeout fallback
       showLoading('Loading listings...');
-      const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 5000));
+      const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 3000));
       const dbListings = await Promise.race([fetchListings(), timeoutPromise]);
       hideLoading();
 
