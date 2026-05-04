@@ -1745,10 +1745,11 @@ async function initApp() {
   // Load Supabase first (won't block if CDN fails)
   await loadSupabase();
 
-  // Restore last view
+  // Restore last view — but always start on feed for first-time visitors
   try {
     const saved = localStorage.getItem('gia_view');
-    if (saved && ['feed','messages','profile','about','faq','community','terms'].includes(saved)) showView(saved);
+    const restorable = ['messages', 'profile', 'about'];
+    if (saved && restorable.includes(saved)) showView(saved);
   } catch(e) {}
 
   if (_sb) {
