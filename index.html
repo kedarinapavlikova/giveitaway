@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GiveItAway</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -272,6 +273,21 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 @media (max-width: 600px) { .site-footer { margin-bottom: max(62px, calc(60px + env(safe-area-inset-bottom))); } }
 .site-footer button { background: none; border: none; cursor: pointer; font-size: 0.72rem; color: var(--lagoon-dark); font-weight: 600; padding: 0; text-decoration: underline; font-family: var(--font-body); }
 
+/* AUTH */
+.auth-tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 2px solid var(--gray-light); }
+.auth-tab { flex: 1; background: none; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.88rem; font-weight: 500; color: var(--gray); padding: 0.6rem 0; text-align: center; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
+.auth-tab.active { color: var(--lagoon); border-bottom-color: var(--lagoon); font-weight: 600; }
+.auth-error { background: #FFEBEE; color: #C62828; border-radius: var(--radius-xs); padding: 0.6rem 0.9rem; font-size: 0.82rem; margin-bottom: 0.75rem; display: none; }
+.auth-error.show { display: block; }
+.auth-divider { text-align: center; font-size: 0.75rem; color: var(--gray); margin: 0.75rem 0; }
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--papaya-mid); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; cursor: pointer; flex-shrink: 0; }
+.loading-overlay { position: fixed; inset: 0; background: rgba(250,249,246,0.85); z-index: 400; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px; }
+.loading-overlay.show { display: flex; }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--lagoon-light); border-top-color: var(--lagoon); border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.feed-empty { text-align: center; padding: 3rem 1rem; color: var(--gray); }
+.feed-empty .big { font-size: 3rem; margin-bottom: 0.5rem; }
+
 /* FAQ / COMMUNITY STANDARDS PAGES */
 .content-page { padding: 1.5rem; max-width: 680px; margin: 0 auto; }
 .content-page h2 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; margin-bottom: 0.25rem; }
@@ -330,7 +346,10 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
     <button class="nav-btn" id="nav-profile" onclick="showView('profile')">My Stuff</button>
     <button class="nav-btn" id="nav-about" onclick="showView('about')">About</button>
   </div>
-  <div style="display:flex;align-items:center;gap:0">
+  <div style="display:flex;align-items:center;gap:6px">
+    <div id="nav-auth-area">
+      <button class="post-btn" style="background:var(--lagoon)" onclick="openModal('auth-modal')">Sign in</button>
+    </div>
     <button class="nav-support-btn" onclick="openModal('supporter-modal')">✦ Support</button>
     <button class="post-btn" onclick="openPostModal()">+ Post Item</button>
   </div>
@@ -367,7 +386,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
       <p>Kelowna & area — no cash, no catch, just community.</p>
     </div>
     <div class="hero-stats">
-      <div class="stat"><div class="stat-num" id="stat-items">24</div><div class="stat-label">available</div></div>
+      <div class="stat"><div class="stat-num" id="stat-items">—</div><div class="stat-label">available</div></div>
       <div class="stat"><div class="stat-num">138</div><div class="stat-label">given away</div></div>
       <div class="stat"><div class="stat-num">61</div><div class="stat-label">givers</div></div>
     </div>
@@ -411,7 +430,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 
   <div class="main">
     <div class="feed-meta">
-      <div class="section-label" id="feed-label">24 items near you</div>
+      <div class="section-label" id="feed-label">Loading...</div>
       <div class="search-result-info" id="search-info"></div>
     </div>
     <div class="masonry" id="feed"></div>
@@ -683,6 +702,76 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
   </div>
 </div>
 
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <div style="font-size:0.82rem;color:var(--gray)">Loading...</div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title" id="auth-title">Welcome to GiveItAway 🌿</div>
+      <button class="close-btn" onclick="closeModal('auth-modal')">✕</button>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-signin" onclick="switchAuthTab('signin')">Sign in</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Create account</button>
+    </div>
+    <div class="auth-error" id="auth-error"></div>
+
+    <div id="auth-signin-form">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="signin-email" placeholder="you@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="signin-password" placeholder="Your password" onkeydown="if(event.key==='Enter')handleSignIn()">
+      </div>
+      <button class="submit-btn" style="background:var(--lagoon)" onclick="handleSignIn()">Sign in</button>
+      <div class="auth-divider">
+        <button style="background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--lagoon-dark);text-decoration:underline" onclick="showForgotPassword()">Forgot password?</button>
+      </div>
+    </div>
+
+    <div id="auth-signup-form" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Your name <span class="req">*</span></label>
+        <input class="form-input" type="text" id="signup-name" placeholder="First name or nickname">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email <span class="req">*</span></label>
+        <input class="form-input" type="email" id="signup-email" placeholder="you@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password <span class="req">*</span></label>
+        <input class="form-input" type="password" id="signup-password" placeholder="At least 6 characters">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Neighbourhood</label>
+        <select class="form-select" id="signup-neighbourhood">
+          <option value="">Select your area</option>
+          <option>Lower Mission</option><option>Pandosy Village</option><option>Rutland</option>
+          <option>Glenmore</option><option>Black Mountain</option><option>Dilworth</option>
+          <option>SE Kelowna</option><option>Rutland North</option><option>Other</option>
+        </select>
+      </div>
+      <div style="background:var(--lagoon-light);border-radius:var(--radius-xs);padding:0.75rem;font-size:0.78rem;color:var(--lagoon-dark);margin-bottom:0.75rem;line-height:1.5">
+        By joining you agree to our <button onclick="closeModal('auth-modal');showView('community')" style="background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;padding:0">Community Standards</button>. No money ever changes hands. Be kind.
+      </div>
+      <button class="submit-btn" style="background:var(--lagoon)" onclick="handleSignUp()">Create account</button>
+    </div>
+
+    <div id="auth-confirm-form" style="display:none;text-align:center;padding:1rem 0">
+      <div style="font-size:2.5rem;margin-bottom:0.75rem">📬</div>
+      <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-bottom:0.5rem">Check your email!</div>
+      <div style="font-size:0.85rem;color:var(--gray);line-height:1.6">We sent a confirmation link to <strong id="confirm-email"></strong>. Click it to activate your account, then come back and sign in.</div>
+    </div>
+  </div>
+</div>
+
 <!-- POST MODAL -->
 <div class="modal-overlay" id="post-modal">
   <div class="modal">
@@ -946,6 +1035,178 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 <div class="toast" id="toast"><span id="toast-msg"></span><button class="toast-close" onclick="dismissToast()">✕</button></div>
 
 <script>
+// ── SUPABASE INIT ──────────────────────────────────────────
+const SUPABASE_URL = 'https://rpqyszpzyivypbfykakg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_jT6NVwOSItdaWZR8Gv05pQ_fb84m8Mq5f3VbNMr';
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+let currentUser = null;
+let currentProfile = null;
+
+// ── AUTH HELPERS ───────────────────────────────────────────
+function showLoading(msg) {
+  const o = document.getElementById('loading-overlay');
+  o.querySelector('div:last-child').textContent = msg || 'Loading...';
+  o.classList.add('show');
+}
+function hideLoading() { document.getElementById('loading-overlay').classList.remove('show'); }
+
+function switchAuthTab(tab) {
+  document.getElementById('auth-signin-form').style.display = tab==='signin' ? 'block' : 'none';
+  document.getElementById('auth-signup-form').style.display = tab==='signup' ? 'block' : 'none';
+  document.getElementById('tab-signin').classList.toggle('active', tab==='signin');
+  document.getElementById('tab-signup').classList.toggle('active', tab==='signup');
+  document.getElementById('auth-error').classList.remove('show');
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+function showForgotPassword() {
+  const email = document.getElementById('signin-email').value.trim();
+  if (!email) { showAuthError('Enter your email first'); return; }
+  if (supabase) supabase.auth.resetPasswordForEmail(email);
+  showToast('Password reset email sent!');
+  closeModal('auth-modal');
+}
+
+async function handleSignIn() {
+  const email = document.getElementById('signin-email').value.trim();
+  const password = document.getElementById('signin-password').value;
+  if (!email || !password) { showAuthError('Please fill in both fields'); return; }
+  showLoading('Signing in...');
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    closeModal('auth-modal');
+    await loadUserProfile(data.user);
+    showToast('Welcome back! 🌿');
+  } catch(e) {
+    showAuthError(e.message || 'Sign in failed — check your email and password');
+  } finally { hideLoading(); }
+}
+
+async function handleSignUp() {
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const neighbourhood = document.getElementById('signup-neighbourhood').value;
+  if (!name || !email || !password) { showAuthError('Please fill in all required fields'); return; }
+  if (password.length < 6) { showAuthError('Password must be at least 6 characters'); return; }
+  showLoading('Creating your account...');
+  try {
+    const { data, error } = await supabase.auth.signUp({ email, password,
+      options: { data: { name, neighbourhood } }
+    });
+    if (error) throw error;
+    document.getElementById('auth-signup-form').style.display = 'none';
+    document.getElementById('confirm-email').textContent = email;
+    document.getElementById('auth-confirm-form').style.display = 'block';
+    document.getElementById('auth-title').textContent = 'Almost there!';
+  } catch(e) {
+    showAuthError(e.message || 'Sign up failed — please try again');
+  } finally { hideLoading(); }
+}
+
+async function handleSignOut() {
+  await supabase.auth.signOut();
+  currentUser = null;
+  currentProfile = null;
+  updateAuthUI(null);
+  showToast('Signed out — see you soon! 🌿');
+  showView('feed');
+}
+
+async function loadUserProfile(user) {
+  currentUser = user;
+  let { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+  if (!profile) {
+    const meta = user.user_metadata || {};
+    const { data: newProfile } = await supabase.from('profiles').insert({
+      id: user.id,
+      name: meta.name || user.email.split('@')[0],
+      neighbourhood: meta.neighbourhood || null,
+    }).select().single();
+    profile = newProfile;
+  }
+  currentProfile = profile;
+  updateAuthUI(user, profile);
+}
+
+function updateAuthUI(user, profile) {
+  const area = document.getElementById('nav-auth-area');
+  if (user && profile) {
+    const initials = (profile.name || 'U').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    area.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="user-avatar" title="${profile.name}" onclick="showView('profile')">${initials}</div>
+        <button class="nav-btn" onclick="handleSignOut()" style="font-size:0.75rem;color:var(--gray)">Sign out</button>
+      </div>`;
+    document.getElementById('profile-name-display') && (document.getElementById('profile-name-display').textContent = profile.name);
+  } else {
+    area.innerHTML = `<button class="post-btn" style="background:var(--lagoon);margin-right:6px" onclick="openModal('auth-modal')">Sign in</button>`;
+  }
+}
+
+// ── LISTINGS FROM DATABASE ─────────────────────────────────
+async function fetchListings() {
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('listings')
+    .select(`*, profiles(name, neighbourhood)`)
+    .eq('status', 'available')
+    .order('created_at', { ascending: false });
+  if (error) { console.error(error); return null; }
+  return data;
+}
+
+function dbListingToLocal(item) {
+  const EMOJIS = { Clothes:'👕', Shoes:'👟', Maternity:'🤰', Gear:'🧺', Toys:'🧸', Bikes:'🚲', Books:'📚', Sports:'⚽', Other:'✨' };
+  const COLORS = ['#FF8A65','#00BFA5','#5C6BC0','#AB47BC','#EF5350','#42A5F5','#66BB6A'];
+  const name = item.profiles?.name || 'A neighbour';
+  const color = COLORS[name.charCodeAt(0) % COLORS.length];
+  const createdAt = new Date(item.created_at);
+  const isNew = (Date.now() - createdAt) < 86400000 * 2;
+  return {
+    id: item.id,
+    title: item.title,
+    category: item.category,
+    sizes: item.sizes || [],
+    condition: item.condition,
+    pickup: item.pickup_options || [],
+    location: item.location_text,
+    neighbourhood: item.neighbourhood,
+    desc: item.description || '',
+    photo: item.photo_url || null,
+    emoji: EMOJIS[item.category] || '✨',
+    giver: name,
+    giverColor: color,
+    isNew,
+    dbId: item.id,
+  };
+}
+
+async function saveListingToDb(listingData) {
+  if (!supabase || !currentUser) return null;
+  const { data, error } = await supabase.from('listings').insert({
+    user_id: currentUser.id,
+    title: listingData.title,
+    description: listingData.desc,
+    category: listingData.category,
+    condition: listingData.condition,
+    sizes: listingData.sizes,
+    pickup_options: listingData.pickup,
+    location_text: listingData.location,
+    neighbourhood: listingData.neighbourhood,
+    photo_url: listingData.photo_url || null,
+  }).select().single();
+  if (error) { console.error(error); return null; }
+  return data;
+}
+
 const SIZES = ['Preemie','Newborn','0–3m','3–6m','6–12m','12m','12–18m','18–24m','2T','3T','4T','5T','6','7','8','10','12','14','16'];
 const SHOE_SIZES = ['Infant 0–1','Infant 1–4','4T–5T','6T–7T','8T–9T','10T–12T','1C','2C','3C','4C','5C','6C','7C','8C','9C','10C','11C','12C'];
 const COLORS = ['#FF8A65','#00BFA5','#5C6BC0','#AB47BC','#26A69A','#EF5350','#42A5F5','#66BB6A'];
@@ -1133,7 +1394,7 @@ function submitPost() {
   }
   closeModal('post-modal');
   userPostCount++;
-  document.getElementById('stat-items').textContent = 24 + userPostCount;
+  document.getElementById('stat-items').textContent = LISTINGS.length;
   document.getElementById('profile-count').textContent = `${userPostCount} item${userPostCount!==1?'s':''} posted`;
   showToast('🎉 Posted! Someone out there is going to love this.');
 }
@@ -1376,14 +1637,51 @@ function toggleConditionTooltip() {
   }
 }
 
-updateFeed();
-try {
-  const saved = localStorage.getItem('gia_view');
-  if (saved && ['feed','messages','profile','about','faq','community','terms'].includes(saved)) showView(saved);
-} catch(e) {}
+// ── INIT ──────────────────────────────────────────────────
+async function initApp() {
+  // Restore last view
+  try {
+    const saved = localStorage.getItem('gia_view');
+    if (saved && ['feed','messages','profile','about','faq','community','terms'].includes(saved)) showView(saved);
+  } catch(e) {}
 
-const _origSubmitPost = submitPost;
-submitPost = function() {
+  // Check for existing session
+  if (supabase) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) await loadUserProfile(session.user);
+
+    // Listen for auth changes
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        await loadUserProfile(session.user);
+      } else if (event === 'SIGNED_OUT') {
+        currentUser = null; currentProfile = null;
+        updateAuthUI(null);
+      }
+    });
+
+    // Load real listings from DB
+    showLoading('Loading listings...');
+    const dbListings = await fetchListings();
+    hideLoading();
+    if (dbListings && dbListings.length > 0) {
+      LISTINGS.length = 0;
+      dbListings.forEach(l => LISTINGS.push(dbListingToLocal(l)));
+      document.getElementById('stat-items').textContent = LISTINGS.length;
+    }
+  }
+
+  updateFeed();
+}
+
+// ── POST WITH DB SAVE ──────────────────────────────────────
+submitPost = async function() {
+  if (!currentUser) {
+    closeModal('post-modal');
+    openModal('auth-modal');
+    showToast('⚠️ Sign in to post an item', '#E64A19');
+    return;
+  }
   const title = document.getElementById('post-title').value.trim();
   const loc = document.getElementById('post-location').value.trim();
   const cat = document.getElementById('post-category').value;
@@ -1393,35 +1691,39 @@ submitPost = function() {
   if (!title||!loc||!cat||!cond||!hood||!pickups.length) {
     showToast('⚠️ Fill in all required fields!','#E64A19'); return;
   }
-  const photoSrc = document.getElementById('photo-img').src || null;
   const sizes = [...document.querySelectorAll('.size-chip.selected')].map(c=>c.textContent);
-  const newItem = {
-    id: Date.now(), title, category:cat, sizes, condition:cond,
+  const photoSrc = document.getElementById('photo-img').src || null;
+  const listingData = {
+    title, category:cat, sizes, condition:cond,
     pickup: pickups.map(p=>p.textContent.trim()),
     location: loc, neighbourhood: hood,
     desc: document.getElementById('post-desc').value.trim(),
-    photo: photoSrc && photoSrc.startsWith('data:') ? photoSrc : null,
-    emoji:'🆕', giver:'You', giverColor:'#FF8A65', isNew:true
+    photo_url: photoSrc && photoSrc.startsWith('data:') ? null : photoSrc,
   };
-  LISTINGS.unshift(newItem);
-  userPostCount++;
-  document.getElementById('stat-items').textContent = 24 + userPostCount;
-  document.getElementById('profile-count').textContent = `${userPostCount} item${userPostCount!==1?'s':''} posted`;
+  showLoading('Posting your item...');
+  const saved = await saveListingToDb(listingData);
+  hideLoading();
+  if (saved) {
+    const localItem = dbListingToLocal({ ...saved, profiles: { name: currentProfile?.name || 'You' } });
+    LISTINGS.unshift(localItem);
+    document.getElementById('stat-items').textContent = LISTINGS.length;
+    userPostCount++;
+    document.getElementById('profile-count').textContent = `${userPostCount} item${userPostCount!==1?'s':''} posted`;
+  }
   closeModal('post-modal');
   updateFeed();
   showToast('🎉 Posted! Someone out there is going to love this.');
-  document.getElementById('post-title').value='';
-  document.getElementById('post-location').value='';
-  document.getElementById('post-desc').value='';
-  document.getElementById('post-category').value='';
-  document.getElementById('post-condition').value='';
-  document.getElementById('post-neighbourhood').value='';
+  // Reset form
+  ['post-title','post-location','post-desc'].forEach(id => document.getElementById(id).value='');
+  ['post-category','post-condition','post-neighbourhood'].forEach(id => document.getElementById(id).value='');
   document.querySelectorAll('.pickup-chip.selected').forEach(c=>c.classList.remove('selected'));
   document.querySelectorAll('.size-chip.selected').forEach(c=>c.classList.remove('selected'));
   document.getElementById('size-section').style.display='none';
   document.getElementById('photo-preview').style.display='none';
   document.getElementById('photo-placeholder').style.display='block';
 };
+
+initApp();
 </script>
 </body>
 </html>
