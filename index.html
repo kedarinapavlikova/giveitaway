@@ -1100,6 +1100,8 @@ async function handleSignIn() {
   const email = document.getElementById('signin-email').value.trim();
   const password = document.getElementById('signin-password').value;
   if (!email || !password) { showAuthError('Please fill in both fields'); return; }
+  if (!supabase) { await loadSupabase(); }
+  if (!supabase) { showAuthError('Connection error — please refresh and try again'); return; }
   showLoading('Signing in...');
   try {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -1119,6 +1121,8 @@ async function handleSignUp() {
   const neighbourhood = document.getElementById('signup-neighbourhood').value;
   if (!name || !email || !password) { showAuthError('Please fill in all required fields'); return; }
   if (password.length < 6) { showAuthError('Password must be at least 6 characters'); return; }
+  if (!supabase) { await loadSupabase(); }
+  if (!supabase) { showAuthError('Connection error — please refresh and try again'); return; }
   showLoading('Creating your account...');
   try {
     const { data, error } = await supabase.auth.signUp({ email, password,
@@ -1268,8 +1272,8 @@ function renderFeed(items) {
   if (!items.length) {
     const isFiltered = activeCategory !== 'all' || areaFilter !== 'all' || searchQuery;
     const msg = isFiltered
-      ? `<div class="empty-state"><div class="big">🌿</div><p style="font-weight:600">Nothing here yet!</p><p style="font-size:0.85rem;margin-top:5px">Be the first to add something — hit the <strong>+</strong> button!</p></div>`
-      : `<div class="empty-state"><div class="big">📦</div><p style="font-weight:600">No listings yet!</p><p style="font-size:0.85rem;margin-top:5px">Be the first to give something away — hit the <strong>+</strong> button!</p></div>`;
+      ? `<div class="empty-state"><div class="big">🌿</div><p style="font-weight:600">Nothing here yet!</p><p style="font-size:0.85rem;margin-top:5px">${currentUser ? 'Be the first to add something — hit the <strong>+</strong> button!' : 'Be the first! <button onclick="openModal(\'auth-modal\')" style="background:none;border:none;cursor:pointer;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;font-size:0.85rem;padding:0">Sign in to post an item.</button>'}</p></div>`
+      : `<div class="empty-state"><div class="big">📦</div><p style="font-weight:600">No listings yet!</p><p style="font-size:0.85rem;margin-top:5px">${currentUser ? 'Be the first to give something away — hit the <strong>+</strong> button!' : 'Be the first! <button onclick="openModal(\'auth-modal\')" style="background:none;border:none;cursor:pointer;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;font-size:0.85rem;padding:0">Sign in to post an item.</button>'}</p></div>`;
     feed.innerHTML = msg;
     return;
   }
