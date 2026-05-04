@@ -1043,6 +1043,17 @@ const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SU
 let currentUser = null;
 let currentProfile = null;
 
+function requireAuth(action) {
+  if (!currentUser) {
+    openModal('auth-modal');
+    const title = document.getElementById('auth-title');
+    if (title) title.textContent = 'Sign in to continue 🌿';
+    showToast('Create a free account to ' + action, '#FF8A65');
+    return false;
+  }
+  return true;
+}
+
 // ── AUTH HELPERS ───────────────────────────────────────────
 function showLoading(msg) {
   const o = document.getElementById('loading-overlay');
@@ -1260,7 +1271,11 @@ function renderFeed(items) {
   const query = searchQuery.toLowerCase();
   feed.innerHTML = '';
   if (!items.length) {
-    feed.innerHTML = '<div class="empty-state"><div class="big">🌿</div><p style="font-weight:600">Nothing found!</p><p style="font-size:0.85rem;margin-top:5px">Try a different search or area.</p></div>';
+    const isFiltered = activeCategory !== 'all' || areaFilter !== 'all' || searchQuery;
+    const msg = isFiltered
+      ? `<div class="empty-state"><div class="big">🌿</div><p style="font-weight:600">Nothing here yet!</p><p style="font-size:0.85rem;margin-top:5px">Be the first to add something — hit the <strong>+</strong> button!</p></div>`
+      : `<div class="empty-state"><div class="big">📦</div><p style="font-weight:600">No listings yet!</p><p style="font-size:0.85rem;margin-top:5px">Be the first to give something away — hit the <strong>+</strong> button!</p></div>`;
+    feed.innerHTML = msg;
     return;
   }
   items.forEach(item => {
@@ -1338,16 +1353,6 @@ function filterCategory(el, cat) {
   document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
   updateFeed();
-}
-
-function requireAuth(action) {
-  if (!currentUser) {
-    openModal('auth-modal');
-    document.getElementById('auth-title').textContent = 'Sign in to continue 🌿';
-    showToast('Create a free account to ' + action, '#FF8A65');
-    return false;
-  }
-  return true;
 }
 
 function openClaim(id) {
@@ -1661,30 +1666,38 @@ async function initApp() {
     if (saved && ['feed','messages','profile','about','faq','community','terms'].includes(saved)) showView(saved);
   } catch(e) {}
 
-  // Check for existing session
   if (supabase) {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) await loadUserProfile(session.user);
+    try {
+      // Check for existing session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) await loadUserProfile(session.user);
 
-    // Listen for auth changes
-    supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        await loadUserProfile(session.user);
-      } else if (event === 'SIGNED_OUT') {
-        currentUser = null; currentProfile = null;
-        updateAuthUI(null);
+      supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+          await loadUserProfile(session.user);
+        } else if (event === 'SIGNED_OUT') {
+          currentUser = null; currentProfile = null;
+          updateAuthUI(null);
+        }
+      });
+
+      // Load real listings — with 5s timeout fallback
+      showLoading('Loading listings...');
+      const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 5000));
+      const dbListings = await Promise.race([fetchListings(), timeoutPromise]);
+      hideLoading();
+
+      if (dbListings && dbListings.length > 0) {
+        LISTINGS.length = 0;
+        dbListings.forEach(l => LISTINGS.push(dbListingToLocal(l)));
       }
-    });
-
-    // Load real listings from DB
-    showLoading('Loading listings...');
-    const dbListings = await fetchListings();
-    hideLoading();
-    if (dbListings && dbListings.length > 0) {
-      LISTINGS.length = 0;
-      dbListings.forEach(l => LISTINGS.push(dbListingToLocal(l)));
       document.getElementById('stat-items').textContent = LISTINGS.length;
+    } catch(e) {
+      console.error('Init error:', e);
+      hideLoading();
     }
+  } else {
+    hideLoading();
   }
 
   updateFeed();
