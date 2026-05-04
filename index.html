@@ -1039,7 +1039,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 const SUPABASE_URL = 'https://rpqyszpzyivypbfykakg.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwcXlzenB6eWl2eXBiZnlrYWtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NDA3OTUsImV4cCI6MjA5MzIxNjc5NX0.akRGbFRN1kcjDbpt_IAjYA3dWylTeEwjIu3TU7yGMOQ';
 
-let supabase = null;
+let _sb = null;
 let currentUser = null;
 let currentProfile = null;
 
@@ -1048,19 +1048,19 @@ function loadSupabase() {
   return new Promise((resolve) => {
     // Already loaded
     if (window.supabase && window.supabase.createClient) {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       resolve(); return;
     }
     // Inject script tag
     const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    s.src = 'https://cdn.jsdelivr.net/npm/@_sb/_sb-js@2';
     s.onerror = () => { console.warn('Supabase CDN unavailable'); resolve(); };
     s.onload = () => {
       // Poll until createClient is available (can take a tick after onload)
       let attempts = 0;
       const check = () => {
         if (window.supabase && window.supabase.createClient) {
-          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
           resolve();
         } else if (attempts++ < 20) {
           setTimeout(check, 100);
@@ -1111,7 +1111,7 @@ function showAuthError(msg) {
 function showForgotPassword() {
   const email = document.getElementById('signin-email').value.trim();
   if (!email) { showAuthError('Enter your email first'); return; }
-  if (supabase) supabase.auth.resetPasswordForEmail(email);
+  if (_sb) _sb.auth.resetPasswordForEmail(email);
   showToast('Password reset email sent!');
   closeModal('auth-modal');
 }
@@ -1120,11 +1120,11 @@ async function handleSignIn() {
   const email = document.getElementById('signin-email').value.trim();
   const password = document.getElementById('signin-password').value;
   if (!email || !password) { showAuthError('Please fill in both fields'); return; }
-  if (!supabase) { await loadSupabase(); }
-  if (!supabase) { showAuthError('Connection error — please refresh and try again'); return; }
+  if (!_sb) { await loadSupabase(); }
+  if (!_sb) { showAuthError('Connection error — please refresh and try again'); return; }
   showLoading('Signing in...');
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await _sb.auth.signInWithPassword({ email, password });
     if (error) throw error;
     closeModal('auth-modal');
     await loadUserProfile(data.user);
@@ -1141,11 +1141,11 @@ async function handleSignUp() {
   const neighbourhood = document.getElementById('signup-neighbourhood').value;
   if (!name || !email || !password) { showAuthError('Please fill in all required fields'); return; }
   if (password.length < 6) { showAuthError('Password must be at least 6 characters'); return; }
-  if (!supabase) { await loadSupabase(); }
-  if (!supabase) { showAuthError('Connection error — please refresh and try again'); return; }
+  if (!_sb) { await loadSupabase(); }
+  if (!_sb) { showAuthError('Connection error — please refresh and try again'); return; }
   showLoading('Creating your account...');
   try {
-    const { data, error } = await supabase.auth.signUp({ email, password,
+    const { data, error } = await _sb.auth.signUp({ email, password,
       options: { data: { name, neighbourhood } }
     });
     console.log('SignUp result:', JSON.stringify({ data: data?.user?.id, error: error?.message }));
@@ -1167,7 +1167,7 @@ async function handleSignUp() {
 }
 
 async function handleSignOut() {
-  await supabase.auth.signOut();
+  await _sb.auth.signOut();
   currentUser = null;
   currentProfile = null;
   updateAuthUI(null);
@@ -1177,10 +1177,10 @@ async function handleSignOut() {
 
 async function loadUserProfile(user) {
   currentUser = user;
-  let { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+  let { data: profile } = await _sb.from('profiles').select('*').eq('id', user.id).single();
   if (!profile) {
     const meta = user.user_metadata || {};
-    const { data: newProfile } = await supabase.from('profiles').insert({
+    const { data: newProfile } = await _sb.from('profiles').insert({
       id: user.id,
       name: meta.name || user.email.split('@')[0],
       neighbourhood: meta.neighbourhood || null,
@@ -1219,8 +1219,8 @@ function updateAuthUI(user, profile) {
 
 // ── LISTINGS FROM DATABASE ─────────────────────────────────
 async function fetchListings() {
-  if (!supabase) return null;
-  const { data, error } = await supabase
+  if (!_sb) return null;
+  const { data, error } = await _sb
     .from('listings')
     .select(`*, profiles(name, neighbourhood)`)
     .eq('status', 'available')
@@ -1256,8 +1256,8 @@ function dbListingToLocal(item) {
 }
 
 async function saveListingToDb(listingData) {
-  if (!supabase || !currentUser) return null;
-  const { data, error } = await supabase.from('listings').insert({
+  if (!_sb || !currentUser) return null;
+  const { data, error } = await _sb.from('listings').insert({
     user_id: currentUser.id,
     title: listingData.title,
     description: listingData.desc,
@@ -1457,7 +1457,7 @@ async function submitPost() {
     desc: document.getElementById('post-desc').value.trim(),
     photo_url: photoSrc && photoSrc.startsWith('data:') ? null : photoSrc,
   };
-  if (supabase && currentUser) {
+  if (_sb && currentUser) {
     showLoading('Posting your item...');
     const saved = await saveListingToDb(listingData);
     hideLoading();
@@ -1639,7 +1639,7 @@ function openModal(id) {
     document.getElementById('auth-title').textContent = 'Welcome to GiveItAway 🌿';
     document.getElementById('auth-error').classList.remove('show');
     // Pre-load Supabase so it's ready when user hits submit
-    if (!supabase) loadSupabase();
+    if (!_sb) loadSupabase();
   }
 }
 
@@ -1751,13 +1751,13 @@ async function initApp() {
     if (saved && ['feed','messages','profile','about','faq','community','terms'].includes(saved)) showView(saved);
   } catch(e) {}
 
-  if (supabase) {
+  if (_sb) {
     try {
       // Check for existing session
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await _sb.auth.getSession();
       if (session?.user) await loadUserProfile(session.user);
 
-      supabase.auth.onAuthStateChange(async (event, session) => {
+      _sb.auth.onAuthStateChange(async (event, session) => {
         if (event === 'SIGNED_IN' && session?.user) {
           await loadUserProfile(session.user);
         } else if (event === 'SIGNED_OUT') {
