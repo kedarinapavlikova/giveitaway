@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GiveItAway</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1038,10 +1037,22 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 // ── SUPABASE INIT ──────────────────────────────────────────
 const SUPABASE_URL = 'https://rpqyszpzyivypbfykakg.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_jT6NVwOSItdaWZR8Gv05pQ_fb84m8Mq5f3VbNMr';
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
+let supabase = null;
 let currentUser = null;
 let currentProfile = null;
+
+// Load Supabase SDK dynamically — won't block page if CDN is unavailable
+function loadSupabase() {
+  return new Promise((resolve) => {
+    if (window.supabase) { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    s.onload = () => { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); resolve(); };
+    s.onerror = () => { console.warn('Supabase CDN unavailable — running in offline mode'); resolve(); };
+    document.head.appendChild(s);
+  });
+}
 
 function requireAuth(action) {
   if (!currentUser) {
@@ -1278,16 +1289,16 @@ function renderFeed(items) {
     feed.innerHTML = msg;
     return;
   }
-  items.forEach(item => {
+  items.forEach((item, idx) => {
     const initials = item.giver.split(' ').map(w=>w[0]).join('').toUpperCase();
     const sizeTags = item.sizes.map(s=>`<span class="tag tag-size">${s}</span>`).join('');
     const pickupTags = item.pickup.map(p=>`<span class="tag tag-pickup">${p}</span>`).join('');
-    const h = 110 + (item.id * 37 % 80);
+    const h = 110 + (idx * 37 % 80);
     const imgHTML = `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--papaya-light) 0%,var(--lagoon-light) 100%);font-size:${Math.round(h*0.36)}px">${item.emoji}</div>`;
     const titleHL = highlight(item.title, query);
     const descHL = highlight(item.desc, query);
     feed.innerHTML += `
-      <div class="card" onclick="openClaim(${item.id})">
+      <div class="card" onclick="openClaimByIndex(${idx})">
         ${item.isNew ? '<div class="new-badge">New</div>' : ''}
         ${imgHTML}
         <div class="card-body">
@@ -1305,7 +1316,7 @@ function renderFeed(items) {
               <div class="avatar" style="background:${item.giverColor}">${initials}</div>
               <span class="giver-name">${item.giver}</span>
             </div>
-            <button class="claim-btn" onclick="event.stopPropagation();openClaim(${item.id})">I want this!</button>
+            <button class="claim-btn" onclick="event.stopPropagation();openClaimByIndex(${idx})">I want this!</button>
           </div>
         </div>
       </div>`;
@@ -1355,12 +1366,19 @@ function filterCategory(el, cat) {
   updateFeed();
 }
 
-function openClaim(id) {
+function openClaimByIndex(idx) {
+  const filtered = getFiltered();
+  const item = filtered[idx];
+  if (!item) return;
+  openClaim(item);
+}
+
+function openClaim(item) {
   if (!requireAuth('claim items')) return;
-  claimTarget = LISTINGS.find(l=>l.id===id);
-  document.getElementById('claim-title').textContent = claimTarget.title;
-  document.getElementById('claim-location').textContent = '📍 '+claimTarget.location+' · '+claimTarget.neighbourhood;
-  document.getElementById('claim-emoji').textContent = claimTarget.emoji;
+  claimTarget = item;
+  document.getElementById('claim-title').textContent = item.title;
+  document.getElementById('claim-location').textContent = '📍 '+item.location+' · '+item.neighbourhood;
+  document.getElementById('claim-emoji').textContent = item.emoji;
   document.getElementById('claim-modal').classList.add('open');
 }
 
@@ -1403,7 +1421,8 @@ function toggleSizes() {
   }
 }
 
-function submitPost() {
+async function submitPost() {
+  if (!requireAuth('post an item')) return;
   const title = document.getElementById('post-title').value.trim();
   const loc = document.getElementById('post-location').value.trim();
   const cat = document.getElementById('post-category').value;
@@ -1413,11 +1432,44 @@ function submitPost() {
   if (!title||!loc||!cat||!cond||!hood||!pickups.length) {
     showToast('⚠️ Fill in all required fields!','#E64A19'); return;
   }
-  closeModal('post-modal');
-  userPostCount++;
+  const sizes = [...document.querySelectorAll('.size-chip.selected')].map(c=>c.textContent);
+  const photoSrc = document.getElementById('photo-img').src || null;
+  const listingData = {
+    title, category:cat, sizes, condition:cond,
+    pickup: pickups.map(p=>p.textContent.trim()),
+    location: loc, neighbourhood: hood,
+    desc: document.getElementById('post-desc').value.trim(),
+    photo_url: photoSrc && photoSrc.startsWith('data:') ? null : photoSrc,
+  };
+  if (supabase && currentUser) {
+    showLoading('Posting your item...');
+    const saved = await saveListingToDb(listingData);
+    hideLoading();
+    if (saved) {
+      const localItem = dbListingToLocal({ ...saved, profiles: { name: currentProfile?.name || 'You' } });
+      LISTINGS.unshift(localItem);
+    }
+  } else {
+    // Offline fallback
+    const EMOJIS = { Clothes:'👕', Shoes:'👟', Maternity:'🤰', Gear:'🧺', Toys:'🧸', Bikes:'🚲', Books:'📚', Sports:'⚽', Other:'✨' };
+    LISTINGS.unshift({ id: Date.now(), title, category:cat, sizes, condition:cond,
+      pickup: pickups.map(p=>p.textContent.trim()), location:loc, neighbourhood:hood,
+      desc: listingData.desc, photo:null, emoji: EMOJIS[cat]||'✨',
+      giver: currentProfile?.name || 'You', giverColor:'#FF8A65', isNew:true });
+  }
   document.getElementById('stat-items').textContent = LISTINGS.length;
+  userPostCount++;
   document.getElementById('profile-count').textContent = `${userPostCount} item${userPostCount!==1?'s':''} posted`;
+  closeModal('post-modal');
+  updateFeed();
   showToast('🎉 Posted! Someone out there is going to love this.');
+  ['post-title','post-location','post-desc'].forEach(id => document.getElementById(id).value='');
+  ['post-category','post-condition','post-neighbourhood'].forEach(id => document.getElementById(id).value='');
+  document.querySelectorAll('.pickup-chip.selected').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.size-chip.selected').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('size-section').style.display='none';
+  document.getElementById('photo-preview').style.display='none';
+  document.getElementById('photo-placeholder').style.display='block';
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -1660,6 +1712,9 @@ function toggleConditionTooltip() {
 
 // ── INIT ──────────────────────────────────────────────────
 async function initApp() {
+  // Load Supabase first (won't block if CDN fails)
+  await loadSupabase();
+
   // Restore last view
   try {
     const saved = localStorage.getItem('gia_view');
@@ -1704,54 +1759,6 @@ async function initApp() {
 }
 
 // ── POST WITH DB SAVE ──────────────────────────────────────
-submitPost = async function() {
-  if (!currentUser) {
-    closeModal('post-modal');
-    openModal('auth-modal');
-    showToast('⚠️ Sign in to post an item', '#E64A19');
-    return;
-  }
-  const title = document.getElementById('post-title').value.trim();
-  const loc = document.getElementById('post-location').value.trim();
-  const cat = document.getElementById('post-category').value;
-  const cond = document.getElementById('post-condition').value;
-  const hood = document.getElementById('post-neighbourhood').value;
-  const pickups = [...document.querySelectorAll('.pickup-chip.selected')];
-  if (!title||!loc||!cat||!cond||!hood||!pickups.length) {
-    showToast('⚠️ Fill in all required fields!','#E64A19'); return;
-  }
-  const sizes = [...document.querySelectorAll('.size-chip.selected')].map(c=>c.textContent);
-  const photoSrc = document.getElementById('photo-img').src || null;
-  const listingData = {
-    title, category:cat, sizes, condition:cond,
-    pickup: pickups.map(p=>p.textContent.trim()),
-    location: loc, neighbourhood: hood,
-    desc: document.getElementById('post-desc').value.trim(),
-    photo_url: photoSrc && photoSrc.startsWith('data:') ? null : photoSrc,
-  };
-  showLoading('Posting your item...');
-  const saved = await saveListingToDb(listingData);
-  hideLoading();
-  if (saved) {
-    const localItem = dbListingToLocal({ ...saved, profiles: { name: currentProfile?.name || 'You' } });
-    LISTINGS.unshift(localItem);
-    document.getElementById('stat-items').textContent = LISTINGS.length;
-    userPostCount++;
-    document.getElementById('profile-count').textContent = `${userPostCount} item${userPostCount!==1?'s':''} posted`;
-  }
-  closeModal('post-modal');
-  updateFeed();
-  showToast('🎉 Posted! Someone out there is going to love this.');
-  // Reset form
-  ['post-title','post-location','post-desc'].forEach(id => document.getElementById(id).value='');
-  ['post-category','post-condition','post-neighbourhood'].forEach(id => document.getElementById(id).value='');
-  document.querySelectorAll('.pickup-chip.selected').forEach(c=>c.classList.remove('selected'));
-  document.querySelectorAll('.size-chip.selected').forEach(c=>c.classList.remove('selected'));
-  document.getElementById('size-section').style.display='none';
-  document.getElementById('photo-preview').style.display='none';
-  document.getElementById('photo-placeholder').style.display='block';
-};
-
 initApp();
 </script>
 </body>
