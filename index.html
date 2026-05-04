@@ -342,7 +342,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
   <div class="logo" onclick="showView('feed')">Give<em>It</em><span>Away</span></div>
   <div class="nav-links">
     <button class="nav-btn active" id="nav-browse" onclick="showView('feed')">Browse</button>
-    <button class="nav-btn msg-btn" id="nav-msgs" onclick="showView('messages')">Messages<span class="msg-dot"></span></button>
+    <button class="nav-btn msg-btn" id="nav-msgs" onclick="if(!requireAuth('view messages'))return;showView('messages')">Messages<span class="msg-dot"></span></button>
     <button class="nav-btn" id="nav-profile" onclick="showView('profile')">My Stuff</button>
     <button class="nav-btn" id="nav-about" onclick="showView('about')">About</button>
   </div>
@@ -360,7 +360,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Browse
   </button>
-  <button class="tab-btn" id="tab-msgs" onclick="showView('messages')" style="position:relative">
+  <button class="tab-btn" id="tab-msgs" onclick="if(!requireAuth('view messages'))return;showView('messages')" style="position:relative">
     <span class="tab-msg-dot" id="tab-msg-dot"></span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     Messages
@@ -1340,12 +1340,24 @@ function filterCategory(el, cat) {
   updateFeed();
 }
 
+function requireAuth(action) {
+  if (!currentUser) {
+    openModal('auth-modal');
+    document.getElementById('auth-title').textContent = 'Sign in to continue 🌿';
+    showToast('Create a free account to ' + action, '#FF8A65');
+    return false;
+  }
+  return true;
+}
+
 function openClaim(id) {
+  if (!requireAuth('claim items')) return;
   claimTarget = LISTINGS.find(l=>l.id===id);
   document.getElementById('claim-title').textContent = claimTarget.title;
   document.getElementById('claim-location').textContent = '📍 '+claimTarget.location+' · '+claimTarget.neighbourhood;
   document.getElementById('claim-emoji').textContent = claimTarget.emoji;
-  document.getElementById('claim-modal').classList.add('open');}
+  document.getElementById('claim-modal').classList.add('open');
+}
 
 function sendClaim() {
   closeModal('claim-modal');
@@ -1353,7 +1365,11 @@ function sendClaim() {
   setTimeout(()=>{ document.querySelector('.msg-dot').style.display='block'; }, 500);
 }
 
-function openPostModal() { openModal('post-modal'); buildSizeChips(); }
+function openPostModal() {
+  if (!requireAuth('post an item')) return;
+  openModal('post-modal');
+  buildSizeChips();
+}
 
 function buildSizeChips() { /* handled by toggleSizes now */ }
 
