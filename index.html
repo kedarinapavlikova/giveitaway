@@ -70,15 +70,15 @@ nav {
     background: var(--white);
     border-top: 1px solid #EDE9E3;
     z-index: 100;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-around;
-    padding: 8px 0.5rem 0;
-    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    padding: 10px 0.5rem;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
     height: auto;
-    min-height: 60px;
+    min-height: 62px;
   }
   .tab-btn {
-    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 3px; background: none; border: none; cursor: pointer;
     font-family: var(--font-body); font-size: 0.6rem; font-weight: 500;
     color: var(--gray); padding: 0; transition: color 0.15s;
@@ -87,15 +87,19 @@ nav {
   .tab-btn.active { color: var(--papaya-mid); }
   .tab-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
   .tab-post-btn {
-    flex: 0 0 50px; width: 50px; height: 50px; border-radius: 50%;
-    background: var(--papaya-mid); color: white; border: none; cursor: pointer;
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px; height: 50px; border-radius: 50%;
+    background: var(--papaya-mid); color: white; border: 3px solid var(--cream); cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 14px rgba(255,138,101,0.45);
-    transition: all 0.15s; margin-top: -18px;
-    font-size: 1.4rem; line-height: 1; flex-shrink: 0;
+    transition: all 0.15s;
+    font-size: 1.4rem; line-height: 1; flex-shrink: 0; z-index: 10;
   }
-  .tab-post-btn:hover { background: var(--papaya-dark); transform: scale(1.06); }
-  .tab-msg-dot { position: absolute; top: -2px; right: 10px; width: 7px; height: 7px; background: var(--lagoon); border-radius: 50%; border: 1.5px solid white; }
+  .tab-post-btn:hover { background: var(--papaya-dark); transform: translateX(-50%) scale(1.06); }
+  .tab-msg-dot { position: absolute; top: 0px; right: calc(50% - 13px); width: 7px; height: 7px; background: var(--lagoon); border-radius: 50%; border: 1.5px solid white; }
 }
 body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 
@@ -241,14 +245,47 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 .chat-send:hover { background: var(--lagoon-dark); }
 
 /* TOAST */
-.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--lagoon); color: white; border-radius: 24px; padding: 0.7rem 1.4rem; font-weight: 600; font-size: 0.88rem; z-index: 300; transition: transform 0.3s ease; box-shadow: 0 4px 20px rgba(0,191,165,0.35); white-space: nowrap; }
+.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(120px); background: var(--lagoon); color: white; border-radius: 24px; padding: 0.65rem 1rem 0.65rem 1.2rem; font-weight: 600; font-size: 0.88rem; z-index: 300; transition: transform 0.3s ease; box-shadow: 0 4px 20px rgba(0,191,165,0.35); display: flex; align-items: center; gap: 10px; }
 .toast.show { transform: translateX(-50%) translateY(0); }
-@media (max-width: 600px) { .toast { bottom: 5.5rem; font-size: 0.8rem; padding: 0.6rem 1.1rem; } }
+.toast-close { background: rgba(255,255,255,0.25); border: none; cursor: pointer; width: 20px; height: 20px; border-radius: 50%; color: white; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.12s; }
+.toast-close:hover { background: rgba(255,255,255,0.4); }
+@media (max-width: 600px) { .toast { bottom: 5.5rem; font-size: 0.8rem; padding: 0.55rem 0.85rem 0.55rem 1rem; } }
 
 /* FEEDBACK */
 .feedback-fab { position: fixed; bottom: 1.5rem; right: 1.25rem; z-index: 150; background: var(--white); border: 1.5px solid var(--lagoon); border-radius: 24px; padding: 0.45rem 0.9rem; font-family: var(--font-body); font-size: 0.78rem; font-weight: 600; color: var(--lagoon-dark); cursor: pointer; box-shadow: 0 2px 12px rgba(0,191,165,0.2); transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
 .feedback-fab:hover { background: var(--lagoon-light); transform: translateY(-2px); }
 @media (max-width: 600px) { .feedback-fab { bottom: 5rem; right: 1rem; } }
+
+/* INFO TOOLTIP */
+.info-wrap { position: relative; display: inline-flex; align-items: center; margin-left: 6px; vertical-align: middle; }
+.info-btn { background: none; border: 1.5px solid var(--gray-mid); color: var(--gray); border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0; transition: all 0.15s; font-family: Georgia, serif; }
+.info-btn:hover, .info-btn.open { background: var(--lagoon-light); border-color: var(--lagoon); color: var(--lagoon-dark); }
+.info-tooltip { display: none; position: absolute; left: 24px; top: -8px; width: 230px; background: var(--white); border: 1px solid var(--lagoon); border-radius: var(--radius-sm); padding: 0.75rem 0.9rem; box-shadow: var(--shadow-hover); z-index: 50; font-size: 0.75rem; line-height: 1.55; color: var(--charcoal); }
+.info-tooltip.show { display: block; }
+@media (max-width: 600px) { .info-tooltip { left: auto; right: 0; top: 24px; width: 220px; } }
+.info-tooltip .grade { font-weight: 600; color: var(--charcoal); margin-top: 6px; }
+.info-tooltip .grade:first-child { margin-top: 0; }
+.info-tooltip .grade-desc { color: var(--gray); }
+
+/* STICKY FOOTER */
+.site-footer { background: var(--white); border-top: 1px solid #EDE9E3; padding: 0.75rem 1.5rem; text-align: center; font-size: 0.72rem; color: var(--gray); }
+@media (max-width: 600px) { .site-footer { margin-bottom: max(62px, calc(60px + env(safe-area-inset-bottom))); } }
+.site-footer button { background: none; border: none; cursor: pointer; font-size: 0.72rem; color: var(--lagoon-dark); font-weight: 600; padding: 0; text-decoration: underline; font-family: var(--font-body); }
+
+/* FAQ / COMMUNITY STANDARDS PAGES */
+.content-page { padding: 1.5rem; max-width: 680px; margin: 0 auto; }
+.content-page h2 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; margin-bottom: 0.25rem; }
+.content-page .subtitle { font-size: 0.83rem; color: var(--gray); margin-bottom: 1.5rem; }
+.content-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+.content-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.6rem; color: var(--charcoal); display: flex; align-items: center; gap: 8px; }
+.content-card p, .content-card li { font-size: 0.85rem; line-height: 1.7; color: var(--charcoal); }
+.content-card ul { padding-left: 1.1rem; margin-top: 0.4rem; }
+.content-card ul li { margin-bottom: 4px; }
+.condition-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 0.6rem; }
+@media (max-width: 480px) { .condition-grid { grid-template-columns: 1fr; } }
+.condition-item { background: var(--gray-light); border-radius: var(--radius-xs); padding: 0.6rem 0.75rem; }
+.condition-item .c-name { font-weight: 600; font-size: 0.82rem; margin-bottom: 2px; }
+.condition-item .c-desc { font-size: 0.76rem; color: var(--gray); line-height: 1.45; }
 .rating-row { display: flex; gap: 8px; margin: 0.5rem 0 0.25rem; }
 .rating-chip { flex: 1; background: var(--gray-light); border: 1.5px solid transparent; border-radius: 10px; padding: 0.5rem 0.25rem; text-align: center; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.12s; user-select: none; }
 .rating-chip:hover { border-color: var(--lagoon); }
@@ -299,8 +336,8 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
   </div>
 </nav>
 
-<div class="bottom-nav">
-  <button class="tab-btn" id="tab-browse" onclick="showView('feed')">
+<div class="bottom-nav" style="position:fixed">
+  <button class="tab-btn active" id="tab-browse" onclick="showView('feed')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Browse
   </button>
@@ -309,7 +346,9 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     Messages
   </button>
-  <button class="tab-post-btn" onclick="openPostModal()" aria-label="Post item">+</button>
+  <div style="flex:1;position:relative;display:flex;align-items:center;justify-content:center">
+    <button class="tab-post-btn" onclick="openPostModal()" aria-label="Post item">+</button>
+  </div>
   <button class="tab-btn" id="tab-support" onclick="openModal('supporter-modal')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
     Support
@@ -317,10 +356,6 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
   <button class="tab-btn" id="tab-profile" onclick="showView('profile')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     My Stuff
-  </button>
-  <button class="tab-btn" id="tab-about" onclick="showView('about')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    About
   </button>
 </div>
 
@@ -365,6 +400,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
     <button class="filter-chip active" onclick="filterCategory(this,'all')">All</button>
     <button class="filter-chip" onclick="filterCategory(this,'Clothes')">👕 Clothes</button>
     <button class="filter-chip" onclick="filterCategory(this,'Shoes')">👟 Shoes</button>
+    <button class="filter-chip" onclick="filterCategory(this,'Maternity')">🤰 Maternity</button>
     <button class="filter-chip" onclick="filterCategory(this,'Gear')">🧺 Gear</button>
     <button class="filter-chip" onclick="filterCategory(this,'Toys')">🧸 Toys</button>
     <button class="filter-chip" onclick="filterCategory(this,'Bikes')">🚲 Bikes</button>
@@ -464,12 +500,12 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
         </div>
       </div>
       <div style="padding:1.25rem 1.5rem">
-        <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">When I was pregnant with my daughter Rosie, I got my first box of hand-me-downs from a friend (shout out to Rachel I!). We hadn't even seen each other in ages — she lived in another city — but we re-bonded over our babies, and she went out of her way to send me a ton of awesome clothes and even a bassinet. This interaction set the tone for how I'd approach dressing my kids for years to come.</p>
-        <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">Over the next few years I became a mildly obsessed kids-clothing-bargain-finder. Have you seen the prices of new kids clothes? Have you seen how fast they either ruin something with one good outdoor play session, or simply grow out of it? I was keeping eyes on all the apps for hot deals — but it was exhausting. Conversations abandoned when I realised I couldn't commit to a pickup. Scrambling for cash I never carry. Getting overstimulated trying to input an e-transfer and sending it to the wrong email. Trying to sell my own things and getting ghosted, lowballed, or just... nothing.</p>
-        <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">Fortunately I had great friends to keep the clothing karma going. My former boss still sends boxes of hand-me-downs for Rosie. I give almost everything Rosie outgrows to my neighbour — and once she grows out of them, I get them back and pass them on to another friend. I raid my nephew's closet for gear for my son Jordie. I am basically a one-woman operation trying to make kids' clothing and gear more cyclical.</p>
+        <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">When I was pregnant with my daughter Rosie, I got my first box of hand-me-downs from a friend (shout out to Rachel I!). We hadn't even seen each other in ages — she lived in another city — but we re-bonded over our babies, and she went out of her way to send me a ton of awesome clothes and even a bassinet. This interaction set the tone for how I'd approach dressing my kids.</p>
+        <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">Over the next few years I became a mildly obsessed kids-clothing-bargain-finder. Have you seen the prices of new kids clothes? Have you seen how fast they either ruin something with one good outdoor play session, or grow out of it? I keep eyes on all the apps for hot deals — but that is exhausting. Trying to coordinate picking something up. Scrambling for cash I never carry. Getting overstimulated trying to input an e-transfer and sending it to the wrong email. Trying to sell my own things and getting ghosted, lowballed, or just... nothing.</p>
+        <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">Fortunately I had great friends to keep the clothing karma going. A former boss still sends boxes of hand-me-downs for Rosie. I give almost everything Rosie outgrows to my neighbour, and once she grows out of them, I get them back and pass them on to <em>another</em> friend. I raid my nephew's closet for my son Jordie. I am basically a one-woman operation trying to make kids' stuff more cyclical.</p>
         <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">This is all to say: I wanted to build a better system. I've been to the second hand shops plenty of times only to either be offered $1.17 for 40 pieces of kids clothing, or have awesome pieces rejected due to tiny imperfections. We all know these clothes are still totally wearable (and honestly, they reduce my anxiety because I don't care if my kids continue to destroy them). But they won't sell on Marketplace either. You can donate them, but there's no guarantee they won't end up in landfill anyway — and it's still effort on your part with no real connection at the end of it.</p>
         <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">Direct, person-to-person giving is different. I've had so many genuine connections through giving and receiving kids' things — the kind where you end up chatting on the porch for twenty minutes and exchanging numbers. It makes parenting a little easier. It makes your community feel real. And it keeps good stuff out of the bin.</p>
-        <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">Getting a bag of hand-me-downs is so joyful! Finding a piece that becomes your kid's absolute favourite — the dress they refuse to take off, the hoodie that somehow captures their whole personality. Clothing is how little kids start to express who they are, and it doesn't have to cost a fortune (or anything) for that to happen.</p>
+        <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:1rem">Getting a bag of hand-me-downs is so joyful! Finding the dress they refuse to take off, the hoodie that somehow captures their whole personality... Clothing is a way for kids to express who they are, and it shouldn't have to cost a fortune (or anything).</p>
         <p style="font-size:0.9rem;line-height:1.75;color:var(--charcoal);margin-bottom:2rem">GiveItAway is built for exactly that. No price tags. No negotiations. No awkward lowball offers. Just neighbours passing things on to people who'll actually use them — and maybe making a friend along the way.</p>
         <div style="margin-top:1.5rem;display:flex;align-items:center;gap:10px">
           <svg width="36" height="34" viewBox="0 0 36 34" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -486,7 +522,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
       </div>
     </div>
     <div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.25rem 1.5rem;margin-bottom:1.25rem">
-      <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:0.75rem">The rules — always</div>
+      <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:0.75rem">How we do things around here</div>
       <div style="display:flex;flex-direction:column;gap:8px">
         <div style="display:flex;gap:10px;align-items:flex-start;font-size:0.85rem;line-height:1.5"><span style="color:var(--lagoon);font-weight:700;flex-shrink:0">✦</span><span>No money ever changes hands — ever. Not $1, not a trade for cash.</span></div>
         <div style="display:flex;gap:10px;align-items:flex-start;font-size:0.85rem;line-height:1.5"><span style="color:var(--lagoon);font-weight:700;flex-shrink:0">✦</span><span>Givers choose who receives — based on vibe, not speed.</span></div>
@@ -497,6 +533,152 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
     <div style="text-align:center;padding:0.5rem 0 1rem">
       <button class="post-btn" style="background:var(--lagoon)" onclick="openModal('supporter-modal')">✦ Support GiveItAway</button>
       <div style="font-size:0.75rem;color:var(--gray);margin-top:8px">Optional. $3/mo keeps the lights on.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SITE FOOTER -->
+<footer class="site-footer">
+  Free to use, always. No money ever changes hands between neighbours. 🌿<br>
+  Made in Kelowna, BC by <button onclick="showView('about')">Keds</button>
+  &nbsp;·&nbsp; <button onclick="showView('about')">About</button>
+  &nbsp;·&nbsp; <button onclick="showView('faq')">FAQ</button>
+  &nbsp;·&nbsp; <button onclick="showView('community')">Community Standards</button>
+  &nbsp;·&nbsp; <button onclick="showView('terms')">Terms &amp; Privacy</button>
+  &nbsp;·&nbsp; <button onclick="openModal('feedback-modal')">Feedback</button>
+</footer>
+
+<!-- FAQ VIEW -->
+<div id="view-faq" style="display:none">
+  <div class="content-page">
+    <button class="msg-back" onclick="showView('feed')">← Back to browse</button>
+    <h2>Frequently Asked Questions</h2>
+    <p class="subtitle">Everything you need to know about giving and getting on GiveItAway.</p>
+
+    <div class="content-card">
+      <h3>💸 Is this actually free?</h3>
+      <p>Yes. GiveItAway is free to use and no money ever changes hands between neighbours — not $1, not a trade for cash, not "just cover shipping." If someone asks you to pay for an item, report the listing.</p>
+    </div>
+
+    <div class="content-card">
+      <h3>📦 What can I post?</h3>
+      <p>Anything kids-related that another family could use:</p>
+      <ul>
+        <li>Clothing and shoes (all sizes, newborn to teen)</li>
+        <li>Baby and toddler gear (bouncers, carriers, monitors, high chairs)</li>
+        <li>Toys, puzzles, books, and games</li>
+        <li>Bikes, scooters, sports equipment</li>
+        <li>Maternity clothing (XS–3X)</li>
+      </ul>
+      <p style="margin-top:0.6rem">Not sure? Post it. If it could help a family, it belongs here.</p>
+    </div>
+
+    <div class="content-card">
+      <h3>🏷️ What do the condition grades mean?</h3>
+      <div class="condition-grid">
+        <div class="condition-item"><div class="c-name">🌟 New</div><div class="c-desc">Tags on, never used or worn.</div></div>
+        <div class="condition-item"><div class="c-name">✨ Like New</div><div class="c-desc">Worn once or twice. No visible wear or marks.</div></div>
+        <div class="condition-item"><div class="c-name">👍 Good</div><div class="c-desc">Gently used. Minor fading, small mark, or light pilling.</div></div>
+        <div class="condition-item"><div class="c-name">💪 Well Loved</div><div class="c-desc">Visible wear — rips, stains, or fading. Still totally wearable and usable!</div></div>
+      </div>
+      <p style="margin-top:0.75rem;font-size:0.8rem;color:var(--lagoon-dark);font-weight:500">🧺 Please wash clothing and fabric items before your item is picked up.</p>
+    </div>
+
+    <div class="content-card">
+      <h3>📍 Why is location required?</h3>
+      <p>GiveItAway is built for local, person-to-person giving. A specific intersection or neighbourhood helps claimants figure out if pickup is realistic for them — and avoids wasted conversations.</p>
+    </div>
+
+    <div class="content-card">
+      <h3>🤝 Who gets the item?</h3>
+      <p>OPs are asked to triage incoming requests and make appropriate arrangements — just like on any other online marketplace. We trust our community to handle it with kindness and common sense.</p>
+    </div>
+
+    <div class="content-card">
+      <h3>🚩 What if something seems off?</h3>
+      <p>Use the Report button on any listing. Our community mods review all reports. Listings asking for money, spam, or anything unsafe are removed promptly. Repeat offenders are banned.</p>
+    </div>
+
+    <div class="content-card">
+      <h3>✦ What is the Supporter program?</h3>
+      <p>GiveItAway is free to use and always will be. Optional supporters ($3–$15/mo) help cover hosting costs and get a badge on their profile. No pressure — using the app and giving generously is contribution enough.</p>
+    </div>
+  </div>
+</div>
+
+<!-- COMMUNITY STANDARDS VIEW -->
+<div id="view-community" style="display:none">
+  <div class="content-page">
+    <button class="msg-back" onclick="showView('feed')">← Back to browse</button>
+    <h2>Community Standards</h2>
+    <p class="subtitle">GiveItAway runs on trust. These are the rules that keep it that way.</p>
+
+    <div class="content-card">
+      <h3>✦ The non-negotiables</h3>
+      <ul>
+        <li><strong>No money, ever.</strong> Not for the item, not for delivery, not as a "suggested donation." Free means free.</li>
+        <li><strong>Be honest about condition.</strong> If something has a rip or stain, say so. Surprises at pickup erode trust.</li>
+        <li><strong>Be specific about location.</strong> A real intersection or neighbourhood, not just "Kelowna."</li>
+        <li><strong>Wash items before pickup.</strong> Especially clothing — a quick wash goes a long way for the next family.</li>
+        <li><strong>Follow through.</strong> If you claim something, show up. If you post something, be reachable.</li>
+        <li><strong>Be kind.</strong> This is a community, not a marketplace. Treat people like neighbours.</li>
+      </ul>
+    </div>
+
+    <div class="content-card">
+      <h3>🌿 What we're here to do</h3>
+      <p>Keep good stuff out of landfill. Make parenting a little more affordable. Build genuine connections between neighbours. Every item given is a small act of generosity — we take that seriously.</p>
+    </div>
+
+    <div class="content-card">
+      <h3>🚫 What gets you removed</h3>
+      <ul>
+        <li>Asking for or accepting money for items</li>
+        <li>Posting items in unsafe or unusable condition without disclosure</li>
+        <li>Harassment, discrimination, or unkind behaviour toward other members</li>
+        <li>Spam listings or fake accounts</li>
+        <li>Repeatedly claiming items and not following through</li>
+      </ul>
+    </div>
+
+    <div class="content-card">
+      <h3>👋 A note from Keds</h3>
+      <p>I built this because I believe people genuinely want to help each other — they just need an easy way to do it. If you're here, you already get it. Thank you for being part of this.</p>
+    </div>
+  </div>
+</div>
+
+<!-- TERMS & PRIVACY VIEW -->
+<div id="view-terms" style="display:none">
+  <div class="content-page">
+    <button class="msg-back" onclick="showView('feed')">← Back to browse</button>
+    <h2>Terms &amp; Privacy</h2>
+    <p class="subtitle">GiveItAway is in beta. Full legal terms are coming — here's the plain-language version for now.</p>
+
+    <div class="content-card">
+      <h3>📋 Terms of use (plain language)</h3>
+      <ul>
+        <li>GiveItAway is a free platform for giving items to other community members at no charge.</li>
+        <li>No money may change hands between users. Violations result in account removal.</li>
+        <li>GiveItAway is not responsible for the condition of items, safety of meetups, or disputes between users. Use good judgement and meet in safe, public places.</li>
+        <li>We reserve the right to remove listings or accounts that violate community standards.</li>
+        <li>By using GiveItAway, you agree to be a decent human being.</li>
+      </ul>
+    </div>
+
+    <div class="content-card">
+      <h3>🔒 Privacy (plain language)</h3>
+      <ul>
+        <li>During beta, we collect only what you give us: your name, email, and what you post.</li>
+        <li>We don't sell your data. We don't run ads. We don't share your information with third parties.</li>
+        <li>Your approximate location is shown on listings — never your exact address.</li>
+        <li>You can request deletion of your account and data at any time by contacting us.</li>
+      </ul>
+    </div>
+
+    <div class="content-card" style="background:var(--papaya-light);border:none">
+      <h3>🚧 Full legal terms coming soon</h3>
+      <p>We're a small beta — proper Terms of Service and Privacy Policy are in progress and will be published before any payment features go live. Questions? Use the Feedback button.</p>
     </div>
   </div>
 </div>
@@ -516,7 +698,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
       <label class="form-label">Category <span class="req">*</span></label>
       <select class="form-select" id="post-category" onchange="toggleSizes()">
         <option value="">Select a category</option>
-        <option>Clothes</option><option>Shoes</option><option>Gear</option><option>Toys</option>
+        <option>Clothes</option><option>Shoes</option><option>Maternity</option><option>Gear</option><option>Toys</option>
         <option>Bikes</option><option>Books</option><option>Sports</option><option>Other</option>
       </select>
     </div>
@@ -525,7 +707,18 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
       <div class="size-grid" id="size-chips"></div>
     </div>
     <div class="form-group">
-      <label class="form-label">Condition <span class="req">*</span></label>
+      <label class="form-label">Condition <span class="req">*</span>
+        <span class="info-wrap">
+          <button type="button" class="info-btn" id="condition-info-btn" onclick="toggleConditionTooltip()" aria-label="Condition guide">i</button>
+          <div class="info-tooltip" id="condition-tooltip">
+            <div class="grade">🌟 New <span class="grade-desc">— tags on, never used</span></div>
+            <div class="grade">✨ Like New <span class="grade-desc">— worn once or twice, no visible wear</span></div>
+            <div class="grade">👍 Good <span class="grade-desc">— gently used, minor fade or small mark</span></div>
+            <div class="grade">💪 Well Loved <span class="grade-desc">— visible wear, rips or stains, still totally usable</span></div>
+            <div style="margin-top:8px;font-size:0.7rem;color:var(--lagoon-dark);font-weight:500">🧺 Please wash items before pickup!</div>
+          </div>
+        </span>
+      </label>
       <select class="form-select" id="post-condition">
         <option value="">Select condition</option>
         <option>New (never used)</option><option>Like New</option><option>Good</option><option>Well Loved</option>
@@ -750,7 +943,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast"><span id="toast-msg"></span><button class="toast-close" onclick="dismissToast()">✕</button></div>
 
 <script>
 const SIZES = ['Preemie','Newborn','0–3m','3–6m','6–12m','12m','12–18m','18–24m','2T','3T','4T','5T','6','7','8','10','12','14','16'];
@@ -903,14 +1096,18 @@ function openPostModal() { openModal('post-modal'); buildSizeChips(); }
 
 function buildSizeChips() { /* handled by toggleSizes now */ }
 
+const MATERNITY_SIZES = ['XS','S','M','L','XL','XXL','1X','2X','3X'];
+
 function toggleSizes() {
   const cat = document.getElementById('post-category').value;
   const section = document.getElementById('size-section');
   const grid = document.getElementById('size-chips');
-  if (cat === 'Clothes' || cat === 'Shoes') {
+  if (cat === 'Clothes' || cat === 'Shoes' || cat === 'Maternity') {
     section.style.display = 'block';
     grid.innerHTML = '';
-    const sizes = cat === 'Shoes' ? SHOE_SIZES : SIZES;
+    const sizes = cat === 'Shoes' ? SHOE_SIZES : cat === 'Maternity' ? MATERNITY_SIZES : SIZES;
+    const label = document.querySelector('#size-section .form-label');
+    if (label) label.childNodes[0].textContent = cat === 'Maternity' ? 'Size(s) — select all that apply ' : 'Size(s) — select all that apply ';
     sizes.forEach(s => {
       const d = document.createElement('div');
       d.className = 'size-chip';
@@ -944,19 +1141,21 @@ function submitPost() {
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 function showView(v) {
-  ['feed','messages','profile','about'].forEach(name => {
-    document.getElementById('view-'+name).style.display = v===name ? 'block' : 'none';
+  ['feed','messages','profile','about','faq','community','terms'].forEach(name => {
+    const el = document.getElementById('view-'+name);
+    if (el) el.style.display = v===name ? 'block' : 'none';
   });
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   const map = {feed:'nav-browse',messages:'nav-msgs',profile:'nav-profile',about:'nav-about'};
   if (map[v] && document.getElementById(map[v])) document.getElementById(map[v]).classList.add('active');
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  const tabMap = {feed:'tab-browse',messages:'tab-msgs',profile:'tab-profile',about:'tab-about'};
+  const tabMap = {feed:'tab-browse',messages:'tab-msgs',profile:'tab-profile'};
   if (tabMap[v] && document.getElementById(tabMap[v])) document.getElementById(tabMap[v]).classList.add('active');
   if (v==='messages') renderThreadList();
   try { localStorage.setItem('gia_view', v); } catch(e){}
   const t = document.getElementById('toast');
   t.classList.remove('show');
+  window.scrollTo(0,0);
 }
 
 function updateClaimCount(el) {
@@ -1047,12 +1246,18 @@ function showThreadList() {
   renderThreadList();
 }
 
+let toastTimer = null;
 function showToast(msg, color) {
   const t = document.getElementById('toast');
   t.style.background = color || 'var(--lagoon)';
-  t.textContent = msg;
+  document.getElementById('toast-msg').textContent = msg;
   t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 3200);
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+}
+function dismissToast() {
+  document.getElementById('toast').classList.remove('show');
+  if (toastTimer) clearTimeout(toastTimer);
 }
 
 document.querySelectorAll('.modal-overlay').forEach(m => {
@@ -1153,10 +1358,28 @@ function completeSupport() {
   document.getElementById('supporter-strip').style.background = 'var(--lagoon-dark)';
 }
 
+function toggleConditionTooltip() {
+  const tooltip = document.getElementById('condition-tooltip');
+  const btn = document.getElementById('condition-info-btn');
+  const isOpen = tooltip.classList.contains('show');
+  tooltip.classList.toggle('show');
+  btn.classList.toggle('open');
+  if (!isOpen) {
+    const close = (e) => {
+      if (!document.getElementById('condition-info-btn').contains(e.target)) {
+        tooltip.classList.remove('show');
+        btn.classList.remove('open');
+        document.removeEventListener('click', close);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', close), 10);
+  }
+}
+
 updateFeed();
 try {
   const saved = localStorage.getItem('gia_view');
-  if (saved && ['feed','messages','profile','about'].includes(saved)) showView(saved);
+  if (saved && ['feed','messages','profile','about','faq','community','terms'].includes(saved)) showView(saved);
 } catch(e) {}
 
 const _origSubmitPost = submitPost;
