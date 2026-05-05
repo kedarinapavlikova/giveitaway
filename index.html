@@ -1506,6 +1506,8 @@ async function loadProfileListings() {
       <span class="tag ${item.status==='available'?'tag-condition':'tag-size'}" style="flex-shrink:0">${item.status==='available'?'Available':'Given 🎉'}</span>
     </div>`).join('');
 }
+
+function reportCurrentListing() {
   if (!claimTarget) return;
   closeModal('claim-modal');
   if (confirm(`Report "${claimTarget.title}"?\n\nThis will flag the listing for review by our community mods.`)) {
@@ -1825,6 +1827,7 @@ function openModal(id) {
     document.getElementById('edit-bio').value = currentProfile.bio || '';
     document.getElementById('edit-profile-error').classList.remove('show');
   }
+  if (id === 'auth-modal') {
     document.getElementById('auth-confirm-form').style.display = 'none';
     document.getElementById('auth-signin-form').style.display = 'block';
     document.getElementById('auth-signup-form').style.display = 'none';
