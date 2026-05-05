@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GiveItAway</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -31,7 +30,7 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--font-body); background: var(--cream); color: var(--charcoal); min-height: 100vh; padding-bottom: 0; }
-@media (max-width: 600px) { body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); } }
+@media (max-width: 600px) { body { padding-bottom: 70px; } }
 
 nav {
   background: var(--white);
@@ -43,7 +42,7 @@ nav {
   height: 60px;
   position: sticky; top: 0; z-index: 100;
 }
-.logo { font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: var(--papaya-mid); letter-spacing: -0.5px; cursor: pointer; flex-shrink: 0; }
+.logo { font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: var(--papaya); letter-spacing: -0.5px; cursor: pointer; flex-shrink: 0; }
 .logo span { color: var(--lagoon); }
 .logo em { font-style: normal; font-weight: 700; }
 .nav-links { display: flex; gap: 0.3rem; align-items: center; }
@@ -51,7 +50,7 @@ nav {
 .nav-btn:hover, .nav-btn.active { background: var(--papaya-light); color: var(--papaya-dark); }
 .nav-btn.msg-btn { position: relative; }
 .msg-dot { position: absolute; top: 5px; right: 8px; width: 7px; height: 7px; background: var(--lagoon); border-radius: 50%; }
-.post-btn { background: var(--papaya-mid); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.83rem; font-weight: 600; padding: 0.45rem 1.1rem; border-radius: 20px; transition: all 0.15s; white-space: nowrap; }
+.post-btn { background: var(--papaya); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.83rem; font-weight: 600; padding: 0.45rem 1.1rem; border-radius: 20px; transition: all 0.15s; white-space: nowrap; }
 .post-btn:hover { background: var(--papaya-dark); transform: translateY(-1px); }
 .nav-support-btn { color: var(--lagoon-dark); font-weight: 600; border: 1.5px solid var(--lagoon); border-radius: 20px; padding: 0.4rem 0.85rem; margin-right: 6px; font-family: var(--font-body); font-size: 0.83rem; background: none; cursor: none; white-space: nowrap; transition: all 0.15s; }
 .nav-support-btn:hover { background: var(--lagoon-light); }
@@ -85,7 +84,7 @@ nav {
     color: var(--gray); padding: 0; transition: color 0.15s;
     position: relative;
   }
-  .tab-btn.active { color: var(--papaya-mid); }
+  .tab-btn.active { color: var(--papaya); }
   .tab-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
   .tab-post-btn {
     position: absolute;
@@ -93,7 +92,7 @@ nav {
     left: 50%;
     transform: translateX(-50%);
     width: 50px; height: 50px; border-radius: 50%;
-    background: var(--papaya-mid); color: white; border: 3px solid var(--cream); cursor: pointer;
+    background: var(--papaya); color: white; border: 3px solid var(--cream); cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 14px rgba(255,138,101,0.45);
     transition: all 0.15s;
@@ -102,9 +101,9 @@ nav {
   .tab-post-btn:hover { background: var(--papaya-dark); transform: translateX(-50%) scale(1.06); }
   .tab-msg-dot { position: absolute; top: 0px; right: calc(50% - 13px); width: 7px; height: 7px; background: var(--lagoon); border-radius: 50%; border: 1.5px solid white; }
 }
+body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 
-
-.hero { background: var(--papaya-mid); padding: 1.1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.hero { background: var(--papaya); padding: 1.1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 @media (max-width: 600px) {
   .hero { padding: 0.6rem 1rem; gap: 0.5rem; }
   .hero-text h1 { font-size: 1rem; }
@@ -136,9 +135,9 @@ nav {
 .filters::-webkit-scrollbar { display: none; }
 .filter-chip { white-space: nowrap; flex-shrink: 0; background: var(--gray-light); border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.78rem; font-weight: 500; color: var(--charcoal); padding: 0.32rem 0.85rem; border-radius: 20px; transition: all 0.15s; }
 .filter-chip:hover { background: var(--papaya-light); color: var(--papaya-dark); }
-.filter-chip.active { background: var(--papaya-mid); color: white; }
+.filter-chip.active { background: var(--papaya); color: white; }
 
-
+.main { padding: 1.25rem 1.5rem; max-width: 1100px; margin: 0 auto; }
 .feed-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
 .section-label { font-size: 0.73rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--gray); }
 .search-result-info { font-size: 0.8rem; color: var(--lagoon-dark); font-weight: 500; }
@@ -146,7 +145,6 @@ nav {
 .masonry { columns: 3; column-gap: 1rem; }
 @media (max-width: 860px) { .masonry { columns: 2; } }
 @media (max-width: 520px) { .masonry { columns: 1; } }
-.masonry:empty + .empty-state, .masonry .empty-state { column-span: all; -webkit-column-span: all; }
 
 .card { break-inside: avoid; background: var(--white); border-radius: var(--radius); margin-bottom: 1rem; overflow: hidden; box-shadow: var(--shadow); transition: all 0.2s; cursor: pointer; position: relative; }
 .card:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px); }
@@ -166,12 +164,12 @@ nav {
 .giver { display: flex; align-items: center; gap: 7px; }
 .avatar { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 600; color: white; flex-shrink: 0; }
 .giver-name { font-size: 0.76rem; color: var(--gray); }
-.claim-btn { background: var(--papaya-mid); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.76rem; font-weight: 600; padding: 0.32rem 0.85rem; border-radius: 20px; transition: all 0.15s; white-space: nowrap; }
+.claim-btn { background: var(--papaya); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.76rem; font-weight: 600; padding: 0.32rem 0.85rem; border-radius: 20px; transition: all 0.15s; white-space: nowrap; }
 .claim-btn:hover { background: var(--papaya-dark); }
 .new-badge { position: absolute; top: 9px; right: 9px; background: var(--lagoon); color: white; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; }
 
-.empty-state { text-align: center; padding: 4rem 1rem; color: var(--gray); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 40vh; width: 100%; column-span: all; -webkit-column-span: all; }
-.empty-state .big { font-size: 3.5rem; margin-bottom: 0.75rem; }
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--gray); grid-column: 1/-1; }
+.empty-state .big { font-size: 3rem; margin-bottom: 0.5rem; }
 
 /* MODAL BASE */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(45,45,45,0.5); z-index: 200; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; }
@@ -184,7 +182,7 @@ nav {
 .close-btn:hover { background: var(--gray-mid); }
 .form-group { margin-bottom: 1rem; }
 .form-label { font-size: 0.8rem; font-weight: 600; color: var(--charcoal); margin-bottom: 0.38rem; display: block; }
-.form-label .req { color: var(--papaya-mid); margin-left: 2px; }
+.form-label .req { color: var(--papaya); margin-left: 2px; }
 .form-input, .form-select, .form-textarea { width: 100%; background: var(--gray-light); border: none; border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 0.88rem; color: var(--charcoal); padding: 0.6rem 0.9rem; outline: none; transition: box-shadow 0.15s; }
 .form-input:focus, .form-select:focus, .form-textarea:focus { box-shadow: 0 0 0 2px var(--papaya); }
 .form-textarea { resize: vertical; min-height: 75px; }
@@ -192,12 +190,12 @@ nav {
 .size-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(82px, 1fr)); gap: 5px; }
 .size-chip { background: var(--gray-light); border: 1.5px solid transparent; border-radius: 9px; padding: 0.38rem 0.4rem; text-align: center; cursor: pointer; font-size: 0.76rem; font-weight: 500; transition: all 0.12s; user-select: none; }
 .size-chip:hover { border-color: var(--papaya); }
-.size-chip.selected { background: var(--papaya-light); border-color: var(--papaya-mid); color: var(--papaya-dark); }
+.size-chip.selected { background: var(--papaya-light); border-color: var(--papaya); color: var(--papaya-dark); }
 .pickup-grid { display: flex; gap: 7px; flex-wrap: wrap; }
 .pickup-chip { background: var(--gray-light); border: 1.5px solid transparent; border-radius: 10px; padding: 0.45rem 0.9rem; cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.12s; user-select: none; }
 .pickup-chip:hover { border-color: var(--lagoon); }
 .pickup-chip.selected { background: var(--lagoon-light); border-color: var(--lagoon); color: var(--lagoon-dark); }
-.submit-btn { width: 100%; background: var(--papaya-mid); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.95rem; font-weight: 600; padding: 0.8rem; border-radius: var(--radius-sm); margin-top: 0.4rem; transition: all 0.15s; }
+.submit-btn { width: 100%; background: var(--papaya); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.95rem; font-weight: 600; padding: 0.8rem; border-radius: var(--radius-sm); margin-top: 0.4rem; transition: all 0.15s; }
 .submit-btn:hover { background: var(--papaya-dark); transform: translateY(-1px); }
 
 /* CLAIM MODAL */
@@ -247,9 +245,9 @@ nav {
 .chat-send:hover { background: var(--lagoon-dark); }
 
 /* TOAST */
-.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(120px); background: var(--lagoon); color: white; border-radius: 24px; padding: 0.65rem 1rem 0.65rem 1.2rem; font-weight: 600; font-size: 0.88rem; z-index: 500; transition: transform 0.3s ease; box-shadow: 0 4px 20px rgba(0,191,165,0.35); display: flex; align-items: center; gap: 10px; }
+.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(120px); background: var(--lagoon); color: white; border-radius: 24px; padding: 0.65rem 1rem 0.65rem 1.2rem; font-weight: 600; font-size: 0.88rem; z-index: 300; transition: transform 0.3s ease; box-shadow: 0 4px 20px rgba(0,191,165,0.35); display: flex; align-items: center; gap: 10px; }
 .toast.show { transform: translateX(-50%) translateY(0); }
-.toast-close { background: rgba(255,255,255,0.25); border: none; cursor: pointer; width: 24px; height: 24px; border-radius: 50%; color: white; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.12s; padding: 0; }
+.toast-close { background: rgba(255,255,255,0.25); border: none; cursor: pointer; width: 20px; height: 20px; border-radius: 50%; color: white; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.12s; }
 .toast-close:hover { background: rgba(255,255,255,0.4); }
 @media (max-width: 600px) { .toast { bottom: 5.5rem; font-size: 0.8rem; padding: 0.55rem 0.85rem 0.55rem 1rem; } }
 
@@ -270,9 +268,9 @@ nav {
 .info-tooltip .grade-desc { color: var(--gray); }
 
 /* STICKY FOOTER */
-.site-footer { background: var(--white); border-top: 1px solid #EDE9E3; padding: 0.75rem 1.5rem; text-align: center; font-size: 0.72rem; color: var(--gray); position: sticky; bottom: 0; clear: both; margin-top: 2rem; }
+.site-footer { background: var(--white); border-top: 1px solid #EDE9E3; padding: 0.75rem 1.5rem; text-align: center; font-size: 0.72rem; color: var(--gray); }
+@media (max-width: 600px) { .site-footer { margin-bottom: max(62px, calc(60px + env(safe-area-inset-bottom))); } }
 .site-footer button { background: none; border: none; cursor: pointer; font-size: 0.72rem; color: var(--lagoon-dark); font-weight: 600; padding: 0; text-decoration: underline; font-family: var(--font-body); }
-.main { padding: 1.25rem 1.5rem 2.5rem; max-width: 1100px; margin: 0 auto; }
 
 /* AUTH */
 .auth-tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 2px solid var(--gray-light); }
@@ -281,7 +279,7 @@ nav {
 .auth-error { background: #FFEBEE; color: #C62828; border-radius: var(--radius-xs); padding: 0.6rem 0.9rem; font-size: 0.82rem; margin-bottom: 0.75rem; display: none; }
 .auth-error.show { display: block; }
 .auth-divider { text-align: center; font-size: 0.75rem; color: var(--gray); margin: 0.75rem 0; }
-.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--papaya-mid); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; cursor: pointer; flex-shrink: 0; }
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--papaya); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; cursor: pointer; flex-shrink: 0; }
 .loading-overlay { position: fixed; inset: 0; background: rgba(250,249,246,0.85); z-index: 400; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px; }
 .loading-overlay.show { display: flex; }
 .spinner { width: 32px; height: 32px; border: 3px solid var(--lagoon-light); border-top-color: var(--lagoon); border-radius: 50%; animation: spin 0.7s linear infinite; }
@@ -290,7 +288,7 @@ nav {
 .feed-empty .big { font-size: 3rem; margin-bottom: 0.5rem; }
 
 /* FAQ / COMMUNITY STANDARDS PAGES */
-.content-page { padding: 1.5rem; max-width: 680px; margin: 0 auto; min-height: 60vh; }
+.content-page { padding: 1.5rem; max-width: 680px; margin: 0 auto; }
 .content-page h2 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; margin-bottom: 0.25rem; }
 .content-page .subtitle { font-size: 0.83rem; color: var(--gray); margin-bottom: 1.5rem; }
 .content-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
@@ -309,19 +307,19 @@ nav {
 .rating-chip.selected { background: var(--lagoon-light); border-color: var(--lagoon); color: var(--lagoon-dark); }
 .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0.5rem 0; }
 .tag-chip { background: var(--gray-light); border: 1.5px solid transparent; border-radius: 20px; padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.76rem; font-weight: 500; transition: all 0.12s; user-select: none; }
-.tag-chip:hover { border-color: var(--papaya-mid); }
-.tag-chip.selected { background: var(--papaya-light); border-color: var(--papaya-mid); color: #BF360C; }
+.tag-chip:hover { border-color: var(--papaya); }
+.tag-chip.selected { background: var(--papaya-light); border-color: var(--papaya); color: #BF360C; }
 .supporter-banner { background: var(--lagoon-light); border: 1px solid #B2DFDB; border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .supporter-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 700; padding: 2px 9px; border-radius: 20px; letter-spacing: 0.03em; vertical-align: middle; margin-left: 5px; }
 .badge-neighbour { background: var(--lagoon-light); color: var(--lagoon-dark); border: 1px solid var(--lagoon); }
-.badge-champion { background: var(--papaya-light); color: #BF360C; border: 1px solid var(--papaya-mid); }
+.badge-champion { background: var(--papaya-light); color: #BF360C; border: 1px solid var(--papaya); }
 .badge-founding { background: #FFF8E1; color: #E65100; border: 1px solid #FFB300; }
 .tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 1.1rem 0; }
 @media (max-width: 500px) { .tier-grid { grid-template-columns: 1fr; } }
 .tier-card { border: 1.5px solid var(--gray-mid); border-radius: var(--radius-sm); padding: 1rem 0.9rem; cursor: pointer; transition: all 0.15s; text-align: center; position: relative; background: var(--white); }
 .tier-card:hover { border-color: var(--lagoon); transform: translateY(-2px); box-shadow: var(--shadow); }
 .tier-card.selected { border-color: var(--lagoon); border-width: 2px; background: var(--lagoon-light); }
-.popular-label { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); background: var(--papaya-mid); color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 10px; border-radius: 20px; white-space: nowrap; }
+.popular-label { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); background: var(--papaya); color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 10px; border-radius: 20px; white-space: nowrap; }
 .tier-emoji { font-size: 1.5rem; margin-bottom: 4px; }
 .tier-price { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--charcoal); line-height: 1; }
 .tier-price span { font-size: 0.75rem; font-weight: 400; color: var(--gray); }
@@ -335,6 +333,96 @@ nav {
 .feed-supporter-strip { background: var(--lagoon); color: white; text-align: center; padding: 0.55rem 1.5rem; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: background 0.15s; }
 .feed-supporter-strip:hover { background: var(--lagoon-dark); }
 .feed-supporter-strip strong { font-weight: 700; }
+
+/* ── KARMA CHIP (nav) ───────────────────────────────────────────── */
+.karma-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--papaya-light); color: #7A1F00; padding: 0.32rem 0.72rem; border-radius: 20px; font-size: 0.78rem; font-weight: 600; flex-shrink: 0; }
+.karma-chip .kc-spark { color: var(--papaya); }
+@keyframes karmaChipPulse {
+  0%   { transform: scale(1);    box-shadow: 0 0 0 0   rgba(255,138,101,0.5); }
+  50%  { transform: scale(1.12); box-shadow: 0 0 0 10px rgba(255,138,101,0); }
+  100% { transform: scale(1);    box-shadow: 0 0 0 0   rgba(255,138,101,0); }
+}
+.karma-chip.pulse { animation: karmaChipPulse 0.9s ease; }
+
+/* ── OWN-POST CARD CONTROLS ─────────────────────────────────────── */
+.my-post-badge { position: absolute; top: 9px; left: 9px; background: rgba(255,255,255,0.95); color: #7A1F00; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; z-index: 2; border: 1px solid var(--papaya); }
+.card-owner-actions { display: flex; gap: 4px; }
+.card-edit-btn { background: var(--gray-light); border: none; cursor: pointer; width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--charcoal); transition: background 0.12s; flex-shrink: 0; }
+.card-edit-btn:hover { background: var(--gray-mid); }
+.card-given-btn { background: var(--lagoon); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.72rem; font-weight: 600; padding: 0.3rem 0.7rem; border-radius: 20px; white-space: nowrap; transition: background 0.12s; }
+.card-given-btn:hover { background: var(--lagoon-dark); }
+
+/* ── MY STUFF PAGE ──────────────────────────────────────────────── */
+.my-stuff-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+.my-stuff-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--charcoal); }
+.karma-stats { display: flex; gap: 10px; margin-bottom: 1.4rem; }
+.karma-stat-card { flex: 1; background: var(--white); border-radius: 14px; padding: 1rem; box-shadow: var(--shadow); }
+.karma-stat-label { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); margin-bottom: 4px; }
+.karma-stat-value { font-family: var(--font-display); font-size: 2.1rem; font-weight: 700; line-height: 1; }
+.stuff-tabs { display: flex; gap: 6px; margin-bottom: 1rem; border-bottom: 1px solid #EDE9E3; padding-bottom: 6px; }
+.stuff-tab { background: none; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.85rem; font-weight: 600; padding: 0.55rem 1rem; border-radius: 20px; transition: all 0.12s; color: var(--gray); white-space: nowrap; }
+.stuff-tab.active { background: var(--papaya-light); color: #7A1F00; }
+.stuff-row { background: var(--white); border-radius: 12px; padding: 0.85rem 1rem; display: flex; align-items: center; gap: 14px; margin-bottom: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: all 0.15s; position: relative; }
+.stuff-row:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+.stuff-row.given-row { opacity: 0.78; }
+.stuff-row-icon { width: 56px; height: 56px; border-radius: 10px; flex-shrink: 0; background: linear-gradient(135deg, var(--papaya-light), var(--lagoon-light)); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+.stuff-row-icon.faded { background: var(--lagoon-light); filter: grayscale(0.45); }
+.stuff-row-body { flex: 1; min-width: 0; }
+.stuff-row-title { font-weight: 600; font-size: 0.92rem; color: var(--charcoal); }
+.stuff-row-title.crossed { text-decoration: line-through; color: var(--gray); }
+.stuff-row-meta { font-size: 0.74rem; color: var(--gray); margin-top: 2px; }
+.stuff-row-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+.stuff-edit-btn { background: var(--gray-light); border: none; cursor: pointer; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--charcoal); transition: background 0.12s; }
+.stuff-edit-btn:hover { background: var(--gray-mid); }
+.stuff-mark-btn { background: var(--lagoon); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.78rem; font-weight: 600; padding: 0 0.85rem; border-radius: 20px; height: 34px; white-space: nowrap; transition: background 0.12s; }
+.stuff-mark-btn:hover { background: var(--lagoon-dark); }
+.stuff-more-btn { background: var(--gray-light); border: none; cursor: pointer; width: 34px; height: 34px; border-radius: 10px; font-size: 18px; color: var(--charcoal); transition: background 0.12s; }
+.stuff-more-btn:hover { background: var(--gray-mid); }
+.stuff-row-menu { position: absolute; top: calc(100% - 2px); right: 10px; background: var(--white); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.14); min-width: 180px; z-index: 20; overflow: hidden; animation: modalIn 0.12s ease; }
+.stuff-menu-item { display: block; width: 100%; text-align: left; background: none; border: none; padding: 0.55rem 0.9rem; font-size: 0.83rem; cursor: pointer; color: var(--charcoal); font-family: var(--font-body); transition: background 0.1s; }
+.stuff-menu-item:hover { background: var(--gray-light); }
+.stuff-menu-item.menu-danger { color: #C62828; }
+.stuff-empty { background: var(--white); border-radius: 12px; padding: 2.2rem 1rem; text-align: center; color: var(--gray); font-size: 0.88rem; line-height: 1.6; }
+.stuff-tag-requests { background: #FFF8E1; color: #7A2E00; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.04em; text-transform: uppercase; }
+.stuff-tag-given { background: var(--lagoon-light); color: #003D38; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+/* ── KARMA BLOOM MODAL ──────────────────────────────────────────── */
+.karma-bloom-overlay { display: none; position: fixed; inset: 0; background: rgba(45,45,45,0.55); z-index: 350; align-items: center; justify-content: center; padding: 1rem; }
+.karma-bloom-overlay.open { display: flex; }
+.karma-bloom { background: linear-gradient(160deg, var(--papaya-light) 0%, var(--white) 45%, var(--lagoon-light) 100%); border-radius: 16px; width: 100%; max-width: 460px; padding: 2.2rem 1.6rem 1.5rem; position: relative; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.18); animation: karmaIn 0.35s cubic-bezier(0.2,0.9,0.3,1.2); }
+@keyframes karmaIn { from { opacity: 0; transform: scale(0.92) translateY(20px); } to { opacity: 1; transform: none; } }
+.bloom-heart-wrap { position: relative; font-size: 4.2rem; line-height: 1; margin-bottom: 0.5rem; }
+.bloom-heart-wrap span { display: inline-block; animation: karmaPop 0.6s cubic-bezier(0.3,1.4,0.6,1); }
+@keyframes karmaPop { 0% { transform: scale(0.3) rotate(-30deg); } 60% { transform: scale(1.25) rotate(8deg); } 100% { transform: scale(1) rotate(0deg); } }
+.bloom-title { font-family: var(--font-display); font-size: 1.7rem; font-weight: 700; color: var(--charcoal); margin: 0; position: relative; }
+.bloom-sub { font-size: 0.86rem; color: var(--gray); margin-top: 6px; position: relative; }
+.bloom-sub em { color: var(--lagoon-dark); font-style: normal; font-weight: 600; }
+.bloom-stats { display: flex; gap: 10px; margin: 1.4rem 0 1.2rem; position: relative; }
+.bloom-stat { flex: 1; background: rgba(255,255,255,0.7); border-radius: 14px; padding: 0.8rem 0.6rem; text-align: center; }
+.bloom-stat-label { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); margin-bottom: 4px; }
+.bloom-stat-value { font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; line-height: 1; }
+.bloom-stat-sub { font-size: 0.7rem; color: var(--gray); margin-top: 4px; }
+.bloom-actions { display: flex; gap: 8px; position: relative; }
+.bloom-outline-btn { flex: 1; background: none; color: var(--lagoon-dark); border: 1.5px solid var(--lagoon); cursor: pointer; font-family: var(--font-body); font-size: 0.88rem; font-weight: 600; padding: 0.55rem 1rem; border-radius: 20px; transition: background 0.12s; }
+.bloom-outline-btn:hover { background: var(--lagoon-light); }
+.bloom-primary-btn { flex: 1; background: var(--papaya); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.88rem; font-weight: 600; padding: 0.55rem 1rem; border-radius: 20px; transition: background 0.12s; }
+.bloom-primary-btn:hover { background: var(--papaya-dark); }
+.heart-burst { position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: 16px; }
+@keyframes karmaHeart {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(-10deg); }
+  15%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.85) rotate(20deg); }
+}
+
+/* ── CONFIRM REMOVE ─────────────────────────────────────────────── */
+.confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(45,45,45,0.5); z-index: 260; align-items: center; justify-content: center; padding: 1rem; }
+.confirm-overlay.open { display: flex; }
+.confirm-box { background: var(--white); border-radius: 16px; width: 100%; max-width: 380px; padding: 1.5rem; animation: modalIn 0.18s ease; }
+.confirm-box h3 { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; }
+.confirm-box p { font-size: 0.85rem; color: var(--gray); margin-bottom: 16px; line-height: 1.55; }
+.confirm-actions { display: flex; gap: 8px; }
+.danger-remove-btn { flex: 1; background: #FFEBEE; color: #C62828; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.83rem; font-weight: 600; padding: 0.45rem 1.1rem; border-radius: 20px; transition: background 0.12s; }
+.danger-remove-btn:hover { background: #FFCDD2; }
 </style>
 </head>
 <body>
@@ -343,11 +431,12 @@ nav {
   <div class="logo" onclick="showView('feed')">Give<em>It</em><span>Away</span></div>
   <div class="nav-links">
     <button class="nav-btn active" id="nav-browse" onclick="showView('feed')">Browse</button>
-    <button class="nav-btn msg-btn" id="nav-msgs" onclick="if(!requireAuth('view messages'))return;showView('messages')" style="display:none">Messages<span class="msg-dot" id="nav-msg-dot" style="display:none"></span></button>
-    <button class="nav-btn" id="nav-profile" onclick="showView('profile')" style="display:none">My Stuff</button>
+    <button class="nav-btn msg-btn" id="nav-msgs" onclick="if(!requireAuth('view messages'))return;showView('messages')">Messages<span class="msg-dot"></span></button>
+    <button class="nav-btn" id="nav-profile" onclick="showView('profile')">My Stuff</button>
     <button class="nav-btn" id="nav-about" onclick="showView('about')">About</button>
   </div>
   <div style="display:flex;align-items:center;gap:6px">
+    <div id="karma-chip-wrap" style="display:none"><div class="karma-chip" id="karma-chip"><span class="kc-spark">✦</span><span class="karma-count">0 given</span></div></div>
     <div id="nav-auth-area">
       <button class="post-btn" style="background:var(--lagoon)" onclick="openModal('auth-modal')">Sign in</button>
     </div>
@@ -361,8 +450,8 @@ nav {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Browse
   </button>
-  <button class="tab-btn" id="tab-msgs" onclick="if(!requireAuth('view messages'))return;showView('messages')" style="position:relative;display:none">
-    <span class="tab-msg-dot" id="tab-msg-dot" style="display:none"></span>
+  <button class="tab-btn" id="tab-msgs" onclick="if(!requireAuth('view messages'))return;showView('messages')" style="position:relative">
+    <span class="tab-msg-dot" id="tab-msg-dot"></span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     Messages
   </button>
@@ -373,7 +462,7 @@ nav {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
     Support
   </button>
-  <button class="tab-btn" id="tab-profile" onclick="showView('profile')" style="display:none">
+  <button class="tab-btn" id="tab-profile" onclick="showView('profile')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     My Stuff
   </button>
@@ -388,8 +477,8 @@ nav {
     </div>
     <div class="hero-stats">
       <div class="stat"><div class="stat-num" id="stat-items">—</div><div class="stat-label">available</div></div>
-      <div class="stat"><div class="stat-num">—</div><div class="stat-label">given away</div></div>
-      <div class="stat"><div class="stat-num">—</div><div class="stat-label">givers</div></div>
+      <div class="stat"><div class="stat-num">138</div><div class="stat-label">given away</div></div>
+      <div class="stat"><div class="stat-num">61</div><div class="stat-label">givers</div></div>
     </div>
   </div>
 
@@ -431,7 +520,7 @@ nav {
 
   <div class="main">
     <div class="feed-meta">
-      <div class="section-label" id="feed-label"></div>
+      <div class="section-label" id="feed-label">Loading...</div>
       <div class="search-result-info" id="search-info"></div>
     </div>
     <div class="masonry" id="feed"></div>
@@ -440,17 +529,11 @@ nav {
 
 <!-- MESSAGES VIEW -->
 <div id="view-messages" style="display:none">
-  <div class="msg-view" style="min-height:60vh">
+  <div class="msg-view">
     <div id="thread-list-view">
       <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;margin-bottom:1.1rem;color:var(--charcoal)">Messages</div>
       <div class="section-label" style="margin-bottom:0.75rem">Active conversations</div>
       <div class="thread-list" id="thread-list"></div>
-      <div id="messages-empty" style="display:none;text-align:center;padding:3rem 1rem;color:var(--gray)">
-        <div style="font-size:3rem;margin-bottom:0.75rem">💬</div>
-        <p style="font-weight:600;margin-bottom:6px">No messages yet!</p>
-        <p style="font-size:0.85rem;line-height:1.6">Click <strong>"I want this!"</strong> on an item to start a conversation with a neighbour.</p>
-        <button onclick="showView('feed')" style="margin-top:1rem;background:var(--lagoon);color:white;border:none;cursor:pointer;font-family:var(--font-body);font-size:0.85rem;font-weight:600;padding:0.5rem 1.25rem;border-radius:20px">Browse items</button>
-      </div>
     </div>
     <div id="chat-view" style="display:none">
       <button class="msg-back" onclick="showThreadList()">← Back to messages</button>
@@ -473,53 +556,58 @@ nav {
   </div>
 </div>
 
-<!-- PROFILE VIEW -->
+<!-- MY STUFF VIEW -->
 <div id="view-profile" style="display:none">
-  <div class="main" style="max-width:680px">
-    <div style="background:var(--white);border-radius:var(--radius);padding:1.4rem;margin-bottom:1.25rem;box-shadow:var(--shadow);display:flex;align-items:center;gap:1rem;">
-      <div class="avatar" style="width:52px;height:52px;font-size:1.1rem;background:var(--papaya-mid)" id="profile-avatar">ME</div>
-      <div style="flex:1">
-        <div style="font-family:var(--font-display);font-size:1.15rem;font-weight:700;display:flex;align-items:center;flex-wrap:wrap;gap:4px" id="profile-name-display">Your Profile <span id="profile-badge" style="display:none"></span></div>
-        <div style="font-size:0.8rem;color:var(--gray);margin-top:2px" id="profile-neighbourhood">Kelowna · Member since 2025</div>
-        <div style="margin-top:6px;display:flex;gap:7px;flex-wrap:wrap;align-items:center">
-          <span class="tag tag-size" id="profile-count">0 items posted</span>
-          <button onclick="openModal('edit-profile-modal')" style="background:none;border:none;cursor:pointer;font-size:0.75rem;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;padding:0;font-family:var(--font-body)">Edit profile</button>
-        </div>
+  <div class="main" style="max-width:760px">
+    <div class="my-stuff-header">
+      <div>
+        <div class="my-stuff-title">My stuff</div>
+        <div style="font-size:0.82rem;color:var(--gray);margin-top:2px">Everything you've posted, shared, and given.</div>
+      </div>
+      <button class="post-btn" onclick="openPostModal()">+ Post item</button>
+    </div>
+
+    <div class="karma-stats">
+      <div class="karma-stat-card" style="border:1.5px solid var(--papaya)">
+        <div class="karma-stat-label">Hearts given</div>
+        <div class="karma-stat-value" id="karma-hearts-val" style="color:var(--papaya)">💚 0</div>
+      </div>
+      <div class="karma-stat-card" style="border:1.5px solid var(--lagoon)">
+        <div class="karma-stat-label">Streak</div>
+        <div class="karma-stat-value" id="karma-streak-val" style="color:var(--lagoon)">🔥 0w</div>
+      </div>
+      <div class="karma-stat-card" style="border:1.5px solid #4527A0">
+        <div class="karma-stat-label">Live listings</div>
+        <div class="karma-stat-value" id="karma-live-val" style="color:#4527A0">0</div>
       </div>
     </div>
 
-    <div id="profile-listings-section">
-      <div class="section-label" style="margin-bottom:0.75rem">Your listings</div>
-      <div id="profile-listings-grid" style="display:flex;flex-direction:column;gap:10px">
-        <div style="text-align:center;padding:1rem;color:var(--gray);font-size:0.85rem">Loading your listings...</div>
-      </div>
-    </div>
-
-    <div id="profile-empty-state" style="display:none;text-align:center;padding:2rem 1rem">
-      <div style="font-size:2.5rem;margin-bottom:0.75rem">📦</div>
-      <p style="font-weight:600;margin-bottom:6px">Nothing posted yet!</p>
-      <p style="font-size:0.85rem;color:var(--gray)">Hit "+ Post Item" and make someone's day.</p>
-      <button class="post-btn" style="margin-top:1rem" onclick="openPostModal()">+ Post your first item</button>
-    </div>
-
-    <div style="margin-top:1.5rem" id="supporter-profile-banner">
+    <div id="supporter-profile-banner" style="display:block;margin-bottom:1rem">
       <div class="supporter-banner">
         <div>
           <div style="font-weight:600;font-size:0.92rem;margin-bottom:3px">Keep GiveItAway free for everyone 💚</div>
-          <div style="font-size:0.8rem;color:var(--lagoon-dark)">$3/mo keeps the lights on. Cancel anytime.</div>
+          <div style="font-size:0.8rem;color:var(--lagoon-dark)">Optional supporters keep the lights on. $3/mo. Cancel anytime. No pressure at all.</div>
         </div>
-        <button class="post-btn" style="background:var(--lagoon);white-space:nowrap;flex-shrink:0" onclick="openModal('supporter-modal')">✦ Support us</button>
+        <button class="post-btn" style="background:var(--lagoon);white-space:nowrap;flex-shrink:0" onclick="openModal('supporter-modal')">✦ Become a supporter</button>
       </div>
     </div>
-    <div style="margin-top:1.5rem;display:none" id="supporter-profile-active">
+    <div id="supporter-profile-active" style="display:none;margin-bottom:1rem">
       <div class="supporter-banner" style="background:var(--lagoon-light)">
         <div>
-          <div style="font-weight:600;font-size:0.92rem;margin-bottom:3px">You're a GiveItAway supporter ✦</div>
+          <div style="font-weight:600;font-size:0.92rem;margin-bottom:3px">You're a GiveItAway supporter ✦ <span id="profile-badge" style="display:none"></span></div>
           <div style="font-size:0.8rem;color:var(--lagoon-dark)" id="supporter-tier-label">Thank you — you're keeping this community alive.</div>
         </div>
         <button class="nav-btn" style="font-size:0.78rem;color:var(--gray)" onclick="openModal('supporter-modal')">Manage</button>
       </div>
     </div>
+
+    <div class="stuff-tabs">
+      <button class="stuff-tab active" data-tab="available" onclick="switchStuffTab(this,'available')">Available (0)</button>
+      <button class="stuff-tab" data-tab="pending" onclick="switchStuffTab(this,'pending')">Pending (0)</button>
+      <button class="stuff-tab" data-tab="given" onclick="switchStuffTab(this,'given')">Given away (0)</button>
+    </div>
+
+    <div id="my-stuff-list"></div>
   </div>
 </div>
 
@@ -567,7 +655,7 @@ nav {
     </div>
     <div style="text-align:center;padding:0.5rem 0 1rem">
       <button class="post-btn" style="background:var(--lagoon)" onclick="openModal('supporter-modal')">✦ Support GiveItAway</button>
-      <div style="font-size:0.75rem;color:var(--gray);margin-top:8px">$3/mo keeps the lights on.</div>
+      <div style="font-size:0.75rem;color:var(--gray);margin-top:8px">Optional. $3/mo keeps the lights on.</div>
     </div>
   </div>
 </div>
@@ -746,14 +834,10 @@ nav {
         <label class="form-label">Password</label>
         <input class="form-input" type="password" id="signin-password" placeholder="Your password" onkeydown="if(event.key==='Enter')handleSignIn()">
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.82rem;color:var(--charcoal)">
-          <input type="checkbox" id="signin-remember" style="width:16px;height:16px;accent-color:var(--lagoon);cursor:pointer">
-          Remember me
-        </label>
-        <button style="background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--lagoon-dark);text-decoration:underline;padding:0" onclick="showForgotPassword()">Forgot password?</button>
-      </div>
       <button class="submit-btn" style="background:var(--lagoon)" onclick="handleSignIn()">Sign in</button>
+      <div class="auth-divider">
+        <button style="background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--lagoon-dark);text-decoration:underline" onclick="showForgotPassword()">Forgot password?</button>
+      </div>
     </div>
 
     <div id="auth-signup-form" style="display:none">
@@ -789,35 +873,6 @@ nav {
       <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-bottom:0.5rem">Check your email!</div>
       <div style="font-size:0.85rem;color:var(--gray);line-height:1.6">We sent a confirmation link to <strong id="confirm-email"></strong>. Click it to activate your account, then come back and sign in.</div>
     </div>
-  </div>
-</div>
-
-<!-- EDIT PROFILE MODAL -->
-<div class="modal-overlay" id="edit-profile-modal">
-  <div class="modal" style="max-width:440px">
-    <div class="modal-header">
-      <div class="modal-title">Edit profile</div>
-      <button class="close-btn" onclick="closeModal('edit-profile-modal')">✕</button>
-    </div>
-    <div class="auth-error" id="edit-profile-error"></div>
-    <div class="form-group">
-      <label class="form-label">Display name <span class="req">*</span></label>
-      <input class="form-input" type="text" id="edit-name" placeholder="Your name or nickname">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Neighbourhood</label>
-      <select class="form-select" id="edit-neighbourhood">
-        <option value="">Select your area</option>
-        <option>Lower Mission</option><option>Pandosy Village</option><option>Rutland</option>
-        <option>Glenmore</option><option>Black Mountain</option><option>Dilworth</option>
-        <option>SE Kelowna</option><option>Rutland North</option><option>Other</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Bio <span style="color:var(--gray);font-weight:400">(optional)</span></label>
-      <textarea class="form-textarea" id="edit-bio" placeholder="Tell neighbours a little about yourself..." rows="3" maxlength="200" style="resize:none"></textarea>
-    </div>
-    <button class="submit-btn" style="background:var(--lagoon)" onclick="saveProfile()">Save changes</button>
   </div>
 </div>
 
@@ -928,9 +983,6 @@ nav {
       </div>
       <button class="send-btn" style="width:100%;margin-top:8px;padding:0.6rem" onclick="sendClaim()">Send message</button>
     </div>
-    <div style="text-align:center;margin-top:0.5rem">
-      <button onclick="reportCurrentListing()" style="background:none;border:none;cursor:pointer;font-size:0.72rem;color:var(--gray);text-decoration:underline;padding:0">🚩 Report this listing</button>
-    </div>
   </div>
 </div>
 
@@ -957,7 +1009,7 @@ nav {
             <div><span class="check">✦</span><span>Priority support</span></div>
           </div>
         </div>
-        <div class="tier-card" id="tier-champion" onclick="selectTier('champion')" style="border-color:var(--papaya-mid)">
+        <div class="tier-card" id="tier-champion" onclick="selectTier('champion')" style="border-color:var(--papaya)">
           <div class="popular-label">Most popular</div>
           <div class="tier-emoji">🌟</div>
           <div class="tier-price">$7<span>/mo</span></div>
@@ -1084,38 +1136,101 @@ nav {
   </div>
 </div>
 
+<!-- EDIT LISTING MODAL -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">Edit listing</div>
+      <button class="close-btn" onclick="closeModal('edit-modal')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Item title <span class="req">*</span></label>
+      <input class="form-input" type="text" id="edit-title">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Location <span class="req">*</span></label>
+      <input class="form-input" type="text" id="edit-location">
+      <div class="hint">Be specific — intersection or neighbourhood so people can plan!</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-textarea" id="edit-desc" placeholder="Colours, brand, how many pieces, anything helpful…"></textarea>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="submit-btn" style="background:var(--gray-light);color:var(--charcoal);flex:1" onclick="closeModal('edit-modal')">Cancel</button>
+      <button class="submit-btn" style="flex:2" onclick="saveEdit()">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- KARMA BLOOM MODAL -->
+<div class="karma-bloom-overlay" id="karma-bloom-overlay" onclick="closeKarmaBloom()">
+  <div class="karma-bloom" onclick="event.stopPropagation()">
+    <div class="heart-burst" id="heart-burst-container"></div>
+    <div class="bloom-heart-wrap"><span>💚</span></div>
+    <h2 class="bloom-title">You made someone's day!</h2>
+    <p class="bloom-sub"><em id="bloom-item-name"></em> is on its way to a new home.</p>
+    <div class="bloom-stats">
+      <div class="bloom-stat" style="border:1.5px solid rgba(255,138,101,0.25)">
+        <div class="bloom-stat-label">Hearts given</div>
+        <div class="bloom-stat-value" id="bloom-count" style="color:var(--papaya)">0</div>
+        <div class="bloom-stat-sub">+1 today 💕</div>
+      </div>
+      <div class="bloom-stat" style="border:1.5px solid rgba(0,191,165,0.25)">
+        <div class="bloom-stat-label">Streak</div>
+        <div class="bloom-stat-value" id="bloom-streak-val" style="color:var(--lagoon)">1🔥</div>
+        <div class="bloom-stat-sub" id="bloom-streak-sub">one week</div>
+      </div>
+    </div>
+    <div class="bloom-actions" id="bloom-actions-row">
+      <button class="bloom-outline-btn" onclick="showBloomShare()">Share the love</button>
+      <button class="bloom-primary-btn" onclick="closeKarmaBloom()">Keep giving →</button>
+    </div>
+    <div id="bloom-share-section" style="display:none;position:relative">
+      <div style="background:var(--white);border-radius:12px;padding:0.85rem 1rem;text-align:left;font-size:0.84rem;line-height:1.55;color:var(--charcoal);border:1.5px solid #EDE9E3;margin-bottom:8px">
+        "Just gave away <strong id="bloom-share-title"></strong> on GiveItAway 💚 Free kids stuff for Kelowna neighbours — <span style="color:var(--lagoon-dark)">giveitawayapp.com</span>"
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="bloom-outline-btn" onclick="copyBloomShare()">📋 Copy</button>
+        <button class="bloom-primary-btn" onclick="closeKarmaBloom()">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM REMOVE MODAL -->
+<div class="confirm-overlay" id="confirm-overlay" onclick="document.getElementById('confirm-overlay').classList.remove('open')">
+  <div class="confirm-box" onclick="event.stopPropagation()">
+    <h3>Remove this listing?</h3>
+    <p>If it found a new home, mark it <strong style="color:var(--lagoon-dark)">"given away"</strong> instead — that way it counts toward your karma 💚</p>
+    <p style="font-size:0.8rem;color:var(--gray);font-style:italic;margin-bottom:16px" id="confirm-remove-title"></p>
+    <div class="confirm-actions">
+      <button class="nav-btn" style="flex:1;border:1.5px solid var(--lagoon);color:var(--lagoon-dark)" onclick="document.getElementById('confirm-overlay').classList.remove('open')">Keep it</button>
+      <button class="danger-remove-btn" onclick="doRemove()">Yes, remove</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"><span id="toast-msg"></span><button class="toast-close" onclick="dismissToast()">✕</button></div>
 
 <script>
 // ── SUPABASE INIT ──────────────────────────────────────────
 const SUPABASE_URL = 'https://rpqyszpzyivypbfykakg.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwcXlzenB6eWl2eXBiZnlrYWtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NDA3OTUsImV4cCI6MjA5MzIxNjc5NX0.akRGbFRN1kcjDbpt_IAjYA3dWylTeEwjIu3TU7yGMOQ';
+const SUPABASE_KEY = 'sb_publishable_jT6NVwOSItdaWZR8Gv05pQ_fb84m8Mq5f3VbNMr';
 
-let _sb = null;
+let supabase = null;
 let currentUser = null;
 let currentProfile = null;
 
-// The CDN script tag in <head> loads window.supabase synchronously.
-// This function just initialises our client from it, with a short poll fallback.
+// Load Supabase SDK dynamically — won't block page if CDN is unavailable
 function loadSupabase() {
   return new Promise((resolve) => {
-    if (_sb) { resolve(); return; }
-    if (window.supabase && window.supabase.createClient) {
-      _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      resolve(); return;
-    }
-    let attempts = 0;
-    const check = setInterval(() => {
-      if (window.supabase && window.supabase.createClient) {
-        clearInterval(check);
-        _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        resolve();
-      } else if (++attempts >= 30) {
-        clearInterval(check);
-        console.warn('Supabase did not load');
-        resolve();
-      }
-    }, 100);
+    if (window.supabase) { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    s.onload = () => { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); resolve(); };
+    s.onerror = () => { console.warn('Supabase CDN unavailable — running in offline mode'); resolve(); };
+    document.head.appendChild(s);
   });
 }
 
@@ -1155,57 +1270,24 @@ function showAuthError(msg) {
 function showForgotPassword() {
   const email = document.getElementById('signin-email').value.trim();
   if (!email) { showAuthError('Enter your email first'); return; }
-  if (_sb) _sb.auth.resetPasswordForEmail(email);
+  if (supabase) supabase.auth.resetPasswordForEmail(email);
   showToast('Password reset email sent!');
   closeModal('auth-modal');
-}
-
-function friendlyAuthError(msg) {
-  if (!msg) return 'Something went wrong — please try again.';
-  const m = msg.toLowerCase();
-  if (m.includes('fetch') || m.includes('network') || m.includes('connect')) 
-    return 'Having trouble connecting — check your internet and try again.';
-  if (m.includes('invalid login') || m.includes('invalid credentials') || m.includes('wrong password'))
-    return 'Incorrect email or password — double check and try again.';
-  if (m.includes('not confirmed') || m.includes('email not confirmed'))
-    return 'Please confirm your email first — check your inbox for our welcome message.';
-  if (m.includes('already registered') || m.includes('already exists'))
-    return 'An account with that email already exists. Try signing in instead.';
-  if (m.includes('rate limit') || m.includes('too many'))
-    return 'Too many attempts — please wait a few minutes and try again.';
-  if (m.includes('user not found') || m.includes('no user'))
-    return "We couldn't find an account with that email. Want to create one?";
-  if (m.includes('password') && m.includes('6'))
-    return 'Password needs to be at least 6 characters.';
-  if (m.includes('valid email') || m.includes('invalid email'))
-    return 'Please enter a valid email address.';
-  return msg;
 }
 
 async function handleSignIn() {
   const email = document.getElementById('signin-email').value.trim();
   const password = document.getElementById('signin-password').value;
-  const remember = document.getElementById('signin-remember').checked;
   if (!email || !password) { showAuthError('Please fill in both fields'); return; }
   showLoading('Signing in...');
-  if (!_sb) await loadSupabase();
-  if (!_sb) {
-    hideLoading();
-    showAuthError('Having trouble connecting — check your internet and try again.');
-    return;
-  }
   try {
-    const { data, error } = await _sb.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    if (remember) {
-      try { localStorage.setItem('gia_remember', email); } catch(e) {}
-    }
     closeModal('auth-modal');
     await loadUserProfile(data.user);
     showToast('Welcome back! 🌿');
   } catch(e) {
-    console.error('SignIn error:', e);
-    showAuthError(friendlyAuthError(e.message));
+    showAuthError(e.message || 'Sign in failed — check your email and password');
   } finally { hideLoading(); }
 }
 
@@ -1216,35 +1298,23 @@ async function handleSignUp() {
   const neighbourhood = document.getElementById('signup-neighbourhood').value;
   if (!name || !email || !password) { showAuthError('Please fill in all required fields'); return; }
   if (password.length < 6) { showAuthError('Password must be at least 6 characters'); return; }
-  if (!_sb) { await loadSupabase(); }
-  if (!_sb) { showAuthError('Connection error — please refresh and try again'); return; }
   showLoading('Creating your account...');
   try {
-    const { data, error } = await _sb.auth.signUp({ email, password,
+    const { data, error } = await supabase.auth.signUp({ email, password,
       options: { data: { name, neighbourhood } }
     });
-    console.log('SignUp result:', JSON.stringify({ data: data?.user?.id, error: error?.message }));
     if (error) throw error;
-    if (data?.user) {
-      hideLoading();
-      document.getElementById('auth-signup-form').style.display = 'none';
-      document.getElementById('confirm-email').textContent = email;
-      document.getElementById('auth-confirm-form').style.display = 'block';
-      document.getElementById('auth-title').textContent = 'Almost there!';
-    } else {
-      throw new Error('No user returned — please try again');
-    }
+    document.getElementById('auth-signup-form').style.display = 'none';
+    document.getElementById('confirm-email').textContent = email;
+    document.getElementById('auth-confirm-form').style.display = 'block';
+    document.getElementById('auth-title').textContent = 'Almost there!';
   } catch(e) {
-    console.error('SignUp error:', e);
-    hideLoading();
-    showAuthError(friendlyAuthError(e.message));
-  }
+    showAuthError(e.message || 'Sign up failed — please try again');
+  } finally { hideLoading(); }
 }
 
 async function handleSignOut() {
-  try {
-    if (_sb) await _sb.auth.signOut();
-  } catch(e) { console.warn('Sign out error:', e); }
+  await supabase.auth.signOut();
   currentUser = null;
   currentProfile = null;
   updateAuthUI(null);
@@ -1254,10 +1324,10 @@ async function handleSignOut() {
 
 async function loadUserProfile(user) {
   currentUser = user;
-  let { data: profile } = await _sb.from('profiles').select('*').eq('id', user.id).single();
+  let { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
   if (!profile) {
     const meta = user.user_metadata || {};
-    const { data: newProfile } = await _sb.from('profiles').insert({
+    const { data: newProfile } = await supabase.from('profiles').insert({
       id: user.id,
       name: meta.name || user.email.split('@')[0],
       neighbourhood: meta.neighbourhood || null,
@@ -1270,34 +1340,264 @@ async function loadUserProfile(user) {
 
 function updateAuthUI(user, profile) {
   const area = document.getElementById('nav-auth-area');
-  const authNavItems = ['nav-msgs', 'nav-profile', 'tab-msgs', 'tab-profile'];
-
+  const chipWrap = document.getElementById('karma-chip-wrap');
   if (user && profile) {
-    // Show nav items
-    authNavItems.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = '';
-    });
     const initials = (profile.name || 'U').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
     area.innerHTML = `
       <div style="display:flex;align-items:center;gap:8px">
         <div class="user-avatar" title="${profile.name}" onclick="showView('profile')">${initials}</div>
         <button class="nav-btn" onclick="handleSignOut()" style="font-size:0.75rem;color:var(--gray)">Sign out</button>
       </div>`;
+    if (chipWrap) { chipWrap.style.display = 'block'; updateKarmaChipDisplay(); }
   } else {
-    // Hide nav items
-    authNavItems.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = 'none';
-    });
     area.innerHTML = `<button class="post-btn" style="background:var(--lagoon);margin-right:6px" onclick="openModal('auth-modal')">Sign in</button>`;
+    if (chipWrap) chipWrap.style.display = 'none';
   }
+}
+
+function updateKarmaChipDisplay() {
+  const el = document.querySelector('#karma-chip .karma-count');
+  if (el) el.textContent = `${karmaCount} given`;
+}
+
+// ── MY STUFF ────────────────────────────────────────────────────────
+function getMyItems() {
+  return LISTINGS.filter(l => l.mine || (currentUser && l.userId === currentUser.id));
+}
+
+function switchStuffTab(btn, tab) {
+  stuffActiveTab = tab;
+  document.querySelectorAll('.stuff-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMyStuffList();
+}
+
+function renderMyStuff() {
+  const myItems = getMyItems();
+  const counts = {
+    available: myItems.filter(i => !i.status || i.status === 'available').length,
+    pending:   myItems.filter(i => i.status === 'pending').length,
+    given:     myItems.filter(i => i.status === 'given').length,
+  };
+  const hv = document.getElementById('karma-hearts-val');
+  const sv = document.getElementById('karma-streak-val');
+  const lv = document.getElementById('karma-live-val');
+  if (hv) hv.textContent = `💚 ${karmaCount}`;
+  if (sv) sv.textContent = `🔥 ${karmaStreak}w`;
+  if (lv) lv.textContent = counts.available;
+  const tabs = document.querySelectorAll('.stuff-tab');
+  if (tabs[0]) tabs[0].textContent = `Available (${counts.available})`;
+  if (tabs[1]) tabs[1].textContent = `Pending (${counts.pending})`;
+  if (tabs[2]) tabs[2].textContent = `Given away (${counts.given})`;
+  renderMyStuffList();
+}
+
+function renderMyStuffList() {
+  const CAT_EMOJIS = { Clothes:'👕', Shoes:'👟', Maternity:'🤰', Gear:'🧺', Toys:'🧸', Bikes:'🚲', Books:'📚', Sports:'⚽', Other:'✨' };
+  const myItems = getMyItems();
+  const visible = myItems.filter(i => (i.status || 'available') === stuffActiveTab);
+  const list = document.getElementById('my-stuff-list');
+  if (!list) return;
+  if (!visible.length) {
+    const msgs = {
+      available: `Nothing posted yet! Hit <strong style="color:var(--papaya)">"+ Post item"</strong> and make someone's day.`,
+      pending: `No pending requests. When someone wants something, they'll show up here. ✨`,
+      given: `Nothing given yet — your first 💚 is coming soon!`,
+    };
+    list.innerHTML = `<div class="stuff-empty">${msgs[stuffActiveTab] || ''}</div>`;
+    return;
+  }
+  list.innerHTML = visible.map(item => {
+    const emoji = item.emoji || CAT_EMOJIS[item.category] || '✨';
+    const isGiven = item.status === 'given';
+    const isPending = item.status === 'pending';
+    const statusTag = isPending
+      ? `<span class="stuff-tag-requests">${item.requests||1} request${(item.requests||1)>1?'s':''}</span>`
+      : isGiven ? `<span class="stuff-tag-given">💚 Given</span>` : '';
+    const givenNote = isGiven && item.givenTo ? ` · Given to <strong style="color:var(--lagoon-dark)">${item.givenTo}</strong>` : '';
+    const actions = !isGiven ? `
+      <div class="stuff-row-actions">
+        <button class="stuff-edit-btn" title="Edit" onclick="openEditModal('${item.id}')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+        </button>
+        <button class="stuff-mark-btn" onclick="markAsGiven('${item.id}')">💚 Mark given</button>
+        <div style="position:relative">
+          <button class="stuff-more-btn" onclick="toggleStuffMenu(event,'${item.id}')">⋯</button>
+          <div class="stuff-row-menu" id="stuff-menu-${item.id}" style="display:none">
+            <button class="stuff-menu-item" onclick="closeStuffMenu('${item.id}');openEditModal('${item.id}')">✎ Edit listing</button>
+            <button class="stuff-menu-item" onclick="closeStuffMenu('${item.id}');markAsGiven('${item.id}')">💚 Mark as given</button>
+            <button class="stuff-menu-item menu-danger" onclick="closeStuffMenu('${item.id}');confirmRemove('${item.id}')">🗑 Remove listing</button>
+          </div>
+        </div>
+      </div>` : `<button onclick="confirmRemove('${item.id}')" style="background:none;border:none;cursor:pointer;font-size:0.76rem;color:var(--gray);text-decoration:underline;font-family:var(--font-body)">Hide</button>`;
+    return `
+      <div class="stuff-row ${isGiven?'given-row':''}">
+        <div class="stuff-row-icon ${isGiven?'faded':''}">${emoji}</div>
+        <div class="stuff-row-body">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+            <div class="stuff-row-title ${isGiven?'crossed':''}">${item.title}</div>${statusTag}
+          </div>
+          <div class="stuff-row-meta">📍 ${item.location} · Posted ${item.postedLabel||'recently'}${givenNote}</div>
+        </div>
+        ${actions}
+      </div>`;
+  }).join('');
+}
+
+function toggleStuffMenu(e, id) {
+  e.stopPropagation();
+  const menu = document.getElementById('stuff-menu-' + id);
+  if (!menu) return;
+  const isOpen = menu.style.display !== 'none';
+  document.querySelectorAll('.stuff-row-menu').forEach(m => m.style.display = 'none');
+  if (!isOpen) {
+    menu.style.display = 'block';
+    setTimeout(() => {
+      const close = ev => { if (!menu.contains(ev.target)) { menu.style.display='none'; document.removeEventListener('click',close); } };
+      document.addEventListener('click', close);
+    }, 10);
+  }
+}
+
+function closeStuffMenu(id) {
+  const m = document.getElementById('stuff-menu-' + id);
+  if (m) m.style.display = 'none';
+}
+
+// ── MARK AS GIVEN ───────────────────────────────────────────────────
+function markAsGiven(id) {
+  const item = LISTINGS.find(l => String(l.id) === String(id));
+  if (!item) return;
+  const fromCount = karmaCount;
+  karmaCount++;
+  item.status = 'given';
+  item.givenTo = 'a neighbour';
+
+  // Pulse karma chip in nav
+  const chip = document.getElementById('karma-chip');
+  if (chip) {
+    updateKarmaChipDisplay();
+    chip.classList.remove('pulse');
+    void chip.offsetWidth;
+    chip.classList.add('pulse');
+    setTimeout(() => chip.classList.remove('pulse'), 900);
+  }
+
+  showKarmaBloom(item, fromCount, karmaCount);
+  updateFeed();
+  renderMyStuff();
+}
+
+// ── KARMA BLOOM ─────────────────────────────────────────────────────
+function showKarmaBloom(item, fromCount, toCount) {
+  currentBloomItem = item;
+  document.getElementById('bloom-item-name').textContent = item.title;
+  document.getElementById('bloom-share-title').textContent = item.title.toLowerCase();
+  document.getElementById('bloom-streak-val').textContent = `${karmaStreak}🔥`;
+  document.getElementById('bloom-streak-sub').textContent = karmaStreak===1 ? 'one week' : `${karmaStreak} weeks giving`;
+  document.getElementById('bloom-actions-row').style.display = 'flex';
+  document.getElementById('bloom-share-section').style.display = 'none';
+
+  const countEl = document.getElementById('bloom-count');
+  countEl.textContent = fromCount;
+  const dur = 1100, start = performance.now();
+  const tick = t => {
+    const p = Math.min(1, (t - start) / dur);
+    const e = 1 - Math.pow(1 - p, 3);
+    countEl.textContent = Math.round(fromCount + (toCount - fromCount) * e);
+    if (p < 1) requestAnimationFrame(tick); else countEl.textContent = toCount;
+  };
+  requestAnimationFrame(tick);
+
+  generateHeartBurst();
+  document.getElementById('karma-bloom-overlay').classList.add('open');
+}
+
+function generateHeartBurst() {
+  const burst = document.getElementById('heart-burst-container');
+  burst.innerHTML = '';
+  const cols = ['#00BFA5','#FF8A65','#FFB199'];
+  for (let i = 0; i < 14; i++) {
+    const angle = (i/14)*Math.PI*2 + (Math.random()-0.5)*0.4;
+    const dist = 110 + Math.random()*60;
+    const dx = Math.cos(angle)*dist, dy = Math.sin(angle)*dist - 40;
+    const sz = 14 + Math.random()*18;
+    const delay = Math.random()*0.25;
+    const s = document.createElement('span');
+    s.style.cssText = `position:absolute;left:50%;top:38%;width:${sz}px;height:${sz}px;color:${cols[i%3]};animation:karmaHeart 1.4s cubic-bezier(0.2,0.7,0.3,1) ${delay}s forwards;--dx:${dx}px;--dy:${dy}px;opacity:0;`;
+    s.innerHTML = `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="currentColor"><path d="M12 21s-7-4.5-9.5-9C1 8.5 3 5 6.5 5 8.5 5 10.5 6 12 8c1.5-2 3.5-3 5.5-3C21 5 23 8.5 21.5 12 19 16.5 12 21 12 21z"/></svg>`;
+    burst.appendChild(s);
+  }
+}
+
+function closeKarmaBloom() {
+  document.getElementById('karma-bloom-overlay').classList.remove('open');
+  currentBloomItem = null;
+}
+
+function showBloomShare() {
+  document.getElementById('bloom-actions-row').style.display = 'none';
+  document.getElementById('bloom-share-section').style.display = 'block';
+}
+
+function copyBloomShare() {
+  const title = currentBloomItem?.title?.toLowerCase() || 'something great';
+  const text = `"Just gave away ${title} on GiveItAway 💚 Free kids stuff for Kelowna neighbours — giveitawayapp.com"`;
+  navigator.clipboard?.writeText(text).catch(()=>{});
+  showToast('Copied to clipboard 📋');
+  closeKarmaBloom();
+}
+
+// ── CONFIRM REMOVE ──────────────────────────────────────────────────
+function confirmRemove(id) {
+  currentRemoveId = id;
+  const item = LISTINGS.find(l => String(l.id) === String(id));
+  const titleEl = document.getElementById('confirm-remove-title');
+  if (titleEl) titleEl.textContent = item ? `"${item.title}"` : '';
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+
+function doRemove() {
+  if (currentRemoveId !== null) {
+    const idx = LISTINGS.findIndex(l => String(l.id) === String(currentRemoveId));
+    if (idx !== -1) LISTINGS.splice(idx, 1);
+    showToast('Listing removed.');
+    updateFeed();
+    renderMyStuff();
+  }
+  currentRemoveId = null;
+  document.getElementById('confirm-overlay').classList.remove('open');
+}
+
+// ── EDIT LISTING ─────────────────────────────────────────────────────
+function openEditModal(id) {
+  currentEditItem = LISTINGS.find(l => String(l.id) === String(id));
+  if (!currentEditItem) return;
+  document.getElementById('edit-title').value = currentEditItem.title || '';
+  document.getElementById('edit-location').value = currentEditItem.location || '';
+  document.getElementById('edit-desc').value = currentEditItem.desc || '';
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function saveEdit() {
+  if (!currentEditItem) return;
+  const title = document.getElementById('edit-title').value.trim();
+  const location = document.getElementById('edit-location').value.trim();
+  if (!title || !location) { showToast('⚠️ Title and location are required', '#E64A19'); return; }
+  currentEditItem.title = title;
+  currentEditItem.location = location;
+  currentEditItem.desc = document.getElementById('edit-desc').value.trim();
+  closeModal('edit-modal');
+  showToast('Listing updated ✨');
+  updateFeed();
+  renderMyStuff();
+  currentEditItem = null;
 }
 
 // ── LISTINGS FROM DATABASE ─────────────────────────────────
 async function fetchListings() {
-  if (!_sb) return null;
-  const { data, error } = await _sb
+  if (!supabase) return null;
+  const { data, error } = await supabase
     .from('listings')
     .select(`*, profiles(name, neighbourhood)`)
     .eq('status', 'available')
@@ -1313,6 +1613,8 @@ function dbListingToLocal(item) {
   const color = COLORS[name.charCodeAt(0) % COLORS.length];
   const createdAt = new Date(item.created_at);
   const isNew = (Date.now() - createdAt) < 86400000 * 2;
+  const mine = currentUser ? item.user_id === currentUser.id : false;
+  const postedLabel = formatRelativeTime(createdAt);
   return {
     id: item.id,
     title: item.title,
@@ -1329,13 +1631,26 @@ function dbListingToLocal(item) {
     giverColor: color,
     isNew,
     dbId: item.id,
-    userId: item.user_id || null,
+    userId: item.user_id,
+    mine,
+    status: item.status || 'available',
+    postedLabel,
   };
 }
 
+function formatRelativeTime(date) {
+  const diff = Date.now() - date.getTime();
+  const h = Math.floor(diff / 3600000);
+  if (h < 1) return 'just now';
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `${d} day${d>1?'s':''} ago`;
+  return date.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
+}
+
 async function saveListingToDb(listingData) {
-  if (!_sb || !currentUser) return null;
-  const { data, error } = await _sb.from('listings').insert({
+  if (!supabase || !currentUser) return null;
+  const { data, error } = await supabase.from('listings').insert({
     user_id: currentUser.id,
     title: listingData.title,
     description: listingData.desc,
@@ -1355,8 +1670,36 @@ const SIZES = ['Preemie','Newborn','0–3m','3–6m','6–12m','12m','12–18m',
 const SHOE_SIZES = ['Infant 0–1','Infant 1–4','4T–5T','6T–7T','8T–9T','10T–12T','1C','2C','3C','4C','5C','6C','7C','8C','9C','10C','11C','12C'];
 const COLORS = ['#FF8A65','#00BFA5','#5C6BC0','#AB47BC','#26A69A','#EF5350','#42A5F5','#66BB6A'];
 
-const LISTINGS = [];
-const THREADS = [];
+const LISTINGS = [
+  {id:1,title:'Bundle of 3-6m onesies (12 pcs)',category:'Clothes',sizes:['3–6m'],condition:'Like New',pickup:['Porch Pickup'],location:'Pandosy & KLO Rd',neighbourhood:'Pandosy Village',desc:"Carter's and Old Navy mix. Mostly white and yellow. Smoke-free home.",photo:null,emoji:'👕',giver:'Sarah M.',giverColor:'#FF8A65',isNew:true},
+  {id:2,title:'Baby Bjorn bouncer seat',category:'Gear',sizes:[],condition:'Good',pickup:['Meetup','Porch Pickup'],location:'Springfield Rd & Spall Rd',neighbourhood:'Rutland',desc:'The classic one. Faded slightly but totally functional. Saved our lives for 4 months.',photo:null,emoji:'🪑',giver:'Jordan K.',giverColor:'#00BFA5',isNew:true},
+  {id:3,title:'Pile of 2T summer clothes',category:'Clothes',sizes:['2T'],condition:'Good',pickup:['Porch Pickup'],location:'Gordon Dr & Raymer Ave',neighbourhood:'Lower Mission',desc:'About 15 pieces — shorts, tees, one dress. All washed and ready to go!',photo:null,emoji:'☀️',giver:'Priya L.',giverColor:'#5C6BC0',isNew:false},
+  {id:4,title:'Wooden puzzle set (3 puzzles)',category:'Toys',sizes:[],condition:'Like New',pickup:['Meetup'],location:'Banks Rd & Sexsmith Rd',neighbourhood:'Black Mountain',desc:'Melissa & Doug farm, alphabet, and number puzzles. All pieces present and accounted for.',photo:null,emoji:'🧩',giver:'Tom W.',giverColor:'#AB47BC',isNew:false},
+  {id:5,title:'12-18m snowsuit — barely used',category:'Clothes',sizes:['12–18m'],condition:'Like New',pickup:['Porch Pickup','Drop Off'],location:'Harvey Ave & Cooper Rd',neighbourhood:'Glenmore',desc:'Columbia brand. Navy blue. Used maybe 3 times — kid grew out of it so fast!',photo:null,emoji:'🧥',giver:'Amy F.',giverColor:'#EF5350',isNew:true},
+  {id:6,title:'Balance bike for 2-4 year olds',category:'Bikes',sizes:[],condition:'Good',pickup:['Meetup'],location:'Lakeshore Rd & Eldorado Rd',neighbourhood:'Lower Mission',desc:'Strider style, green. Some scratches on the frame but wheels are solid and ready to roll.',photo:null,emoji:'🚲',giver:'Dani C.',giverColor:'#42A5F5',isNew:false},
+  {id:7,title:'0-3m sleeper bundle (8 pcs)',category:'Clothes',sizes:['0–3m'],condition:'New (never used)',pickup:['Porch Pickup'],location:'Dilworth Dr & Stremel Rd',neighbourhood:'Dilworth',desc:'Never worn! Baby came out way bigger than expected. Tags still on 4 of them.',photo:null,emoji:'🌙',giver:'Marcus B.',giverColor:'#66BB6A',isNew:true},
+  {id:8,title:'Toddler backpack — Wildkin brand',category:'Gear',sizes:[],condition:'Good',pickup:['Porch Pickup','Meetup'],location:'Benvoulin Rd & KLO Rd',neighbourhood:'SE Kelowna',desc:'Owl design. Great shape overall, tiny stain inside the front pocket.',photo:null,emoji:'🎒',giver:'Sarah M.',giverColor:'#FF8A65',isNew:false},
+  {id:9,title:'4T-5T mixed clothing lot (20 pcs)',category:'Clothes',sizes:['4T','5T'],condition:'Good',pickup:['Porch Pickup'],location:'Glenmore Dr & Valley Rd',neighbourhood:'Glenmore',desc:'All washed. Mix of brands. Great for daycare wear!',photo:null,emoji:'👗',giver:'Robin T.',giverColor:'#EF5350',isNew:false},
+  {id:10,title:'Baby monitor — Motorola video',category:'Gear',sizes:[],condition:'Good',pickup:['Meetup'],location:'Sexsmith Rd & McCurdy Rd',neighbourhood:'Rutland',desc:'Video and audio. Works great. Just upgrading to a newer model.',photo:null,emoji:'📷',giver:'Jordan K.',giverColor:'#00BFA5',isNew:false},
+  {id:11,title:'Hockey skates size 12',category:'Sports',sizes:['12'],condition:'Good',pickup:['Porch Pickup','Meetup'],location:'Hollywood Rd & Ziprick Rd',neighbourhood:'Rutland North',desc:'CCM brand. Good edge still on them. Great for a first-time skater.',photo:null,emoji:'⛸️',giver:'Pete H.',giverColor:'#5C6BC0',isNew:true},
+  {id:12,title:'Box of board books (20+ books)',category:'Books',sizes:[],condition:'Good',pickup:['Porch Pickup'],location:'Casorso Rd & Gordon Dr',neighbourhood:'Lower Mission',desc:'Mix of classics — Hungry Caterpillar, Goodnight Moon, full Sandra Boynton set.',photo:null,emoji:'📚',giver:'Priya L.',giverColor:'#5C6BC0',isNew:false},
+];
+
+const THREADS = [
+  {id:1,name:'Jordan K.',color:'#00BFA5',itemTitle:'Baby Bjorn bouncer seat',emoji:'🪑',unread:true,messages:[
+    {from:'them',text:"Hi! Is the bouncer still available?",time:'Yesterday 2:14pm'},
+    {from:'me',text:"Yes it is! Come grab it anytime.",time:'Yesterday 2:31pm'},
+    {from:'them',text:"Amazing! Can I do porch pickup tomorrow morning?",time:'Yesterday 3:02pm'},
+  ]},
+  {id:2,name:'Amy F.',color:'#EF5350',itemTitle:'0-3m sleeper bundle',emoji:'🌙',unread:false,messages:[
+    {from:'them',text:"Hey these are so cute, would love them for my newborn!",time:'Mon 11:20am'},
+    {from:'me',text:"They're yours! Leaving on the porch — 47 Lakeview Cres.",time:'Mon 12:05pm'},
+    {from:'them',text:"Just grabbed them, thank you so much!! 💚",time:'Mon 12:47pm'},
+  ]},
+  {id:3,name:'Robin T.',color:'#EF5350',itemTitle:'Box of board books',emoji:'📚',unread:true,messages:[
+    {from:'them',text:"Are all 20 books there? Missing any?",time:'Today 9:03am'},
+  ]},
+];
 
 let activeCategory = 'all';
 let searchQuery = '';
@@ -1364,6 +1707,12 @@ let areaFilter = 'all';
 let claimTarget = null;
 let activeThread = null;
 let userPostCount = 0;
+let karmaCount = 0;
+let karmaStreak = 1;
+let stuffActiveTab = 'available';
+let currentRemoveId = null;
+let currentEditItem = null;
+let currentBloomItem = null;
 
 function highlight(text, query) {
   if (!query) return text;
@@ -1378,29 +1727,48 @@ function renderFeed(items) {
   if (!items.length) {
     const isFiltered = activeCategory !== 'all' || areaFilter !== 'all' || searchQuery;
     const msg = isFiltered
-      ? `<div class="empty-state"><div class="big">🌿</div><p style="font-weight:600">Nothing here yet!</p><p style="font-size:0.85rem;margin-top:5px">${currentUser ? 'Be the first to add something — hit the <strong>+</strong> button!' : 'Be the first! <button onclick="openModal(\'auth-modal\')" style="background:none;border:none;cursor:pointer;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;font-size:0.85rem;padding:0">Sign in to post an item.</button>'}</p></div>`
-      : `<div class="empty-state"><div class="big">📦</div><p style="font-weight:600">No listings yet!</p><p style="font-size:0.85rem;margin-top:5px">${currentUser ? 'Be the first to give something away — hit the <strong>+</strong> button!' : 'Be the first! <button onclick="openModal(\'auth-modal\')" style="background:none;border:none;cursor:pointer;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;font-size:0.85rem;padding:0">Sign in to post an item.</button>'}</p></div>`;
+      ? `<div class="empty-state"><div class="big">🌿</div><p style="font-weight:600">Nothing here yet!</p><p style="font-size:0.85rem;margin-top:5px">Be the first to add something — hit the <strong>+</strong> button!</p></div>`
+      : `<div class="empty-state"><div class="big">📦</div><p style="font-weight:600">No listings yet!</p><p style="font-size:0.85rem;margin-top:5px">Be the first to give something away — hit the <strong>+</strong> button!</p></div>`;
     feed.innerHTML = msg;
     return;
   }
   items.forEach((item, idx) => {
-    const initials = item.giver.split(' ').map(w=>w[0]).join('').toUpperCase();
+    const isMine = item.mine || (currentUser && item.userId === currentUser.id);
+    const initials = isMine ? 'ME' : item.giver.split(' ').map(w=>w[0]).join('').toUpperCase();
+    const avatarColor = isMine ? 'var(--papaya)' : item.giverColor;
+    const giverName = isMine ? 'You' : item.giver;
     const sizeTags = item.sizes.map(s=>`<span class="tag tag-size">${s}</span>`).join('');
     const pickupTags = item.pickup.map(p=>`<span class="tag tag-pickup">${p}</span>`).join('');
     const h = 110 + (idx * 37 % 80);
-    const imgHTML = item.photo
-      ? `<img src="${item.photo}" style="width:100%;height:${h}px;object-fit:cover;display:block" loading="lazy" onerror="this.style.display='none'">`
-      : `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--papaya-light) 0%,var(--lagoon-light) 100%);font-size:${Math.round(h*0.36)}px">${item.emoji}</div>`;
+    const imgHTML = `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--papaya-light) 0%,var(--lagoon-light) 100%);font-size:${Math.round(h*0.36)}px">${item.emoji}</div>`;
     const titleHL = highlight(item.title, query);
     const descHL = highlight(item.desc, query);
-    const isOwn = currentUser && item.userId === currentUser.id;
-    const actionBtn = isOwn
-      ? `<span class="tag tag-condition" style="font-size:0.72rem">Your listing</span>`
-      : `<button class="claim-btn" onclick="event.stopPropagation();openClaimByIndex(${idx})">I want this!</button>`;
-    const cardClick = isOwn ? '' : `onclick="openClaimByIndex(${idx})"`;
+    const cardClick = isMine ? '' : `onclick="openClaimByIndex(${idx})"`;
+    const newBadge = item.isNew && !isMine ? '<div class="new-badge">New</div>' : '';
+    const myBadge = isMine ? '<div class="my-post-badge">Your post</div>' : '';
+    const cardFooter = isMine ? `
+      <div class="card-footer">
+        <div class="giver">
+          <div class="avatar" style="background:${avatarColor}">${initials}</div>
+          <span class="giver-name">${giverName}</span>
+        </div>
+        <div class="card-owner-actions">
+          <button class="card-edit-btn" title="Edit" onclick="event.stopPropagation();openEditModal('${item.id}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+          </button>
+          <button class="card-given-btn" onclick="event.stopPropagation();markAsGiven('${item.id}')">💚 Given</button>
+        </div>
+      </div>` : `
+      <div class="card-footer">
+        <div class="giver">
+          <div class="avatar" style="background:${avatarColor}">${initials}</div>
+          <span class="giver-name">${giverName}</span>
+        </div>
+        <button class="claim-btn" onclick="event.stopPropagation();openClaimByIndex(${idx})">I want this!</button>
+      </div>`;
     feed.innerHTML += `
-      <div class="card" ${cardClick} style="${isOwn ? '' : 'cursor:pointer'}">
-        ${item.isNew ? '<div class="new-badge">New</div>' : ''}
+      <div class="card" ${cardClick}>
+        ${newBadge}${myBadge}
         ${imgHTML}
         <div class="card-body">
           <div class="card-title">${titleHL}</div>
@@ -1412,15 +1780,7 @@ function renderFeed(items) {
             <span class="tag tag-condition">${item.condition}</span>
             ${pickupTags}
           </div>
-          <div class="card-footer">
-            <div class="giver">
-              <div class="avatar" style="background:${item.giverColor}">${initials}</div>
-              <span class="giver-name">${item.giver}</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:6px">
-              ${actionBtn}
-            </div>
-          </div>
+          ${cardFooter}
         </div>
       </div>`;
   });
@@ -1476,82 +1836,6 @@ function openClaimByIndex(idx) {
   openClaim(item);
 }
 
-async function loadProfileListings() {
-  if (!currentUser || !_sb) return;
-  const grid = document.getElementById('profile-listings-grid');
-  const empty = document.getElementById('profile-empty-state');
-  grid.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--gray);font-size:0.85rem">Loading your listings...</div>';
-  document.getElementById('profile-listings-section').style.display = 'block';
-  empty.style.display = 'none';
-  const { data, error } = await _sb.from('listings')
-    .select('*').eq('user_id', currentUser.id)
-    .order('created_at', { ascending: false });
-  if (error || !data || !data.length) {
-    document.getElementById('profile-listings-section').style.display = 'none';
-    empty.style.display = 'block';
-    document.getElementById('profile-count').textContent = '0 items posted';
-    return;
-  }
-  document.getElementById('profile-count').textContent = `${data.length} item${data.length!==1?'s':''} posted`;
-  const EMOJIS = { Clothes:'👕', Shoes:'👟', Maternity:'🤰', Gear:'🧺', Toys:'🧸', Bikes:'🚲', Books:'📚', Sports:'⚽', Other:'✨' };
-  grid.innerHTML = data.map(item => `
-    <div style="background:var(--white);border-radius:var(--radius-sm);box-shadow:var(--shadow);padding:0.9rem 1rem;display:flex;align-items:center;gap:12px">
-      <div style="width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,var(--papaya-light),var(--lagoon-light));display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">
-        ${item.photo_url && item.photo_url.startsWith('data:') ? `<img src="${item.photo_url}" style="width:48px;height:48px;object-fit:cover;border-radius:8px">` : (EMOJIS[item.category]||'✨')}
-      </div>
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:600;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.title}</div>
-        <div style="font-size:0.75rem;color:var(--gray);margin-top:2px">${item.category} · ${item.condition} · ${item.neighbourhood}</div>
-      </div>
-      <span class="tag ${item.status==='available'?'tag-condition':'tag-size'}" style="flex-shrink:0">${item.status==='available'?'Available':'Given 🎉'}</span>
-    </div>`).join('');
-}
-
-function reportCurrentListing() {
-  if (!claimTarget) return;
-  closeModal('claim-modal');
-  if (confirm(`Report "${claimTarget.title}"?\n\nThis will flag the listing for review by our community mods.`)) {
-    showToast('🚩 Reported — our mods will review this listing. Thank you!');
-  }
-}
-
-function reportListing(idx) {
-  const filtered = getFiltered();
-  const item = filtered[idx];
-  if (!item) return;
-  if (confirm(`Report "${item.title}"?\n\nThis will flag the listing for review by our community mods.`)) {
-    showToast('🚩 Reported — our mods will review this listing. Thank you!');
-  }
-}
-
-async function saveProfile() {
-  const name = document.getElementById('edit-name').value.trim();
-  const neighbourhood = document.getElementById('edit-neighbourhood').value;
-  const bio = document.getElementById('edit-bio').value.trim();
-  if (!name) {
-    const err = document.getElementById('edit-profile-error');
-    err.textContent = 'Name is required'; err.classList.add('show'); return;
-  }
-  if (!_sb) { await loadSupabase(); }
-  showLoading('Saving...');
-  try {
-    const { error } = await _sb.from('profiles').update({ name, neighbourhood, bio }).eq('id', currentUser.id);
-    if (error) throw error;
-    currentProfile = { ...currentProfile, name, neighbourhood, bio };
-    closeModal('edit-profile-modal');
-    const initials = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    document.getElementById('profile-avatar').textContent = initials;
-    document.getElementById('profile-name-display').childNodes[0].textContent = name + ' ';
-    document.getElementById('profile-neighbourhood').textContent = neighbourhood ? `${neighbourhood}, Kelowna` : 'Kelowna';
-    updateAuthUI(currentUser, currentProfile);
-    showToast('Profile updated! 🌿');
-  } catch(e) {
-    const err = document.getElementById('edit-profile-error');
-    err.textContent = friendlyAuthError(e.message);
-    err.classList.add('show');
-  } finally { hideLoading(); }
-}
-
 function openClaim(item) {
   if (!requireAuth('claim items')) return;
   claimTarget = item;
@@ -1564,7 +1848,7 @@ function openClaim(item) {
 function sendClaim() {
   closeModal('claim-modal');
   showToast('✅ Message sent! The giver will reach out soon.');
-  setTimeout(updateMsgDot, 500);
+  setTimeout(()=>{ document.querySelector('.msg-dot').style.display='block'; }, 500);
 }
 
 function openPostModal() {
@@ -1613,15 +1897,14 @@ async function submitPost() {
   }
   const sizes = [...document.querySelectorAll('.size-chip.selected')].map(c=>c.textContent);
   const photoSrc = document.getElementById('photo-img').src || null;
-  const hasPhoto = photoSrc && photoSrc.startsWith('data:') && photoSrc.length > 100;
   const listingData = {
     title, category:cat, sizes, condition:cond,
     pickup: pickups.map(p=>p.textContent.trim()),
     location: loc, neighbourhood: hood,
     desc: document.getElementById('post-desc').value.trim(),
-    photo_url: hasPhoto ? photoSrc : null,
+    photo_url: photoSrc && photoSrc.startsWith('data:') ? null : photoSrc,
   };
-  if (_sb && currentUser) {
+  if (supabase && currentUser) {
     showLoading('Posting your item...');
     const saved = await saveListingToDb(listingData);
     hideLoading();
@@ -1635,14 +1918,14 @@ async function submitPost() {
     LISTINGS.unshift({ id: Date.now(), title, category:cat, sizes, condition:cond,
       pickup: pickups.map(p=>p.textContent.trim()), location:loc, neighbourhood:hood,
       desc: listingData.desc, photo:null, emoji: EMOJIS[cat]||'✨',
-      giver: currentProfile?.name || 'You', giverColor:'#FF8A65', isNew:true });
+      giver: currentProfile?.name || 'You', giverColor:'#FF8A65', isNew:true,
+      mine: true, userId: currentUser?.id, status: 'available', postedLabel: 'just now' });
   }
   document.getElementById('stat-items').textContent = LISTINGS.length;
   userPostCount++;
   document.getElementById('profile-count').textContent = `${userPostCount} item${userPostCount!==1?'s':''} posted`;
   closeModal('post-modal');
   updateFeed();
-  if (document.getElementById('view-profile').style.display !== 'none') loadProfileListings();
   showToast('🎉 Posted! Someone out there is going to love this.');
   ['post-title','post-location','post-desc'].forEach(id => document.getElementById(id).value='');
   ['post-category','post-condition','post-neighbourhood'].forEach(id => document.getElementById(id).value='');
@@ -1667,17 +1950,7 @@ function showView(v) {
   const tabMap = {feed:'tab-browse',messages:'tab-msgs',profile:'tab-profile'};
   if (tabMap[v] && document.getElementById(tabMap[v])) document.getElementById(tabMap[v]).classList.add('active');
   if (v==='messages') renderThreadList();
-  if (v==='profile') {
-    loadProfileListings();
-    if (currentProfile) {
-      const initials = (currentProfile.name||'U').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-      document.getElementById('profile-avatar').textContent = initials;
-      document.getElementById('profile-name-display').childNodes[0].textContent = currentProfile.name + ' ';
-      if (currentProfile.neighbourhood) {
-        document.getElementById('profile-neighbourhood').textContent = `${currentProfile.neighbourhood}, Kelowna`;
-      }
-    }
-  }
+  if (v==='profile') renderMyStuff();
   try { localStorage.setItem('gia_view', v); } catch(e){}
   const t = document.getElementById('toast');
   t.classList.remove('show');
@@ -1702,24 +1975,9 @@ function previewPhoto(input) {
   reader.readAsDataURL(input.files[0]);
 }
 
-function updateMsgDot() {
-  const hasUnread = THREADS.some(t => t.unread);
-  ['nav-msg-dot', 'tab-msg-dot'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = hasUnread ? 'block' : 'none';
-  });
-}
-
 function renderThreadList() {
   const list = document.getElementById('thread-list');
-  const empty = document.getElementById('messages-empty');
   list.innerHTML = '';
-  updateMsgDot();
-  if (!THREADS.length) {
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
   THREADS.forEach(t => {
     const initials = t.name.split(' ').map(w=>w[0]).join('');
     const last = t.messages[t.messages.length-1];
@@ -1794,11 +2052,11 @@ function showToast(msg, color) {
   document.getElementById('toast-msg').textContent = msg;
   t.classList.add('show');
   if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(dismissToast, 3500);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
 }
 function dismissToast() {
   document.getElementById('toast').classList.remove('show');
-  if (toastTimer) { clearTimeout(toastTimer); toastTimer = null; }
+  if (toastTimer) clearTimeout(toastTimer);
 }
 
 document.querySelectorAll('.modal-overlay').forEach(m => {
@@ -1820,31 +2078,6 @@ function openModal(id) {
     document.querySelectorAll('.tag-chip').forEach(c=>c.classList.remove('selected'));
     document.getElementById('feedback-text').value = '';
     document.getElementById('feedback-contact').value = '';
-  }
-  if (id === 'edit-profile-modal' && currentProfile) {
-    document.getElementById('edit-name').value = currentProfile.name || '';
-    document.getElementById('edit-neighbourhood').value = currentProfile.neighbourhood || '';
-    document.getElementById('edit-bio').value = currentProfile.bio || '';
-    document.getElementById('edit-profile-error').classList.remove('show');
-  }
-  if (id === 'auth-modal') {
-    document.getElementById('auth-confirm-form').style.display = 'none';
-    document.getElementById('auth-signin-form').style.display = 'block';
-    document.getElementById('auth-signup-form').style.display = 'none';
-    document.getElementById('tab-signin').classList.add('active');
-    document.getElementById('tab-signup').classList.remove('active');
-    document.getElementById('auth-title').textContent = 'Welcome to GiveItAway 🌿';
-    document.getElementById('auth-error').classList.remove('show');
-    // Pre-load Supabase so it's ready when user hits submit
-    if (!_sb) loadSupabase();
-    // Pre-fill remembered email
-    try {
-      const remembered = localStorage.getItem('gia_remember');
-      if (remembered) {
-        document.getElementById('signin-email').value = remembered;
-        document.getElementById('signin-remember').checked = true;
-      }
-    } catch(e) {}
   }
 }
 
@@ -1944,26 +2177,22 @@ function toggleConditionTooltip() {
 
 // ── INIT ──────────────────────────────────────────────────
 async function initApp() {
-  // Show feed immediately with sample data while DB loads
-  updateFeed();
-
   // Load Supabase first (won't block if CDN fails)
   await loadSupabase();
 
-  // Restore last view — but always start on feed for first-time visitors
+  // Restore last view
   try {
     const saved = localStorage.getItem('gia_view');
-    const restorable = ['messages', 'profile', 'about'];
-    if (saved && restorable.includes(saved)) showView(saved);
+    if (saved && ['feed','messages','profile','about','faq','community','terms'].includes(saved)) showView(saved);
   } catch(e) {}
 
-  if (_sb) {
+  if (supabase) {
     try {
       // Check for existing session
-      const { data: { session } } = await _sb.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) await loadUserProfile(session.user);
 
-      _sb.auth.onAuthStateChange(async (event, session) => {
+      supabase.auth.onAuthStateChange(async (event, session) => {
         if (event === 'SIGNED_IN' && session?.user) {
           await loadUserProfile(session.user);
         } else if (event === 'SIGNED_OUT') {
@@ -1974,7 +2203,7 @@ async function initApp() {
 
       // Load real listings — with 5s timeout fallback
       showLoading('Loading listings...');
-      const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 3000));
+      const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 5000));
       const dbListings = await Promise.race([fetchListings(), timeoutPromise]);
       hideLoading();
 
