@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GiveItAway</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -31,7 +31,7 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--font-body); background: var(--cream); color: var(--charcoal); min-height: 100vh; padding-bottom: 0; }
-@media (max-width: 600px) { body { padding-bottom: 70px; } }
+@media (max-width: 600px) { body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); } }
 
 nav {
   background: var(--white);
@@ -102,7 +102,7 @@ nav {
   .tab-post-btn:hover { background: var(--papaya-dark); transform: translateX(-50%) scale(1.06); }
   .tab-msg-dot { position: absolute; top: 0px; right: calc(50% - 13px); width: 7px; height: 7px; background: var(--lagoon); border-radius: 50%; border: 1.5px solid white; }
 }
-body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
+
 
 .hero { background: var(--papaya-mid); padding: 1.1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 @media (max-width: 600px) {
@@ -247,9 +247,9 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 .chat-send:hover { background: var(--lagoon-dark); }
 
 /* TOAST */
-.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(120px); background: var(--lagoon); color: white; border-radius: 24px; padding: 0.65rem 1rem 0.65rem 1.2rem; font-weight: 600; font-size: 0.88rem; z-index: 300; transition: transform 0.3s ease; box-shadow: 0 4px 20px rgba(0,191,165,0.35); display: flex; align-items: center; gap: 10px; }
+.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(120px); background: var(--lagoon); color: white; border-radius: 24px; padding: 0.65rem 1rem 0.65rem 1.2rem; font-weight: 600; font-size: 0.88rem; z-index: 500; transition: transform 0.3s ease; box-shadow: 0 4px 20px rgba(0,191,165,0.35); display: flex; align-items: center; gap: 10px; }
 .toast.show { transform: translateX(-50%) translateY(0); }
-.toast-close { background: rgba(255,255,255,0.25); border: none; cursor: pointer; width: 20px; height: 20px; border-radius: 50%; color: white; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.12s; }
+.toast-close { background: rgba(255,255,255,0.25); border: none; cursor: pointer; width: 24px; height: 24px; border-radius: 50%; color: white; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.12s; padding: 0; }
 .toast-close:hover { background: rgba(255,255,255,0.4); }
 @media (max-width: 600px) { .toast { bottom: 5.5rem; font-size: 0.8rem; padding: 0.55rem 0.85rem 0.55rem 1rem; } }
 
@@ -270,8 +270,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 .info-tooltip .grade-desc { color: var(--gray); }
 
 /* STICKY FOOTER */
-.site-footer { background: var(--white); border-top: 1px solid #EDE9E3; padding: 0.75rem 1.5rem; text-align: center; font-size: 0.72rem; color: var(--gray); }
-@media (max-width: 600px) { .site-footer { margin-bottom: max(62px, calc(60px + env(safe-area-inset-bottom))); } }
+.site-footer { background: var(--white); border-top: 1px solid #EDE9E3; padding: 0.75rem 1.5rem; text-align: center; font-size: 0.72rem; color: var(--gray); position: relative; clear: both; }
 .site-footer button { background: none; border: none; cursor: pointer; font-size: 0.72rem; color: var(--lagoon-dark); font-weight: 600; padding: 0; text-decoration: underline; font-family: var(--font-body); }
 
 /* AUTH */
@@ -290,7 +289,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 .feed-empty .big { font-size: 3rem; margin-bottom: 0.5rem; }
 
 /* FAQ / COMMUNITY STANDARDS PAGES */
-.content-page { padding: 1.5rem; max-width: 680px; margin: 0 auto; }
+.content-page { padding: 1.5rem; max-width: 680px; margin: 0 auto; min-height: 60vh; }
 .content-page h2 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; margin-bottom: 0.25rem; }
 .content-page .subtitle { font-size: 0.83rem; color: var(--gray); margin-bottom: 1.5rem; }
 .content-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
@@ -440,11 +439,17 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
 
 <!-- MESSAGES VIEW -->
 <div id="view-messages" style="display:none">
-  <div class="msg-view">
+  <div class="msg-view" style="min-height:60vh">
     <div id="thread-list-view">
       <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;margin-bottom:1.1rem;color:var(--charcoal)">Messages</div>
       <div class="section-label" style="margin-bottom:0.75rem">Active conversations</div>
       <div class="thread-list" id="thread-list"></div>
+      <div id="messages-empty" style="display:none;text-align:center;padding:3rem 1rem;color:var(--gray)">
+        <div style="font-size:3rem;margin-bottom:0.75rem">💬</div>
+        <p style="font-weight:600;margin-bottom:6px">No messages yet!</p>
+        <p style="font-size:0.85rem;line-height:1.6">Click <strong>"I want this!"</strong> on an item to start a conversation with a neighbour.</p>
+        <button onclick="showView('feed')" style="margin-top:1rem;background:var(--lagoon);color:white;border:none;cursor:pointer;font-family:var(--font-body);font-size:0.85rem;font-weight:600;padding:0.5rem 1.25rem;border-radius:20px">Browse items</button>
+      </div>
     </div>
     <div id="chat-view" style="display:none">
       <button class="msg-back" onclick="showThreadList()">← Back to messages</button>
@@ -552,7 +557,7 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
     </div>
     <div style="text-align:center;padding:0.5rem 0 1rem">
       <button class="post-btn" style="background:var(--lagoon)" onclick="openModal('supporter-modal')">✦ Support GiveItAway</button>
-      <div style="font-size:0.75rem;color:var(--gray);margin-top:8px">Optional. $3/mo keeps the lights on.</div>
+      <div style="font-size:0.75rem;color:var(--gray);margin-top:8px">$3/mo keeps the lights on.</div>
     </div>
   </div>
 </div>
@@ -731,10 +736,14 @@ body { padding-bottom: max(70px, calc(60px + env(safe-area-inset-bottom))); }
         <label class="form-label">Password</label>
         <input class="form-input" type="password" id="signin-password" placeholder="Your password" onkeydown="if(event.key==='Enter')handleSignIn()">
       </div>
-      <button class="submit-btn" style="background:var(--lagoon)" onclick="handleSignIn()">Sign in</button>
-      <div class="auth-divider">
-        <button style="background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--lagoon-dark);text-decoration:underline" onclick="showForgotPassword()">Forgot password?</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.82rem;color:var(--charcoal)">
+          <input type="checkbox" id="signin-remember" style="width:16px;height:16px;accent-color:var(--lagoon);cursor:pointer">
+          Remember me
+        </label>
+        <button style="background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--lagoon-dark);text-decoration:underline;padding:0" onclick="showForgotPassword()">Forgot password?</button>
       </div>
+      <button class="submit-btn" style="background:var(--lagoon)" onclick="handleSignIn()">Sign in</button>
     </div>
 
     <div id="auth-signup-form" style="display:none">
@@ -1109,21 +1118,52 @@ function showForgotPassword() {
   closeModal('auth-modal');
 }
 
+function friendlyAuthError(msg) {
+  if (!msg) return 'Something went wrong — please try again.';
+  const m = msg.toLowerCase();
+  if (m.includes('fetch') || m.includes('network') || m.includes('connect')) 
+    return 'Having trouble connecting — check your internet and try again.';
+  if (m.includes('invalid login') || m.includes('invalid credentials') || m.includes('wrong password'))
+    return 'Incorrect email or password — double check and try again.';
+  if (m.includes('not confirmed') || m.includes('email not confirmed'))
+    return 'Please confirm your email first — check your inbox for our welcome message.';
+  if (m.includes('already registered') || m.includes('already exists'))
+    return 'An account with that email already exists. Try signing in instead.';
+  if (m.includes('rate limit') || m.includes('too many'))
+    return 'Too many attempts — please wait a few minutes and try again.';
+  if (m.includes('user not found') || m.includes('no user'))
+    return "We couldn't find an account with that email. Want to create one?";
+  if (m.includes('password') && m.includes('6'))
+    return 'Password needs to be at least 6 characters.';
+  if (m.includes('valid email') || m.includes('invalid email'))
+    return 'Please enter a valid email address.';
+  return msg;
+}
+
 async function handleSignIn() {
   const email = document.getElementById('signin-email').value.trim();
   const password = document.getElementById('signin-password').value;
+  const remember = document.getElementById('signin-remember').checked;
   if (!email || !password) { showAuthError('Please fill in both fields'); return; }
-  if (!_sb) { await loadSupabase(); }
-  if (!_sb) { showAuthError('Connection error — please refresh and try again'); return; }
   showLoading('Signing in...');
+  if (!_sb) await loadSupabase();
+  if (!_sb) {
+    hideLoading();
+    showAuthError('Having trouble connecting — check your internet and try again.');
+    return;
+  }
   try {
     const { data, error } = await _sb.auth.signInWithPassword({ email, password });
     if (error) throw error;
+    if (remember) {
+      try { localStorage.setItem('gia_remember', email); } catch(e) {}
+    }
     closeModal('auth-modal');
     await loadUserProfile(data.user);
     showToast('Welcome back! 🌿');
   } catch(e) {
-    showAuthError(e.message || 'Sign in failed — check your email and password');
+    console.error('SignIn error:', e);
+    showAuthError(friendlyAuthError(e.message));
   } finally { hideLoading(); }
 }
 
@@ -1155,12 +1195,14 @@ async function handleSignUp() {
   } catch(e) {
     console.error('SignUp error:', e);
     hideLoading();
-    showAuthError(e.message || 'Sign up failed — please try again');
+    showAuthError(friendlyAuthError(e.message));
   }
 }
 
 async function handleSignOut() {
-  await _sb.auth.signOut();
+  try {
+    if (_sb) await _sb.auth.signOut();
+  } catch(e) { console.warn('Sign out error:', e); }
   currentUser = null;
   currentProfile = null;
   updateAuthUI(null);
@@ -1245,6 +1287,7 @@ function dbListingToLocal(item) {
     giverColor: color,
     isNew,
     dbId: item.id,
+    userId: item.user_id || null,
   };
 }
 
@@ -1306,8 +1349,13 @@ function renderFeed(items) {
     const imgHTML = `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--papaya-light) 0%,var(--lagoon-light) 100%);font-size:${Math.round(h*0.36)}px">${item.emoji}</div>`;
     const titleHL = highlight(item.title, query);
     const descHL = highlight(item.desc, query);
+    const isOwn = currentUser && item.userId === currentUser.id;
+    const actionBtn = isOwn
+      ? `<span class="tag tag-condition" style="font-size:0.72rem">Your listing</span>`
+      : `<button class="claim-btn" onclick="event.stopPropagation();openClaimByIndex(${idx})">I want this!</button>`;
+    const cardClick = isOwn ? '' : `onclick="openClaimByIndex(${idx})"`;
     feed.innerHTML += `
-      <div class="card" onclick="openClaimByIndex(${idx})">
+      <div class="card" ${cardClick} style="${isOwn ? '' : 'cursor:pointer'}">
         ${item.isNew ? '<div class="new-badge">New</div>' : ''}
         ${imgHTML}
         <div class="card-body">
@@ -1325,7 +1373,10 @@ function renderFeed(items) {
               <div class="avatar" style="background:${item.giverColor}">${initials}</div>
               <span class="giver-name">${item.giver}</span>
             </div>
-            <button class="claim-btn" onclick="event.stopPropagation();openClaimByIndex(${idx})">I want this!</button>
+            <div style="display:flex;align-items:center;gap:6px">
+              ${!isOwn ? `<button onclick="event.stopPropagation();reportListing(${idx})" style="background:none;border:none;cursor:pointer;font-size:0.68rem;color:var(--gray);padding:0;text-decoration:underline" title="Report this listing">Report</button>` : ''}
+              ${actionBtn}
+            </div>
           </div>
         </div>
       </div>`;
@@ -1380,6 +1431,15 @@ function openClaimByIndex(idx) {
   const item = filtered[idx];
   if (!item) return;
   openClaim(item);
+}
+
+function reportListing(idx) {
+  const filtered = getFiltered();
+  const item = filtered[idx];
+  if (!item) return;
+  if (confirm(`Report "${item.title}"?\n\nThis will flag the listing for review by our community mods.`)) {
+    showToast('🚩 Reported — our mods will review this listing. Thank you!');
+  }
 }
 
 function openClaim(item) {
@@ -1521,7 +1581,13 @@ function previewPhoto(input) {
 
 function renderThreadList() {
   const list = document.getElementById('thread-list');
+  const empty = document.getElementById('messages-empty');
   list.innerHTML = '';
+  if (!THREADS.length) {
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
   THREADS.forEach(t => {
     const initials = t.name.split(' ').map(w=>w[0]).join('');
     const last = t.messages[t.messages.length-1];
@@ -1596,11 +1662,11 @@ function showToast(msg, color) {
   document.getElementById('toast-msg').textContent = msg;
   t.classList.add('show');
   if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+  toastTimer = setTimeout(dismissToast, 3500);
 }
 function dismissToast() {
   document.getElementById('toast').classList.remove('show');
-  if (toastTimer) clearTimeout(toastTimer);
+  if (toastTimer) { clearTimeout(toastTimer); toastTimer = null; }
 }
 
 document.querySelectorAll('.modal-overlay').forEach(m => {
@@ -1633,6 +1699,14 @@ function openModal(id) {
     document.getElementById('auth-error').classList.remove('show');
     // Pre-load Supabase so it's ready when user hits submit
     if (!_sb) loadSupabase();
+    // Pre-fill remembered email
+    try {
+      const remembered = localStorage.getItem('gia_remember');
+      if (remembered) {
+        document.getElementById('signin-email').value = remembered;
+        document.getElementById('signin-remember').checked = true;
+      }
+    } catch(e) {}
   }
 }
 
