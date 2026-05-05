@@ -138,7 +138,7 @@ nav {
 .filter-chip:hover { background: var(--papaya-light); color: var(--papaya-dark); }
 .filter-chip.active { background: var(--papaya-mid); color: white; }
 
-.main { padding: 1.25rem 1.5rem; max-width: 1100px; margin: 0 auto; }
+
 .feed-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
 .section-label { font-size: 0.73rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--gray); }
 .search-result-info { font-size: 0.8rem; color: var(--lagoon-dark); font-weight: 500; }
@@ -270,8 +270,9 @@ nav {
 .info-tooltip .grade-desc { color: var(--gray); }
 
 /* STICKY FOOTER */
-.site-footer { background: var(--white); border-top: 1px solid #EDE9E3; padding: 0.75rem 1.5rem; text-align: center; font-size: 0.72rem; color: var(--gray); position: relative; clear: both; }
+.site-footer { background: var(--white); border-top: 1px solid #EDE9E3; padding: 0.75rem 1.5rem; text-align: center; font-size: 0.72rem; color: var(--gray); position: sticky; bottom: 0; clear: both; margin-top: 2rem; }
 .site-footer button { background: none; border: none; cursor: pointer; font-size: 0.72rem; color: var(--lagoon-dark); font-weight: 600; padding: 0; text-decoration: underline; font-family: var(--font-body); }
+.main { padding: 1.25rem 1.5rem 2.5rem; max-width: 1100px; margin: 0 auto; }
 
 /* AUTH */
 .auth-tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 2px solid var(--gray-light); }
@@ -342,7 +343,7 @@ nav {
   <div class="logo" onclick="showView('feed')">Give<em>It</em><span>Away</span></div>
   <div class="nav-links">
     <button class="nav-btn active" id="nav-browse" onclick="showView('feed')">Browse</button>
-    <button class="nav-btn msg-btn" id="nav-msgs" onclick="if(!requireAuth('view messages'))return;showView('messages')" style="display:none">Messages<span class="msg-dot"></span></button>
+    <button class="nav-btn msg-btn" id="nav-msgs" onclick="if(!requireAuth('view messages'))return;showView('messages')" style="display:none">Messages<span class="msg-dot" id="nav-msg-dot" style="display:none"></span></button>
     <button class="nav-btn" id="nav-profile" onclick="showView('profile')" style="display:none">My Stuff</button>
     <button class="nav-btn" id="nav-about" onclick="showView('about')">About</button>
   </div>
@@ -361,7 +362,7 @@ nav {
     Browse
   </button>
   <button class="tab-btn" id="tab-msgs" onclick="if(!requireAuth('view messages'))return;showView('messages')" style="position:relative;display:none">
-    <span class="tab-msg-dot" id="tab-msg-dot"></span>
+    <span class="tab-msg-dot" id="tab-msg-dot" style="display:none"></span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     Messages
   </button>
@@ -387,8 +388,8 @@ nav {
     </div>
     <div class="hero-stats">
       <div class="stat"><div class="stat-num" id="stat-items">—</div><div class="stat-label">available</div></div>
-      <div class="stat"><div class="stat-num">138</div><div class="stat-label">given away</div></div>
-      <div class="stat"><div class="stat-num">61</div><div class="stat-label">givers</div></div>
+      <div class="stat"><div class="stat-num">—</div><div class="stat-label">given away</div></div>
+      <div class="stat"><div class="stat-num">—</div><div class="stat-label">givers</div></div>
     </div>
   </div>
 
@@ -476,26 +477,41 @@ nav {
 <div id="view-profile" style="display:none">
   <div class="main" style="max-width:680px">
     <div style="background:var(--white);border-radius:var(--radius);padding:1.4rem;margin-bottom:1.25rem;box-shadow:var(--shadow);display:flex;align-items:center;gap:1rem;">
-      <div class="avatar" style="width:52px;height:52px;font-size:1.1rem;background:var(--papaya-mid)">ME</div>
+      <div class="avatar" style="width:52px;height:52px;font-size:1.1rem;background:var(--papaya-mid)" id="profile-avatar">ME</div>
       <div style="flex:1">
-        <div style="font-family:var(--font-display);font-size:1.15rem;font-weight:700;display:flex;align-items:center;flex-wrap:wrap;gap:4px">Your Profile <span id="profile-badge" style="display:none"></span></div>
-        <div style="font-size:0.8rem;color:var(--gray);margin-top:2px">Lower Mission, Kelowna · Member since 2025</div>
-        <div style="margin-top:6px;display:flex;gap:7px;flex-wrap:wrap;">
-          <span class="tag tag-condition">👍 4.9 giver rating</span>
+        <div style="font-family:var(--font-display);font-size:1.15rem;font-weight:700;display:flex;align-items:center;flex-wrap:wrap;gap:4px" id="profile-name-display">Your Profile <span id="profile-badge" style="display:none"></span></div>
+        <div style="font-size:0.8rem;color:var(--gray);margin-top:2px" id="profile-neighbourhood">Kelowna · Member since 2025</div>
+        <div style="margin-top:6px;display:flex;gap:7px;flex-wrap:wrap;align-items:center">
           <span class="tag tag-size" id="profile-count">0 items posted</span>
+          <button onclick="openModal('edit-profile-modal')" style="background:none;border:none;cursor:pointer;font-size:0.75rem;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;padding:0;font-family:var(--font-body)">Edit profile</button>
         </div>
       </div>
     </div>
-    <div id="supporter-profile-banner" style="display:block">
+
+    <div id="profile-listings-section">
+      <div class="section-label" style="margin-bottom:0.75rem">Your listings</div>
+      <div id="profile-listings-grid" style="display:flex;flex-direction:column;gap:10px">
+        <div style="text-align:center;padding:1rem;color:var(--gray);font-size:0.85rem">Loading your listings...</div>
+      </div>
+    </div>
+
+    <div id="profile-empty-state" style="display:none;text-align:center;padding:2rem 1rem">
+      <div style="font-size:2.5rem;margin-bottom:0.75rem">📦</div>
+      <p style="font-weight:600;margin-bottom:6px">Nothing posted yet!</p>
+      <p style="font-size:0.85rem;color:var(--gray)">Hit "+ Post Item" and make someone's day.</p>
+      <button class="post-btn" style="margin-top:1rem" onclick="openPostModal()">+ Post your first item</button>
+    </div>
+
+    <div style="margin-top:1.5rem" id="supporter-profile-banner">
       <div class="supporter-banner">
         <div>
           <div style="font-weight:600;font-size:0.92rem;margin-bottom:3px">Keep GiveItAway free for everyone 💚</div>
-          <div style="font-size:0.8rem;color:var(--lagoon-dark)">Optional supporters keep the lights on. $3/mo. Cancel anytime. No pressure at all.</div>
+          <div style="font-size:0.8rem;color:var(--lagoon-dark)">$3/mo keeps the lights on. Cancel anytime.</div>
         </div>
-        <button class="post-btn" style="background:var(--lagoon);white-space:nowrap;flex-shrink:0" onclick="openModal('supporter-modal')">✦ Become a supporter</button>
+        <button class="post-btn" style="background:var(--lagoon);white-space:nowrap;flex-shrink:0" onclick="openModal('supporter-modal')">✦ Support us</button>
       </div>
     </div>
-    <div id="supporter-profile-active" style="display:none">
+    <div style="margin-top:1.5rem;display:none" id="supporter-profile-active">
       <div class="supporter-banner" style="background:var(--lagoon-light)">
         <div>
           <div style="font-weight:600;font-size:0.92rem;margin-bottom:3px">You're a GiveItAway supporter ✦</div>
@@ -503,12 +519,6 @@ nav {
         </div>
         <button class="nav-btn" style="font-size:0.78rem;color:var(--gray)" onclick="openModal('supporter-modal')">Manage</button>
       </div>
-    </div>
-    <div class="empty-state">
-      <div class="big">📦</div>
-      <p style="font-weight:600;margin-bottom:6px">Nothing posted yet!</p>
-      <p style="font-size:0.85rem">Hit "+ Post Item" and make someone's day.</p>
-      <button class="post-btn" style="margin-top:1rem" onclick="openPostModal()">+ Post your first item</button>
     </div>
   </div>
 </div>
@@ -782,6 +792,35 @@ nav {
   </div>
 </div>
 
+<!-- EDIT PROFILE MODAL -->
+<div class="modal-overlay" id="edit-profile-modal">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <div class="modal-title">Edit profile</div>
+      <button class="close-btn" onclick="closeModal('edit-profile-modal')">✕</button>
+    </div>
+    <div class="auth-error" id="edit-profile-error"></div>
+    <div class="form-group">
+      <label class="form-label">Display name <span class="req">*</span></label>
+      <input class="form-input" type="text" id="edit-name" placeholder="Your name or nickname">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Neighbourhood</label>
+      <select class="form-select" id="edit-neighbourhood">
+        <option value="">Select your area</option>
+        <option>Lower Mission</option><option>Pandosy Village</option><option>Rutland</option>
+        <option>Glenmore</option><option>Black Mountain</option><option>Dilworth</option>
+        <option>SE Kelowna</option><option>Rutland North</option><option>Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Bio <span style="color:var(--gray);font-weight:400">(optional)</span></label>
+      <textarea class="form-textarea" id="edit-bio" placeholder="Tell neighbours a little about yourself..." rows="3" maxlength="200" style="resize:none"></textarea>
+    </div>
+    <button class="submit-btn" style="background:var(--lagoon)" onclick="saveProfile()">Save changes</button>
+  </div>
+</div>
+
 <!-- POST MODAL -->
 <div class="modal-overlay" id="post-modal">
   <div class="modal">
@@ -888,6 +927,9 @@ nav {
         <span id="claim-count" style="font-size:0.72rem;color:var(--gray)">253/300</span>
       </div>
       <button class="send-btn" style="width:100%;margin-top:8px;padding:0.6rem" onclick="sendClaim()">Send message</button>
+    </div>
+    <div style="text-align:center;margin-top:0.5rem">
+      <button onclick="reportCurrentListing()" style="background:none;border:none;cursor:pointer;font-size:0.72rem;color:var(--gray);text-decoration:underline;padding:0">🚩 Report this listing</button>
     </div>
   </div>
 </div>
@@ -1346,7 +1388,9 @@ function renderFeed(items) {
     const sizeTags = item.sizes.map(s=>`<span class="tag tag-size">${s}</span>`).join('');
     const pickupTags = item.pickup.map(p=>`<span class="tag tag-pickup">${p}</span>`).join('');
     const h = 110 + (idx * 37 % 80);
-    const imgHTML = `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--papaya-light) 0%,var(--lagoon-light) 100%);font-size:${Math.round(h*0.36)}px">${item.emoji}</div>`;
+    const imgHTML = item.photo
+      ? `<img src="${item.photo}" style="width:100%;height:${h}px;object-fit:cover;display:block" loading="lazy" onerror="this.style.display='none'">`
+      : `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--papaya-light) 0%,var(--lagoon-light) 100%);font-size:${Math.round(h*0.36)}px">${item.emoji}</div>`;
     const titleHL = highlight(item.title, query);
     const descHL = highlight(item.desc, query);
     const isOwn = currentUser && item.userId === currentUser.id;
@@ -1374,7 +1418,6 @@ function renderFeed(items) {
               <span class="giver-name">${item.giver}</span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
-              ${!isOwn ? `<button onclick="event.stopPropagation();reportListing(${idx})" style="background:none;border:none;cursor:pointer;font-size:0.68rem;color:var(--gray);padding:0;text-decoration:underline" title="Report this listing">Report</button>` : ''}
               ${actionBtn}
             </div>
           </div>
@@ -1433,6 +1476,43 @@ function openClaimByIndex(idx) {
   openClaim(item);
 }
 
+async function loadProfileListings() {
+  if (!currentUser || !_sb) return;
+  const grid = document.getElementById('profile-listings-grid');
+  const empty = document.getElementById('profile-empty-state');
+  grid.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--gray);font-size:0.85rem">Loading your listings...</div>';
+  document.getElementById('profile-listings-section').style.display = 'block';
+  empty.style.display = 'none';
+  const { data, error } = await _sb.from('listings')
+    .select('*').eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false });
+  if (error || !data || !data.length) {
+    document.getElementById('profile-listings-section').style.display = 'none';
+    empty.style.display = 'block';
+    document.getElementById('profile-count').textContent = '0 items posted';
+    return;
+  }
+  document.getElementById('profile-count').textContent = `${data.length} item${data.length!==1?'s':''} posted`;
+  const EMOJIS = { Clothes:'👕', Shoes:'👟', Maternity:'🤰', Gear:'🧺', Toys:'🧸', Bikes:'🚲', Books:'📚', Sports:'⚽', Other:'✨' };
+  grid.innerHTML = data.map(item => `
+    <div style="background:var(--white);border-radius:var(--radius-sm);box-shadow:var(--shadow);padding:0.9rem 1rem;display:flex;align-items:center;gap:12px">
+      <div style="width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,var(--papaya-light),var(--lagoon-light));display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">
+        ${item.photo_url && item.photo_url.startsWith('data:') ? `<img src="${item.photo_url}" style="width:48px;height:48px;object-fit:cover;border-radius:8px">` : (EMOJIS[item.category]||'✨')}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.title}</div>
+        <div style="font-size:0.75rem;color:var(--gray);margin-top:2px">${item.category} · ${item.condition} · ${item.neighbourhood}</div>
+      </div>
+      <span class="tag ${item.status==='available'?'tag-condition':'tag-size'}" style="flex-shrink:0">${item.status==='available'?'Available':'Given 🎉'}</span>
+    </div>`).join('');
+}
+  if (!claimTarget) return;
+  closeModal('claim-modal');
+  if (confirm(`Report "${claimTarget.title}"?\n\nThis will flag the listing for review by our community mods.`)) {
+    showToast('🚩 Reported — our mods will review this listing. Thank you!');
+  }
+}
+
 function reportListing(idx) {
   const filtered = getFiltered();
   const item = filtered[idx];
@@ -1440,6 +1520,34 @@ function reportListing(idx) {
   if (confirm(`Report "${item.title}"?\n\nThis will flag the listing for review by our community mods.`)) {
     showToast('🚩 Reported — our mods will review this listing. Thank you!');
   }
+}
+
+async function saveProfile() {
+  const name = document.getElementById('edit-name').value.trim();
+  const neighbourhood = document.getElementById('edit-neighbourhood').value;
+  const bio = document.getElementById('edit-bio').value.trim();
+  if (!name) {
+    const err = document.getElementById('edit-profile-error');
+    err.textContent = 'Name is required'; err.classList.add('show'); return;
+  }
+  if (!_sb) { await loadSupabase(); }
+  showLoading('Saving...');
+  try {
+    const { error } = await _sb.from('profiles').update({ name, neighbourhood, bio }).eq('id', currentUser.id);
+    if (error) throw error;
+    currentProfile = { ...currentProfile, name, neighbourhood, bio };
+    closeModal('edit-profile-modal');
+    const initials = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    document.getElementById('profile-avatar').textContent = initials;
+    document.getElementById('profile-name-display').childNodes[0].textContent = name + ' ';
+    document.getElementById('profile-neighbourhood').textContent = neighbourhood ? `${neighbourhood}, Kelowna` : 'Kelowna';
+    updateAuthUI(currentUser, currentProfile);
+    showToast('Profile updated! 🌿');
+  } catch(e) {
+    const err = document.getElementById('edit-profile-error');
+    err.textContent = friendlyAuthError(e.message);
+    err.classList.add('show');
+  } finally { hideLoading(); }
 }
 
 function openClaim(item) {
@@ -1454,7 +1562,7 @@ function openClaim(item) {
 function sendClaim() {
   closeModal('claim-modal');
   showToast('✅ Message sent! The giver will reach out soon.');
-  setTimeout(()=>{ document.querySelector('.msg-dot').style.display='block'; }, 500);
+  setTimeout(updateMsgDot, 500);
 }
 
 function openPostModal() {
@@ -1503,12 +1611,13 @@ async function submitPost() {
   }
   const sizes = [...document.querySelectorAll('.size-chip.selected')].map(c=>c.textContent);
   const photoSrc = document.getElementById('photo-img').src || null;
+  const hasPhoto = photoSrc && photoSrc.startsWith('data:') && photoSrc.length > 100;
   const listingData = {
     title, category:cat, sizes, condition:cond,
     pickup: pickups.map(p=>p.textContent.trim()),
     location: loc, neighbourhood: hood,
     desc: document.getElementById('post-desc').value.trim(),
-    photo_url: photoSrc && photoSrc.startsWith('data:') ? null : photoSrc,
+    photo_url: hasPhoto ? photoSrc : null,
   };
   if (_sb && currentUser) {
     showLoading('Posting your item...');
@@ -1531,6 +1640,7 @@ async function submitPost() {
   document.getElementById('profile-count').textContent = `${userPostCount} item${userPostCount!==1?'s':''} posted`;
   closeModal('post-modal');
   updateFeed();
+  if (document.getElementById('view-profile').style.display !== 'none') loadProfileListings();
   showToast('🎉 Posted! Someone out there is going to love this.');
   ['post-title','post-location','post-desc'].forEach(id => document.getElementById(id).value='');
   ['post-category','post-condition','post-neighbourhood'].forEach(id => document.getElementById(id).value='');
@@ -1555,6 +1665,17 @@ function showView(v) {
   const tabMap = {feed:'tab-browse',messages:'tab-msgs',profile:'tab-profile'};
   if (tabMap[v] && document.getElementById(tabMap[v])) document.getElementById(tabMap[v]).classList.add('active');
   if (v==='messages') renderThreadList();
+  if (v==='profile') {
+    loadProfileListings();
+    if (currentProfile) {
+      const initials = (currentProfile.name||'U').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+      document.getElementById('profile-avatar').textContent = initials;
+      document.getElementById('profile-name-display').childNodes[0].textContent = currentProfile.name + ' ';
+      if (currentProfile.neighbourhood) {
+        document.getElementById('profile-neighbourhood').textContent = `${currentProfile.neighbourhood}, Kelowna`;
+      }
+    }
+  }
   try { localStorage.setItem('gia_view', v); } catch(e){}
   const t = document.getElementById('toast');
   t.classList.remove('show');
@@ -1579,10 +1700,19 @@ function previewPhoto(input) {
   reader.readAsDataURL(input.files[0]);
 }
 
+function updateMsgDot() {
+  const hasUnread = THREADS.some(t => t.unread);
+  ['nav-msg-dot', 'tab-msg-dot'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = hasUnread ? 'block' : 'none';
+  });
+}
+
 function renderThreadList() {
   const list = document.getElementById('thread-list');
   const empty = document.getElementById('messages-empty');
   list.innerHTML = '';
+  updateMsgDot();
   if (!THREADS.length) {
     empty.style.display = 'block';
     return;
@@ -1689,7 +1819,12 @@ function openModal(id) {
     document.getElementById('feedback-text').value = '';
     document.getElementById('feedback-contact').value = '';
   }
-  if (id === 'auth-modal') {
+  if (id === 'edit-profile-modal' && currentProfile) {
+    document.getElementById('edit-name').value = currentProfile.name || '';
+    document.getElementById('edit-neighbourhood').value = currentProfile.neighbourhood || '';
+    document.getElementById('edit-bio').value = currentProfile.bio || '';
+    document.getElementById('edit-profile-error').classList.remove('show');
+  }
     document.getElementById('auth-confirm-form').style.display = 'none';
     document.getElementById('auth-signin-form').style.display = 'block';
     document.getElementById('auth-signup-form').style.display = 'none';
