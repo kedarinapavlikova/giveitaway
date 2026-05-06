@@ -89,15 +89,15 @@ nav {
   .tab-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
   .tab-post-btn {
     position: absolute;
-    top: -22px;
+    top: -28px;
     left: 50%;
     transform: translateX(-50%);
-    width: 50px; height: 50px; border-radius: 50%;
+    width: 54px; height: 54px; border-radius: 50%;
     background: var(--papaya-mid); color: white; border: 3px solid var(--cream); cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 14px rgba(255,138,101,0.45);
+    box-shadow: 0 6px 18px rgba(255,138,101,0.5);
     transition: all 0.15s;
-    font-size: 1.4rem; line-height: 1; flex-shrink: 0; z-index: 10;
+    font-size: 1.5rem; line-height: 1; flex-shrink: 0; z-index: 10;
   }
   .tab-post-btn:hover { background: var(--papaya-dark); transform: translateX(-50%) scale(1.06); }
   .tab-msg-dot { position: absolute; top: 0px; right: calc(50% - 13px); width: 7px; height: 7px; background: var(--lagoon); border-radius: 50%; border: 1.5px solid white; }
@@ -122,7 +122,8 @@ nav {
 .stat-label { font-size: 0.7rem; opacity: 0.85; margin-top: 2px; }
 
 .search-bar-wrap { background: var(--white); border-bottom: 1px solid #EDE9E3; padding: 0.75rem 1.5rem; display: flex; gap: 0.6rem; align-items: center; }
-.search-input-wrap { position: relative; flex: 1; }
+@media (max-width: 600px) { .search-bar-wrap { flex-direction: column; gap: 0.5rem; padding: 0.65rem 1rem; } .area-select { width: 100% !important; } }
+.search-input-wrap { position: relative; flex: 1; width: 100%; }
 .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--gray); pointer-events: none; }
 .search-input { width: 100%; background: var(--gray-light); border: none; border-radius: 24px; font-family: var(--font-body); font-size: 0.88rem; color: var(--charcoal); padding: 0.55rem 0.9rem 0.55rem 2.2rem; outline: none; transition: box-shadow 0.15s; }
 .search-input:focus { box-shadow: 0 0 0 2px var(--papaya); }
@@ -134,7 +135,7 @@ nav {
 
 .filters { background: var(--white); padding: 0.6rem 1.5rem; border-bottom: 1px solid #EDE9E3; display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none; }
 .filters::-webkit-scrollbar { display: none; }
-.filter-chip { white-space: nowrap; flex-shrink: 0; background: var(--gray-light); border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.78rem; font-weight: 500; color: var(--charcoal); padding: 0.32rem 0.85rem; border-radius: 20px; transition: all 0.15s; }
+
 .filter-chip:hover { background: var(--papaya-light); color: var(--papaya-dark); }
 .filter-chip.active { background: var(--papaya-mid); color: white; }
 
@@ -356,9 +357,17 @@ nav {
 .supporter-cta { width: 100%; background: var(--lagoon); color: white; border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.92rem; font-weight: 600; padding: 0.75rem; border-radius: var(--radius-sm); margin-top: 0.75rem; transition: all 0.15s; }
 .supporter-cta:hover { background: var(--lagoon-dark); transform: translateY(-1px); }
 .supporter-why { background: var(--gray-light); border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin: 0.75rem 0 1rem; font-size: 0.8rem; color: var(--charcoal); line-height: 1.65; }
-.feed-supporter-strip { background: var(--lagoon); color: white; text-align: center; padding: 0.55rem 1.5rem; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+
+
+
+.feed-supporter-strip { background: var(--lagoon); color: white; text-align: center; padding: 0.55rem 1.5rem; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: background 0.15s; line-height: 1.6; }
 .feed-supporter-strip:hover { background: var(--lagoon-dark); }
 .feed-supporter-strip strong { font-weight: 700; }
+.strip-break { display: none; }
+@media (max-width: 600px) { .strip-break { display: block; } .feed-supporter-strip { font-size: 0.75rem; padding: 0.55rem 1rem; } }
+.filter-chip { white-space: nowrap; flex-shrink: 0; background: var(--gray-light); border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.78rem; font-weight: 500; color: var(--charcoal); padding: 0.32rem 0.85rem; border-radius: 20px; transition: all 0.15s; display: inline-flex; align-items: center; line-height: 1.4; }
+.filter-chip:hover { background: var(--papaya-light); color: var(--papaya-dark); }
+.filter-chip.active { background: var(--papaya-mid); color: white; }
 </style>
 </head>
 <body>
@@ -418,7 +427,7 @@ nav {
   </div>
 
   <div class="feed-supporter-strip" id="supporter-strip" onclick="openModal('supporter-modal')">
-    <strong>GiveItAway runs on community love.</strong> Support us for $3/mo and get a ✦ on your profile.
+    <strong>GiveItAway runs on community love.</strong><br class="strip-break"> Support us for $3/mo and get a ✦ on your profile.
   </div>
 
   <div class="search-bar-wrap">
