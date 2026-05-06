@@ -1382,14 +1382,11 @@ async function fetchListings() {
     const { data, error } = await _sb
       .from('listings')
       .select(`*, profiles(name, neighbourhood)`)
-      .eq('status', 'available')
       .order('created_at', { ascending: false });
     if (error) {
-      // Fallback without join if profiles join fails
       const { data: data2, error: error2 } = await _sb
         .from('listings')
         .select('*')
-        .eq('status', 'available')
         .order('created_at', { ascending: false });
       if (error2) { console.error(error2); return null; }
       return data2;
@@ -1471,9 +1468,13 @@ function renderFeed(items) {
   const query = searchQuery.toLowerCase();
   feed.innerHTML = '';
   if (!items.length) {
-    const isFiltered = activeCategory !== 'all' || areaFilter !== 'all' || searchQuery;
-    const msg = isFiltered
-      ? `<div class="empty-state"><div class="big">🌿</div><p style="font-weight:600">Nothing here yet!</p><p style="font-size:0.85rem;margin-top:5px">${currentUser ? 'Be the first to add something — hit the <strong>+</strong> button!' : 'Be the first! <button onclick="openModal(\'auth-modal\')" style="background:none;border:none;cursor:pointer;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;font-size:0.85rem;padding:0">Sign in to post an item.</button>'}</p></div>`
+    const isSearch = searchQuery.length > 0;
+    const isCategoryFilter = activeCategory !== 'all';
+    const isFiltered = isCategoryFilter || areaFilter !== 'all' || isSearch;
+    const msg = isSearch
+      ? `<div class="empty-state"><div class="big">🔍</div><p style="font-weight:600">No results for "${searchQuery}"</p><p style="font-size:0.85rem;margin-top:5px;color:var(--gray)">Try different keywords or browse all categories.</p></div>`
+      : isFiltered
+      ? `<div class="empty-state"><div class="big">🌿</div><p style="font-weight:600">Nothing in this category yet!</p><p style="font-size:0.85rem;margin-top:5px">${currentUser ? 'Be the first — hit the <strong>+</strong> button!' : '<button onclick="openModal(\'auth-modal\')" style="background:none;border:none;cursor:pointer;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;font-size:0.85rem;padding:0">Sign in to post the first item.</button>'}</p></div>`
       : `<div class="empty-state"><div class="big">📦</div><p style="font-weight:600">No listings yet!</p><p style="font-size:0.85rem;margin-top:5px">${currentUser ? 'Be the first to give something away — hit the <strong>+</strong> button!' : 'Be the first! <button onclick="openModal(\'auth-modal\')" style="background:none;border:none;cursor:pointer;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;font-size:0.85rem;padding:0">Sign in to post an item.</button>'}</p></div>`;
     feed.innerHTML = msg;
     return;
@@ -1541,8 +1542,11 @@ function getFiltered() {
   return LISTINGS.filter(l => {
     const matchCat = activeCategory === 'all' || l.category === activeCategory;
     const matchArea = areaFilter === 'all' || l.neighbourhood === areaFilter;
-    const matchSearch = !q || l.title.toLowerCase().includes(q) || l.desc.toLowerCase().includes(q);
-    return matchCat && matchArea && matchSearch;
+    const matchSearch = !q || l.title.toLowerCase().includes(q) || (l.desc||'').toLowerCase().includes(q);
+    // Hide given items from feed unless it's the user's own (they see it with Given pill)
+    const isOwn = currentUser && l.userId === currentUser.id;
+    const showGiven = isOwn || l.status !== 'given';
+    return matchCat && matchArea && matchSearch && showGiven;
   });
 }
 
@@ -1581,7 +1585,71 @@ function filterCategory(el, cat) {
 
 // ── LISTING MANAGEMENT ────────────────────────────────────
 let editingListingIdx = null;
+let editingListingDbId = null;
 
+function toggleProfileDotsMenu(id, btn) {
+  closeAllMenus();
+  const menu = document.getElementById(`profile-dots-${id}`);
+  if (menu) menu.style.display = 'block';
+  setTimeout(() => document.addEventListener('click', closeAllMenus, { once: true }), 10);
+}
+
+function openEditListingById(id) {
+  const item = LISTINGS.find(l => (l.dbId || l.id) === id);
+  if (!item) {
+    // Item might only be in DB, not local — open modal with DB fetch
+    editingListingDbId = id;
+    document.getElementById('edit-listing-title').value = '';
+    document.getElementById('edit-listing-location').value = '';
+    document.getElementById('edit-listing-desc').value = '';
+    document.getElementById('edit-listing-error').classList.remove('show');
+    openModal('edit-listing-modal');
+    return;
+  }
+  editingListingDbId = id;
+  editingListingIdx = null;
+  document.getElementById('edit-listing-title').value = item.title || '';
+  document.getElementById('edit-listing-location').value = item.location || '';
+  document.getElementById('edit-listing-desc').value = item.desc || '';
+  document.getElementById('edit-listing-error').classList.remove('show');
+  openModal('edit-listing-modal');
+}
+
+async function markGivenById(id) {
+  const item = LISTINGS.find(l => (l.dbId || l.id) === id);
+  if (!_sb) await loadSupabase();
+  showLoading('Marking as given...');
+  try {
+    const { error } = await _sb.from('listings').update({ status: 'given' }).eq('id', id);
+    if (error) throw error;
+    if (item) item.status = 'given';
+    const newCount = (currentProfile?.items_given || 0) + 1;
+    await _sb.from('profiles').update({ items_given: newCount }).eq('id', currentUser.id);
+    if (currentProfile) currentProfile.items_given = newCount;
+    showKarmaModal(item || { title: 'Your item' }, newCount);
+    updateFeed();
+    loadProfileListings();
+  } catch(e) {
+    showToast('Something went wrong — ' + friendlyAuthError(e.message), '#E64A19');
+  } finally { hideLoading(); }
+}
+
+async function removeListingById(id) {
+  if (!confirm('Remove this listing? This can\'t be undone.')) return;
+  if (!_sb) await loadSupabase();
+  showLoading('Removing...');
+  try {
+    const { error } = await _sb.from('listings').delete().eq('id', id);
+    if (error) throw error;
+    const idx = LISTINGS.findIndex(l => (l.dbId || l.id) === id);
+    if (idx > -1) LISTINGS.splice(idx, 1);
+    updateFeed();
+    loadProfileListings();
+    showToast('Listing removed.');
+  } catch(e) {
+    showToast('Something went wrong — ' + friendlyAuthError(e.message), '#E64A19');
+  } finally { hideLoading(); }
+}
 function toggleDotsMenu(idx, btn) {
   closeAllMenus();
   const menu = document.getElementById(`dots-menu-${idx}`);
@@ -1598,6 +1666,7 @@ function openEditListing(idx) {
   const item = filtered[idx];
   if (!item) return;
   editingListingIdx = idx;
+  editingListingDbId = item.dbId || item.id || null;
   document.getElementById('edit-listing-title').value = item.title || '';
   document.getElementById('edit-listing-location').value = item.location || '';
   document.getElementById('edit-listing-desc').value = item.desc || '';
@@ -1614,21 +1683,19 @@ async function saveListingEdits() {
     err.textContent = 'Title and location are required'; err.classList.add('show'); return;
   }
   const filtered = getFiltered();
-  const item = filtered[editingListingIdx];
-  if (!item) return;
+  const item = editingListingDbId
+    ? LISTINGS.find(l => (l.dbId || l.id) === editingListingDbId)
+    : filtered[editingListingIdx];
+  const dbId = editingListingDbId || item?.dbId || item?.id;
+  if (!dbId) return;
   if (!_sb) await loadSupabase();
   showLoading('Saving...');
   try {
     const { error } = await _sb.from('listings')
       .update({ title, location_text: location, description: desc })
-      .eq('id', item.dbId || item.id);
+      .eq('id', dbId);
     if (error) throw error;
-    // Update local
-    item.title = title;
-    item.location = location;
-    item.desc = desc;
-    const listingInAll = LISTINGS.find(l => (l.dbId || l.id) === (item.dbId || item.id));
-    if (listingInAll) { listingInAll.title = title; listingInAll.location = location; listingInAll.desc = desc; }
+    if (item) { item.title = title; item.location = location; item.desc = desc; }
     closeModal('edit-listing-modal');
     updateFeed();
     if (document.getElementById('view-profile').style.display !== 'none') loadProfileListings();
@@ -1781,7 +1848,7 @@ async function loadProfileListings() {
   document.getElementById('stat-items').textContent = available;
 
   const EMOJIS = { Clothes:'👕', Shoes:'👟', Maternity:'🤰', Gear:'🧺', Toys:'🧸', Bikes:'🚲', Books:'📚', Sports:'⚽', Other:'✨' };
-  grid.innerHTML = data.map(item => `
+  grid.innerHTML = data.map((item, idx) => `
     <div style="background:var(--white);border-radius:var(--radius-sm);box-shadow:var(--shadow);padding:0.9rem 1rem;display:flex;align-items:center;gap:12px">
       <div style="width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,var(--papaya-light),var(--lagoon-light));display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;overflow:hidden">
         ${item.photo_url && item.photo_url.startsWith('data:') ? `<img src="${item.photo_url}" style="width:48px;height:48px;object-fit:cover">` : (EMOJIS[item.category]||'✨')}
@@ -1790,7 +1857,21 @@ async function loadProfileListings() {
         <div style="font-weight:600;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.title}</div>
         <div style="font-size:0.75rem;color:var(--gray);margin-top:2px">${item.category} · ${item.condition} · ${item.neighbourhood}</div>
       </div>
-      <span class="tag ${item.status==='available'?'tag-condition':'tag-size'}" style="flex-shrink:0">${item.status==='available'?'✅ Available':'💚 Given'}</span>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        ${item.status === 'available' ? `
+          <button onclick="openEditListingById('${item.id}')" class="edit-icon-btn" title="Edit">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <div style="position:relative">
+            <button class="dots-btn" onclick="toggleProfileDotsMenu('${item.id}', this)">···</button>
+            <div class="dots-menu" id="profile-dots-${item.id}" style="display:none;right:0;left:auto">
+              <button onclick="closeAllMenus();openEditListingById('${item.id}')">✏️ Edit listing</button>
+              <button onclick="closeAllMenus();markGivenById('${item.id}')">💚 Mark as given</button>
+              <button class="danger" onclick="closeAllMenus();removeListingById('${item.id}')">🗑️ Remove listing</button>
+            </div>
+          </div>
+        ` : `<span class="given-pill">💚 Given</span>`}
+      </div>
     </div>`).join('');
 }
 
