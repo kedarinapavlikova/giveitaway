@@ -990,6 +990,7 @@ nav {
       <div class="claim-detail">
         <h3 id="claim-title"></h3>
         <p id="claim-location"></p>
+        <p id="claim-desc" style="font-size:0.8rem;color:var(--gray);margin-top:4px;line-height:1.5"></p>
       </div>
     </div>
     <div class="form-group">
@@ -997,8 +998,7 @@ nav {
       <div class="send-wrap">
         <textarea class="form-input" id="claim-msg" rows="3" maxlength="300" style="resize:none;padding-right:0" oninput="updateClaimCount(this)">Hi! I'd love this — when's a good time to pick it up?</textarea>
       </div>
-      <div style="display:flex;justify-content:space-between;margin-top:4px">
-        <span class="hint">Keep it friendly — first come isn't always first served!</span>
+      <div style="display:flex;justify-content:flex-end;margin-top:4px">
         <span id="claim-count" style="font-size:0.72rem;color:var(--gray)">253/300</span>
       </div>
       <button class="send-btn" style="width:100%;margin-top:8px;padding:0.6rem" onclick="sendClaim()">Send message</button>
@@ -1739,13 +1739,22 @@ async function loadProfileListings() {
   if (!currentUser) return;
   const grid = document.getElementById('profile-listings-grid');
   const empty = document.getElementById('profile-empty-state');
-  grid.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--gray);font-size:0.85rem">Loading your listings...</div>';
+  const countEl = document.getElementById('profile-count');
+
+  // Show loading state
+  countEl.textContent = 'Loading...';
+  grid.innerHTML = `
+    <div style="text-align:center;padding:2rem 1rem;color:var(--gray)">
+      <div style="width:28px;height:28px;border:3px solid var(--lagoon-light);border-top-color:var(--lagoon);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 0.75rem"></div>
+      <div style="font-size:0.82rem">Loading your listings...</div>
+    </div>`;
   document.getElementById('profile-listings-section').style.display = 'block';
   empty.style.display = 'none';
 
   if (!_sb) await loadSupabase();
   if (!_sb) {
     grid.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--gray);font-size:0.85rem">Couldn\'t connect — check your internet and try again.</div>';
+    countEl.textContent = '—';
     return;
   }
 
@@ -1755,29 +1764,33 @@ async function loadProfileListings() {
 
   if (error) {
     grid.innerHTML = `<div style="text-align:center;padding:1rem;color:var(--gray);font-size:0.85rem">Couldn't load listings — ${friendlyAuthError(error.message)}</div>`;
+    countEl.textContent = '—';
     return;
   }
 
   if (!data || !data.length) {
     document.getElementById('profile-listings-section').style.display = 'none';
     empty.style.display = 'block';
-    document.getElementById('profile-count').textContent = '0 items posted';
+    countEl.textContent = '0 items posted';
     document.getElementById('stat-items').textContent = '0';
     return;
   }
 
-  document.getElementById('profile-count').textContent = `${data.length} item${data.length!==1?'s':''} posted`;
+  const available = data.filter(l => l.status === 'available').length;
+  countEl.textContent = `${data.length} item${data.length!==1?'s':''} posted`;
+  document.getElementById('stat-items').textContent = available;
+
   const EMOJIS = { Clothes:'👕', Shoes:'👟', Maternity:'🤰', Gear:'🧺', Toys:'🧸', Bikes:'🚲', Books:'📚', Sports:'⚽', Other:'✨' };
   grid.innerHTML = data.map(item => `
     <div style="background:var(--white);border-radius:var(--radius-sm);box-shadow:var(--shadow);padding:0.9rem 1rem;display:flex;align-items:center;gap:12px">
-      <div style="width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,var(--papaya-light),var(--lagoon-light));display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">
-        ${item.photo_url && item.photo_url.startsWith('data:') ? `<img src="${item.photo_url}" style="width:48px;height:48px;object-fit:cover;border-radius:8px">` : (EMOJIS[item.category]||'✨')}
+      <div style="width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,var(--papaya-light),var(--lagoon-light));display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;overflow:hidden">
+        ${item.photo_url && item.photo_url.startsWith('data:') ? `<img src="${item.photo_url}" style="width:48px;height:48px;object-fit:cover">` : (EMOJIS[item.category]||'✨')}
       </div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:600;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.title}</div>
         <div style="font-size:0.75rem;color:var(--gray);margin-top:2px">${item.category} · ${item.condition} · ${item.neighbourhood}</div>
       </div>
-      <span class="tag ${item.status==='available'?'tag-condition':'tag-size'}" style="flex-shrink:0">${item.status==='available'?'Available':'Given 🎉'}</span>
+      <span class="tag ${item.status==='available'?'tag-condition':'tag-size'}" style="flex-shrink:0">${item.status==='available'?'✅ Available':'💚 Given'}</span>
     </div>`).join('');
 }
 
@@ -1835,8 +1848,14 @@ function openClaim(item) {
   if (!requireAuth('claim items')) return;
   claimTarget = item;
   document.getElementById('claim-title').textContent = item.title;
-  document.getElementById('claim-location').textContent = '📍 '+item.location+' · '+item.neighbourhood;
-  document.getElementById('claim-emoji').textContent = item.emoji;
+  document.getElementById('claim-location').textContent = '📍 ' + item.location + ' · ' + item.neighbourhood;
+  document.getElementById('claim-desc').textContent = item.desc || '';
+  document.getElementById('claim-desc').style.display = item.desc ? 'block' : 'none';
+  document.getElementById('claim-emoji').textContent = item.photo
+    ? '' : item.emoji;
+  if (item.photo) {
+    document.getElementById('claim-emoji').innerHTML = `<img src="${item.photo}" style="width:56px;height:56px;object-fit:cover;border-radius:8px">`;
+  }
   document.getElementById('claim-modal').classList.add('open');
 }
 
