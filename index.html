@@ -290,7 +290,8 @@ nav {
 .feed-empty .big { font-size: 3rem; margin-bottom: 0.5rem; }
 
 /* FAQ / COMMUNITY STANDARDS PAGES */
-.content-page { padding: 1.5rem; max-width: 680px; margin: 0 auto; min-height: 60vh; }
+.content-page { padding: 1.5rem; max-width: 680px; margin: 0 auto; min-height: 75vh; }
+#view-faq, #view-community, #view-terms { min-height: 80vh; display: flex; flex-direction: column; }
 .content-page h2 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; margin-bottom: 0.25rem; }
 .content-page .subtitle { font-size: 0.83rem; color: var(--gray); margin-bottom: 1.5rem; }
 .content-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
@@ -942,6 +943,9 @@ nav {
       <button class="close-btn" onclick="closeModal('supporter-modal')">✕</button>
     </div>
     <div id="supporter-step-pick">
+      <div style="background:#FFF8E1;border:1px solid #FFB300;border-radius:var(--radius-xs);padding:0.65rem 0.9rem;margin-bottom:1rem;font-size:0.8rem;color:#7A4F00;display:flex;align-items:center;gap:8px">
+        🚧 <span><strong>Payments aren't live yet</strong> — but you can reserve your spot! We'll notify you when billing goes live.</span>
+      </div>
       <div class="supporter-why">
         🌿 GiveItAway is free to use — always. No ads, no selling your data, no cash for items. Ever.<br><br>
         Optional supporters help pay for hosting, keep the community moderated, and eventually help us expand to new cities. If you love what we're building, a few dollars a month makes a huge difference.
@@ -981,7 +985,7 @@ nav {
           </div>
         </div>
       </div>
-      <button class="supporter-cta" id="supporter-cta-btn" onclick="goToPayStep()" disabled>Select a tier to continue</button>
+      <button class="supporter-cta" id="supporter-cta-btn" onclick="goToPayStep()" disabled>Select a tier — we'll notify you when live</button>
       <div style="text-align:center;margin-top:0.6rem;font-size:0.72rem;color:var(--gray)">Cancel anytime. No pressure. You're already a hero for using the app. 💚</div>
     </div>
     <div id="supporter-step-pay" style="display:none">
@@ -1242,9 +1246,12 @@ async function handleSignUp() {
 }
 
 async function handleSignOut() {
+  showLoading('Signing out...');
   try {
+    if (!_sb) await loadSupabase();
     if (_sb) await _sb.auth.signOut();
   } catch(e) { console.warn('Sign out error:', e); }
+  finally { hideLoading(); }
   currentUser = null;
   currentProfile = null;
   updateAuthUI(null);
@@ -1477,21 +1484,36 @@ function openClaimByIndex(idx) {
 }
 
 async function loadProfileListings() {
-  if (!currentUser || !_sb) return;
+  if (!currentUser) return;
   const grid = document.getElementById('profile-listings-grid');
   const empty = document.getElementById('profile-empty-state');
   grid.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--gray);font-size:0.85rem">Loading your listings...</div>';
   document.getElementById('profile-listings-section').style.display = 'block';
   empty.style.display = 'none';
+
+  if (!_sb) await loadSupabase();
+  if (!_sb) {
+    grid.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--gray);font-size:0.85rem">Couldn\'t connect — check your internet and try again.</div>';
+    return;
+  }
+
   const { data, error } = await _sb.from('listings')
     .select('*').eq('user_id', currentUser.id)
     .order('created_at', { ascending: false });
-  if (error || !data || !data.length) {
+
+  if (error) {
+    grid.innerHTML = `<div style="text-align:center;padding:1rem;color:var(--gray);font-size:0.85rem">Couldn't load listings — ${friendlyAuthError(error.message)}</div>`;
+    return;
+  }
+
+  if (!data || !data.length) {
     document.getElementById('profile-listings-section').style.display = 'none';
     empty.style.display = 'block';
     document.getElementById('profile-count').textContent = '0 items posted';
+    document.getElementById('stat-items').textContent = '0';
     return;
   }
+
   document.getElementById('profile-count').textContent = `${data.length} item${data.length!==1?'s':''} posted`;
   const EMOJIS = { Clothes:'👕', Shoes:'👟', Maternity:'🤰', Gear:'🧺', Toys:'🧸', Bikes:'🚲', Books:'📚', Sports:'⚽', Other:'✨' };
   grid.innerHTML = data.map(item => `
@@ -1532,7 +1554,12 @@ async function saveProfile() {
     const err = document.getElementById('edit-profile-error');
     err.textContent = 'Name is required'; err.classList.add('show'); return;
   }
-  if (!_sb) { await loadSupabase(); }
+  if (!_sb) await loadSupabase();
+  if (!_sb) {
+    const err = document.getElementById('edit-profile-error');
+    err.textContent = 'Connection error — check your internet and try again.';
+    err.classList.add('show'); return;
+  }
   showLoading('Saving...');
   try {
     const { error } = await _sb.from('profiles').update({ name, neighbourhood, bio }).eq('id', currentUser.id);
@@ -1881,7 +1908,11 @@ function selectTier(tier) {
   document.getElementById('tier-'+tier).classList.add('selected');
   const btn = document.getElementById('supporter-cta-btn');
   btn.disabled = false;
-  btn.textContent = `Continue with ${TIERS[tier].name} — ${TIERS[tier].price}`;
+  btn.textContent = `✓ ${TIERS[tier].name} selected — we'll let you know when live!`;
+  btn.onclick = () => {
+    showToast('💚 Thanks! We\'ll email you when supporter payments go live.');
+    closeModal('supporter-modal');
+  };
 }
 
 function goToPayStep() {
