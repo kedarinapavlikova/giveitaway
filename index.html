@@ -157,7 +157,7 @@ nav {
 .card-desc-preview { font-size: 0.78rem; color: var(--gray); margin-bottom: 0.5rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .card-location { font-size: 0.76rem; color: var(--gray); display: flex; align-items: center; gap: 4px; margin-bottom: 0.55rem; }
 .card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 0.7rem; }
-.tag { font-size: 0.7rem; font-weight: 500; padding: 2px 8px; border-radius: 20px; }
+.tag { font-size: 0.7rem; font-weight: 500; padding: 2px 8px; border-radius: 20px; display: inline-flex; align-items: center; line-height: 1.4; }
 .tag-size { background: var(--papaya-light); color: #BF360C; }
 .tag-condition { background: var(--lagoon-light); color: var(--lagoon-dark); }
 .tag-category { background: #EDE7F6; color: #4527A0; }
@@ -423,8 +423,9 @@ nav {
 
   <div class="search-bar-wrap">
     <div class="search-input-wrap">
+      <input type="text" style="display:none" aria-hidden="true">
       <span class="search-icon">🔍</span>
-      <input class="search-input" type="search" id="search-input" placeholder="Search items, descriptions…" oninput="handleSearch()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <input class="search-input" type="search" id="search-input" placeholder="Search items, descriptions…" oninput="handleSearch()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="search_gia">
       <button class="clear-search" id="clear-btn" onclick="clearSearch()">✕</button>
     </div>
     <select class="area-select" id="area-select" onchange="handleSearch()">
