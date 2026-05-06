@@ -291,8 +291,8 @@ nav {
 .info-tooltip .grade-desc { color: var(--gray); }
 
 /* STICKY FOOTER */
-.site-footer { background: var(--white); border-top: 1px solid #EDE9E3; padding: 0.75rem 1.5rem; text-align: center; font-size: 0.72rem; color: var(--gray); position: sticky; bottom: 0; clear: both; margin-top: 2rem; }
-.site-footer button { background: none; border: none; cursor: pointer; font-size: 0.72rem; color: var(--lagoon-dark); font-weight: 600; padding: 0; text-decoration: underline; font-family: var(--font-body); }
+
+
 .main { padding: 1.25rem 1.5rem 2.5rem; max-width: 1100px; margin: 0 auto; }
 
 /* AUTH */
@@ -312,7 +312,9 @@ nav {
 
 /* FAQ / COMMUNITY STANDARDS PAGES */
 .content-page { padding: 1.5rem; max-width: 680px; margin: 0 auto; min-height: 75vh; }
-#view-faq, #view-community, #view-terms { min-height: 80vh; display: flex; flex-direction: column; }
+
+.site-footer { background: var(--white); border-top: 1px solid #EDE9E3; padding: 0.75rem 1.5rem; text-align: center; font-size: 0.72rem; color: var(--gray); margin-top: auto; }
+.site-footer button { background: none; border: none; cursor: pointer; font-size: 0.72rem; color: var(--lagoon-dark); font-weight: 600; padding: 0; text-decoration: underline; font-family: var(--font-body); }
 .content-page h2 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; margin-bottom: 0.25rem; }
 .content-page .subtitle { font-size: 0.83rem; color: var(--gray); margin-bottom: 1.5rem; }
 .content-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
@@ -422,7 +424,7 @@ nav {
   <div class="search-bar-wrap">
     <div class="search-input-wrap">
       <span class="search-icon">🔍</span>
-      <input class="search-input" type="text" id="search-input" placeholder="Search items, descriptions…" oninput="handleSearch()">
+      <input class="search-input" type="search" id="search-input" placeholder="Search items, descriptions…" oninput="handleSearch()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       <button class="clear-search" id="clear-btn" onclick="clearSearch()">✕</button>
     </div>
     <select class="area-select" id="area-select" onchange="handleSearch()">
@@ -594,17 +596,6 @@ nav {
   </div>
 </div>
 
-<!-- SITE FOOTER -->
-<footer class="site-footer">
-  Free to use, always. No money ever changes hands between neighbours. 🌿<br>
-  Made in Kelowna, BC by <button onclick="showView('about')">Keds</button>
-  &nbsp;·&nbsp; <button onclick="showView('about')">About</button>
-  &nbsp;·&nbsp; <button onclick="showView('faq')">FAQ</button>
-  &nbsp;·&nbsp; <button onclick="showView('community')">Community Standards</button>
-  &nbsp;·&nbsp; <button onclick="showView('terms')">Terms &amp; Privacy</button>
-  &nbsp;·&nbsp; <button onclick="openModal('feedback-modal')">Feedback</button>
-</footer>
-
 <!-- FAQ VIEW -->
 <div id="view-faq" style="display:none">
   <div class="content-page">
@@ -739,6 +730,17 @@ nav {
     </div>
   </div>
 </div>
+
+<!-- SITE FOOTER -->
+<footer class="site-footer">
+  Free to use, always. No money ever changes hands between neighbours. 🌿<br>
+  Made in Kelowna, BC by <button onclick="showView('about')">Keds</button>
+  &nbsp;·&nbsp; <button onclick="showView('about')">About</button>
+  &nbsp;·&nbsp; <button onclick="showView('faq')">FAQ</button>
+  &nbsp;·&nbsp; <button onclick="showView('community')">Community Standards</button>
+  &nbsp;·&nbsp; <button onclick="showView('terms')">Terms &amp; Privacy</button>
+  &nbsp;·&nbsp; <button onclick="openModal('feedback-modal')">Feedback</button>
+</footer>
 
 <!-- LOADING OVERLAY -->
 <div class="loading-overlay" id="loading-overlay">
@@ -1858,19 +1860,18 @@ async function loadProfileListings() {
         <div style="font-size:0.75rem;color:var(--gray);margin-top:2px">${item.category} · ${item.condition} · ${item.neighbourhood}</div>
       </div>
       <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-        ${item.status === 'available' ? `
-          <button onclick="openEditListingById('${item.id}')" class="edit-icon-btn" title="Edit">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <div style="position:relative">
-            <button class="dots-btn" onclick="toggleProfileDotsMenu('${item.id}', this)">···</button>
-            <div class="dots-menu" id="profile-dots-${item.id}" style="display:none;right:0;left:auto">
-              <button onclick="closeAllMenus();openEditListingById('${item.id}')">✏️ Edit listing</button>
-              <button onclick="closeAllMenus();markGivenById('${item.id}')">💚 Mark as given</button>
-              <button class="danger" onclick="closeAllMenus();removeListingById('${item.id}')">🗑️ Remove listing</button>
-            </div>
+        <button onclick="openEditListingById('${item.id}')" class="edit-icon-btn" title="Edit">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <div style="position:relative">
+          <button class="dots-btn" onclick="toggleProfileDotsMenu('${item.id}', this)">···</button>
+          <div class="dots-menu" id="profile-dots-${item.id}" style="display:none;right:0;left:auto">
+            <button onclick="closeAllMenus();openEditListingById('${item.id}')">✏️ Edit listing</button>
+            ${item.status === 'available' ? `<button onclick="closeAllMenus();markGivenById('${item.id}')">💚 Mark as given</button>` : ''}
+            <button class="danger" onclick="closeAllMenus();removeListingById('${item.id}')">🗑️ Remove listing</button>
           </div>
-        ` : `<span class="given-pill">💚 Given</span>`}
+        </div>
+        ${item.status !== 'available' ? `<span class="given-pill">💚 Given</span>` : ''}
       </div>
     </div>`).join('');
 }
@@ -2358,23 +2359,18 @@ async function initApp() {
       console.error('Auth init error:', e);
     }
 
-    // Load listings — works for both logged in AND anonymous users
+    // Load listings silently — works for both logged in AND anonymous users
     try {
-      showLoading('Loading listings...');
       const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 3000));
       const dbListings = await Promise.race([fetchListings(), timeoutPromise]);
-      hideLoading();
       if (dbListings && dbListings.length > 0) {
         LISTINGS.length = 0;
         dbListings.forEach(l => LISTINGS.push(dbListingToLocal(l)));
       }
-      document.getElementById('stat-items').textContent = LISTINGS.length;
+      document.getElementById('stat-items').textContent = LISTINGS.filter(l=>l.status!=='given').length;
     } catch(e) {
       console.error('Listings load error:', e);
-      hideLoading();
     }
-  } else {
-    hideLoading();
   }
 
   updateFeed();
