@@ -278,5 +278,98 @@ Katie is a strong community mod candidate.
 - [ ] Real messages between users
 - [ ] Onboarding community agreement screen
 - [ ] Triage more beta feedback
+
+---
+
+## Session 4 — May 4–6, 2026
+
+**Time:** ~4 hours across multiple sittings
+**Versions shipped:** v13, v14 (reverted), v13 patched
+**Real users:** 1 (Keddy — first real account created)
+**Real listings:** 1 (Barbies, Lequime Rd 👋)
+
+### What we built
+
+- Real auth end-to-end — sign up, branded confirmation email, sign in, session restore
+- Confirmation email redirects to `giveitawayapp.com` (was going to localhost:3000)
+- Branded confirmation email — papaya/lagoon design, "Confirm my email" button
+- First real listing posted by a real user and showing in the feed
+- "Your listing" badge on own posts — not clickable, no claim button
+- Report button inside claim modal (removed from card — cleaner)
+- My Stuff page fetches real listings from DB with photo, status, category, condition
+- Edit profile modal — name, neighbourhood, bio. Saves to Supabase, updates UI everywhere instantly
+- Remember me checkbox on sign in with localStorage persistence
+- Friendly error messages for all Supabase auth error codes
+- Messages dot only shows when there are unread threads
+- Support modal "not live yet" banner — tier selection works, no fake payment flow
+- Stripe account created, test keys saved
+- **CLAUDE.md** created and uploaded to GitHub — Claude Code reads this before touching anything
+
+### Bugs fixed
+
+**Bug 1 — Supabase key format**
+`sb_publishable_` key not supported by supabase-js for auth. Swapped to legacy anon JWT key (`eyJ...`).
+
+**Bug 2 — Email confirmation localhost redirect**
+Supabase was redirecting confirmation links to `localhost:3000`. Fixed in Supabase → Authentication → URL Configuration → Site URL set to `https://giveitawayapp.com`.
+
+**Bug 3 — Email rate limit**
+Hit Supabase free tier email limit during testing. Solution: use `email+test2@gmail.com` format for test accounts.
+
+**Bug 4 — _sb null at call time (sign out / My Stuff / save profile all stuck loading)**
+All three functions called `_sb` without awaiting `loadSupabase()` first. On page refresh `_sb` is null until the CDN loads. Fixed by awaiting `loadSupabase()` before every DB/auth call and adding proper error states instead of silent bails.
+
+### Claude Code regression (and the fix)
+
+Claude Code edited `index.html` directly without knowing the project rules. It:
+- Renamed `_sb` → `supabase` (conflicts with CDN global, breaks all auth silently)
+- Changed `var(--papaya-mid)` → `var(--papaya)` (lighter colour, wrong on buttons/hero)
+- Removed `style="display:none"` from Messages and My Stuff nav items (showed when logged out)
+- Broke friendly error messages (raw API errors showing)
+- Removed remember me checkbox
+
+**Root cause:** No rules file. Claude Code didn't know the conventions.
+**Fix:** Created `CLAUDE.md` in repo root. Claude Code reads it automatically every session.
+**Cost:** Half a session. Won't happen again.
+
+### Process decisions
+
+- **Claude Code owns the file** — builds and deploys
+- **Claude.ai does design, diagnosis, strategy** — review broken things here via screenshot
+- **Smoke test before every deploy** — Keddy's reputation is on the line
+- **Database changes** → always screenshot here before proceeding in Claude Code
+- **CLAUDE.md is the contract** — if Claude Code breaks something in the file, it's on Claude Code
+
+### Lessons
+
+- Always `await loadSupabase()` before any `_sb` call. Silent null failures are the hardest bugs to spot.
+- Never let two tools edit the same file without a handoff contract.
+- The CLAUDE.md smoke test checklist is the minimum bar before any deploy.
+
+---
+
+## Progress Update
+
+```
+[█████████████████░░░░░░░] 68%
+
+✅ Prototype    ✅ Live URL    ✅ Auth         ✅ Database
+🟡 Stability    🟡 Features    ⬜ Launch
+```
+
+---
+
+## Session 5 — To Do
+
+- [ ] Mark as picked up + delete listing flow
+- [ ] Karma tally on pickup
+- [ ] Edit listings from My Stuff + feed
+- [ ] Sent messages appearing in Messages tab
+- [ ] Privacy nudge in claim message field
+- [ ] Footer fix on Terms / FAQ / Community Standards pages
+- [ ] Stripe supporter payments
+- [ ] Real given away + givers stats from DB
+- [ ] Update CLAUDE.md with any new conventions
+- [ ] Update progress bar to ~80%
 - [ ] Update progress bar to ~75%
  
