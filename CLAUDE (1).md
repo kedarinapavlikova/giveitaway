@@ -82,59 +82,66 @@ showAuthError(friendlyAuthError(e.message));
 
 ## 🧪 Smoke Test Checklist — Run Before Every Deploy
 
-Open the live site in an incognito browser and check:
+Open the live site in an **incognito browser**. Do NOT use the Claude.ai preview — it blocks all network requests.
 
+**Logged-out basics:**
 - [ ] Homepage loads with correct papaya `#FF8A65` hero colour (not pale `#FFAB91`)
-- [ ] Sign in button works — try signing in with `pavlikkeddy@gmail.com`
-- [ ] Wrong password shows friendly error (not raw API message)
-- [ ] Logged-out state: Messages and My Stuff NOT visible in nav
-- [ ] Logged-in state: Messages and My Stuff visible, Sign out works
-- [ ] "+ Post Item" prompts sign in if logged out
-- [ ] "I want this!" prompts sign in if logged out
-- [ ] Remember me checkbox present on sign in form
-- [ ] Mobile: search bar stacks (search on top, area dropdown below)
-- [ ] Footer sits at bottom of page on all content pages (FAQ, Terms, Community Standards)
+- [ ] Real listings visible in feed without signing in
+- [ ] Messages and My Stuff NOT visible in nav
+- [ ] Clicking a listing → prompts sign in
+- [ ] "I want this!" → prompts sign in
+- [ ] "+ Post Item" → prompts sign in
 
----
+**Auth:**
+- [ ] Sign in works with `pavlikkeddy@gmail.com`
+- [ ] Wrong password shows friendly plain-English error (not raw API text)
+- [ ] Remember me checkbox present, pre-fills email on next visit
+- [ ] Sign out works and returns to logged-out state
+- [ ] After sign in: Messages + My Stuff appear in nav
 
-## 🏗️ Architecture
+**Feed (logged in):**
+- [ ] Own listings show "YOUR POST" badge (papaya, top-left)
+- [ ] Own listings show ✏️ pencil + `···` dots menu
+- [ ] `···` menu shows: Edit listing / Mark as given / Remove listing
+- [ ] Other listings show "I want this!" (no pencil/dots)
 
-Single-file HTML app (`index.html`). Everything lives in one file:
-- CSS in `<style>` block in `<head>`
-- HTML views: `view-feed`, `view-messages`, `view-profile`, `view-about`, `view-faq`, `view-community`, `view-terms`
-- Single `<script>` block at bottom
+**Edit listing:**
+- [ ] Opens with prefilled title, location, description
+- [ ] Save changes updates the listing in the feed
 
-**Supabase project:** `rpqyszpzyivypbfykakg` (Canada Central)
-**Live URL:** `https://giveitawayapp.com`
-**Deploys:** GitHub → Vercel (auto on push)
+**Mark as given:**
+- [ ] "You made someone's day!" modal appears with animated hearts
+- [ ] Listing shows `💚 Given` pill in feed
 
----
+**Remove listing:**
+- [ ] Confirm dialog appears before deleting
+- [ ] Listing disappears from feed after confirming
 
-## 🎯 Design System
+**My Stuff:**
+- [ ] Listings load (not stuck in loading state)
+- [ ] Item count correct
+- [ ] Edit profile saves without eternal loading
 
-**Fonts:**
-- Display/headings: `Fraunces` (Google Fonts), weights 400 + 700
-- Body/UI: `DM Sans` (Google Fonts), weights 400 + 500 + 600
-
-**Border radius:** 16px cards, 12px inputs, 24px pills, 50% avatars
-
-**Key CSS variables:** See `:root` block at top of `<style>`. Never add hardcoded hex colours — always use variables.
+**Mobile:**
+- [ ] Search bar stacks (search on top, area dropdown below)
+- [ ] Bottom tab bar: Browse / Messages / + / Support / My Stuff
+- [ ] Footer at bottom on FAQ, Terms, Community Standards pages
 
 ---
 
 ## 📌 Current Backlog (don't build these without checking with Keddy first)
 
-- Edit listings from My Stuff + feed
 - Footer fix on Terms / FAQ / Community Standards pages
 - "Not live yet" banner on Support modal
-- Karma / points system
-- Stripe integration for supporter payments
-- Supabase Storage for photo uploads
-- Real messaging between users
+- Sent messages showing in Messages tab
+- Privacy nudge in claim field ("don't share home address")
+- Real given away + givers stats from DB
+- Stripe supporter payments
+- Supabase Storage for photos (currently base64)
+- Real messaging between users (backend)
+- Karma emoji tiers (🌱→🌿→🌳) on profile
 - Map view
 - Mobile app
-
----
 
 ## ⚠️ Known Fragile Areas
 
