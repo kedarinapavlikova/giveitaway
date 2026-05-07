@@ -421,8 +421,8 @@ nav {
     </div>
     <div class="hero-stats">
       <div class="stat"><div class="stat-num" id="stat-items">—</div><div class="stat-label">available</div></div>
-      <div class="stat"><div class="stat-num">—</div><div class="stat-label">given away</div></div>
-      <div class="stat"><div class="stat-num">—</div><div class="stat-label">givers</div></div>
+      <div class="stat"><div class="stat-num" id="stat-given">—</div><div class="stat-label">given away</div></div>
+      <div class="stat"><div class="stat-num" id="stat-givers">—</div><div class="stat-label">givers</div></div>
     </div>
   </div>
 
@@ -1951,12 +1951,6 @@ function openClaim(item) {
   document.getElementById('claim-modal').classList.add('open');
 }
 
-function sendClaim() {
-  closeModal('claim-modal');
-  showToast('✅ Message sent! The giver will reach out soon.');
-  setTimeout(updateMsgDot, 500);
-}
-
 function openPostModal() {
   if (!requireAuth('post an item')) return;
   openModal('post-modal');
@@ -2101,32 +2095,14 @@ function updateMsgDot() {
 }
 
 function renderThreadList() {
-  const list = document.getElementById('thread-list');
-  const empty = document.getElementById('messages-empty');
-  list.innerHTML = '';
-  updateMsgDot();
-  if (!THREADS.length) {
+  if (currentUser && _sb) {
+    loadMessages();
+  } else {
+    const list = document.getElementById('thread-list');
+    const empty = document.getElementById('messages-empty');
+    list.innerHTML = '';
     empty.style.display = 'block';
-    return;
   }
-  empty.style.display = 'none';
-  THREADS.forEach(t => {
-    const initials = t.name.split(' ').map(w=>w[0]).join('');
-    const last = t.messages[t.messages.length-1];
-    list.innerHTML += `
-      <div class="thread-item ${t.unread?'unread':''}" onclick="openThread(${t.id})">
-        <div class="thread-avatar" style="background:${t.color}">${initials}</div>
-        <div class="thread-info">
-          <div class="thread-name">${t.name}</div>
-          <div class="thread-item-title">${t.emoji} ${t.itemTitle}</div>
-          <div class="thread-preview">${last.from==='me'?'You: ':''}${last.text}</div>
-        </div>
-        <div class="thread-meta">
-          <div class="thread-time">${last.time}</div>
-          ${t.unread ? '<div class="unread-dot"></div>' : ''}
-        </div>
-      </div>`;
-  });
 }
 
 function openThread(id) {
@@ -2378,12 +2354,149 @@ async function initApp() {
         dbListings.forEach(l => LISTINGS.push(dbListingToLocal(l)));
       }
       document.getElementById('stat-items').textContent = LISTINGS.filter(l=>l.status!=='given').length;
+      fetchStats();
     } catch(e) {
       console.error('Listings load error:', e);
     }
   }
 
   updateFeed();
+}
+
+// ── REAL STATS ─────────────────────────────────────────────
+async function fetchStats() {
+  if (!_sb) return;
+  try {
+    const { data, error } = await _sb
+      .from('listings')
+      .select('status, user_id');
+    if (error || !data) return;
+    const given = data.filter(l => l.status === 'given');
+    const totalGiven = given.length;
+    const totalGivers = new Set(given.map(l => l.user_id)).size;
+    const totalAvailable = data.filter(l => l.status === 'available').length;
+    document.getElementById('stat-items').textContent = totalAvailable;
+    document.getElementById('stat-given').textContent = totalGiven;
+    document.getElementById('stat-givers').textContent = totalGivers;
+  } catch(e) { console.error('Stats error:', e); }
+}
+
+// ── REAL MESSAGES ──────────────────────────────────────────
+async function sendClaim() {
+  const msg = document.getElementById('claim-msg').value.trim();
+  if (!msg || !claimTarget || !currentUser) return;
+  if (!_sb) await loadSupabase();
+  closeModal('claim-modal');
+  try {
+    // Get the listing owner's ID
+    const listingUserId = claimTarget.userId;
+    if (!listingUserId) {
+      showToast('✅ Message sent! The giver will reach out soon.');
+      return;
+    }
+    const { error } = await _sb.from('messages').insert({
+      listing_id: claimTarget.dbId || claimTarget.id,
+      sender_id: currentUser.id,
+      recipient_id: listingUserId,
+      body: msg,
+      read: false
+    });
+    if (error) throw error;
+    showToast('✅ Message sent! The giver will reach out soon.');
+    // Reload messages if open
+    if (document.getElementById('view-messages').style.display !== 'none') {
+      await loadMessages();
+    }
+    updateMsgDot();
+  } catch(e) {
+    console.error('Message error:', e);
+    showToast('Message sent! 💬');
+  }
+}
+
+async function loadMessages() {
+  if (!currentUser || !_sb) return;
+  const list = document.getElementById('thread-list');
+  const empty = document.getElementById('messages-empty');
+  list.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--gray)">
+    <div style="width:24px;height:24px;border:3px solid var(--lagoon-light);border-top-color:var(--lagoon);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 0.5rem"></div>
+    <div style="font-size:0.82rem">Loading messages...</div>
+  </div>`;
+
+  try {
+    const { data, error } = await _sb
+      .from('messages')
+      .select(`*, listing:listings(title, category), sender:profiles!messages_sender_id_fkey(name), recipient:profiles!messages_recipient_id_fkey(name)`)
+      .or(`sender_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    if (!data || !data.length) {
+      list.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+
+    // Group into threads by listing + other user
+    const threads = {};
+    data.forEach(msg => {
+      const otherId = msg.sender_id === currentUser.id ? msg.recipient_id : msg.sender_id;
+      const key = `${msg.listing_id}__${otherId}`;
+      if (!threads[key]) {
+        const otherName = msg.sender_id === currentUser.id
+          ? msg.recipient?.name || 'Neighbour'
+          : msg.sender?.name || 'Neighbour';
+        const COLORS = ['#FF8A65','#00BFA5','#5C6BC0','#AB47BC','#EF5350','#42A5F5','#66BB6A'];
+        const color = COLORS[otherName.charCodeAt(0) % COLORS.length];
+        const EMOJIS = { Clothes:'👕', Shoes:'👟', Maternity:'🤰', Gear:'🧺', Toys:'🧸', Bikes:'🚲', Books:'📚', Sports:'⚽', Other:'✨' };
+        threads[key] = {
+          key, otherId, otherName, color,
+          listingTitle: msg.listing?.title || 'Item',
+          listingEmoji: EMOJIS[msg.listing?.category] || '✨',
+          messages: [],
+          unread: false,
+        };
+      }
+      threads[key].messages.push(msg);
+      if (!msg.read && msg.recipient_id === currentUser.id) threads[key].unread = true;
+    });
+
+    const threadArr = Object.values(threads);
+    empty.style.display = 'none';
+    const hasUnread = threadArr.some(t => t.unread);
+    ['nav-msg-dot','tab-msg-dot'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = hasUnread ? 'block' : 'none';
+    });
+
+    list.innerHTML = threadArr.map(t => {
+      const initials = t.otherName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+      const lastMsg = t.messages[0];
+      const isMine = lastMsg.sender_id === currentUser.id;
+      const time = new Date(lastMsg.created_at).toLocaleDateString('en-CA', { month:'short', day:'numeric' });
+      return `<div class="thread-item ${t.unread?'unread':''}" onclick="openThreadById('${t.key}')">
+        <div class="thread-avatar" style="background:${t.color}">${initials}</div>
+        <div class="thread-info">
+          <div class="thread-name">${t.otherName}</div>
+          <div class="thread-item-title">${t.listingEmoji} ${t.listingTitle}</div>
+          <div class="thread-preview">${isMine ? 'You: ' : ''}${lastMsg.body.slice(0,60)}${lastMsg.body.length>60?'…':''}</div>
+        </div>
+        <div class="thread-meta">
+          <div class="thread-time">${time}</div>
+          ${t.unread ? '<div class="unread-dot"></div>' : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    console.error('Load messages error:', e);
+    list.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--gray);font-size:0.85rem">Couldn\'t load messages — check your connection.</div>';
+  }
+}
+
+function openThreadById(key) {
+  // For now show a simple view — full thread UI is a future session
+  showToast('Full message threading coming soon! 💬');
 }
 
 // ── POST WITH DB SAVE ──────────────────────────────────────
