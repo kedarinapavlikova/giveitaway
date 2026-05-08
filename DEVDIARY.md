@@ -372,4 +372,79 @@ Claude Code edited `index.html` directly without knowing the project rules. It:
 - [ ] Update CLAUDE.md with any new conventions
 - [ ] Update progress bar to ~80%
 - [ ] Update progress bar to ~75%
- 
+
+ [DEVDIARY_session5.md](https://github.com/user-attachments/files/27533305/DEVDIARY_session5.md)
+ ## Session 5 — May 8, 2026
+
+**Time:** ~1.5 hours
+**Versions shipped:** v14 (patched)
+**Bugs squashed:** 0 (we BUILT stuff this time, very refreshing)
+**Vibes:** ☀️ Kelowna spring energy; mild hyperfixation; productive
+
+---
+
+### What we built
+
+- **Location pre-fill on post modal** — neighbourhood dropdown + location text field now auto-populate from the user's saved profile when opening "+ Post Item." Both fields stay fully editable (because life is chaos and you might be posting from Nana's). Resets cleanly after posting so there's no bleed-through to the next listing.
+
+---
+
+### Design decisions
+
+- **Profile → form bridge:** Rather than asking users to type their location every single time they post, we pull it silently from their profile on modal open. Zero friction. Very GiveItAway.
+- **Editable, not locked:** Pre-fill is a starting point, not a cage. Givers who move, visit, or just aren't home get full control.
+- **Reset on submit:** The form wipes on close/submit so old values don't haunt the next post. Lesson from the bio-duplication incident of Session 2. We don't repeat our sins.
+
+---
+
+### Bugs & struggles
+
+Nothing broke. Truly. We just... shipped a thing. Take a screenshot. Frame it.
+
+---
+
+### Moment of the session
+
+> *"I want this app to help communities and the planet. I want to connect kids to clothes and gear, and I want to give away things I don't need. I want it to be EASY."* — Keddy Pavlik, May 8, 2026
+
+That's it. That's the mission statement. That's the T-shirt.
+
+---
+
+### Family cameo
+
+Rosie turns **7 on May 13.** Jordie turns **1 on April 23** (just happened!). The two tiny humans who inspired an entire community platform. Jordie is already in the demographic. Rosie is probably ready to start giving away the toys she's "over."
+
+---
+
+### Backlog status
+
+Still standing. No new items added this session — the pre-fill was focused, contained, and done. A rare and beautiful thing.
+
+---
+
+## Progress Update
+
+```
+[█████████████████░░░░░░░] 70%
+
+✅ Prototype    ✅ Live URL    ✅ Auth         ✅ Database
+✅ Location UX  🟡 Messaging   🟡 Stats        ⬜ Launch
+```
+
+---
+
+## Session 6 — To Do
+
+- [ ] Real messaging backend (Supabase `messages` table — send AND receive)
+- [ ] Fix: sent messages not showing in thread view
+- [ ] Real stats from DB (Hearts Given + Givers count, not placeholder)
+- [ ] Supabase Storage for photos (base64 will not scale)
+- [ ] Stripe supporter payments + Vercel serverless function
+- [ ] Privacy nudge in claim/message flow
+- [ ] Karma emoji tier badges on profile
+- [ ] Size filter in feed (filter chips for size alongside category)
+- [ ] Tiny Humans — kid profiles (avatar, bday → size suggestions, editable)
+- [ ] Full T&C + Privacy Policy (before Stripe ever goes live)
+
+
