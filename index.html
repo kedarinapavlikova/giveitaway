@@ -1467,8 +1467,6 @@ let searchQuery = '';
 let areaFilter = 'all';
 let claimTarget = null;
 let activeThread = null;
-let LOADED_THREADS = {};
-let activeThreadKey = null;
 let userPostCount = 0;
 
 function highlight(text, query) {
@@ -1852,14 +1850,13 @@ async function loadProfileListings() {
   if (!data || !data.length) {
     document.getElementById('profile-listings-section').style.display = 'none';
     empty.style.display = 'block';
-    countEl.textContent = `0 posted · ${currentProfile?.items_given || 0} given 💚`;
+    countEl.textContent = '0 items posted';
     document.getElementById('stat-items').textContent = '0';
     return;
   }
 
   const available = data.filter(l => l.status === 'available').length;
-  const givenCount = currentProfile?.items_given || data.filter(l => l.status === 'given').length;
-  countEl.textContent = `${data.length} posted · ${givenCount} given 💚`;
+  countEl.textContent = `${data.length} item${data.length!==1?'s':''} posted`;
   document.getElementById('stat-items').textContent = available;
 
   const EMOJIS = { Clothes:'👕', Shoes:'👟', Maternity:'🤰', Gear:'🧺', Toys:'🧸', Bikes:'🚲', Books:'📚', Sports:'⚽', Other:'✨' };
@@ -1958,6 +1955,17 @@ function openPostModal() {
   if (!requireAuth('post an item')) return;
   openModal('post-modal');
   buildSizeChips();
+  // Pre-fill location from profile (editable)
+  if (currentProfile) {
+    const locField = document.getElementById('post-location');
+    const hoodField = document.getElementById('post-neighbourhood');
+    if (hoodField && currentProfile.neighbourhood) {
+      hoodField.value = currentProfile.neighbourhood;
+    }
+    if (locField && !locField.value && currentProfile.neighbourhood) {
+      locField.value = currentProfile.neighbourhood + ', Kelowna';
+    }
+  }
 }
 
 function buildSizeChips() { /* handled by toggleSizes now */ }
@@ -2141,34 +2149,13 @@ function renderMessages() {
   box.scrollTop = box.scrollHeight;
 }
 
-async function sendChatMsg() {
+function sendChatMsg() {
   const input = document.getElementById('chat-input-box');
   const text = input.value.trim();
-  if (!text || !currentUser) return;
-  const t = LOADED_THREADS[activeThreadKey];
-  if (!t) { showToast('Can\'t send — no active conversation.', '#E64A19'); return; }
+  if (!text) return;
+  activeThread.messages.push({from:'me',text,time:'Just now'});
   input.value = '';
-  if (!_sb) await loadSupabase();
-  try {
-    const { data, error } = await _sb.from('messages').insert({
-      listing_id: t.messages[0]?.listing_id,
-      sender_id: currentUser.id,
-      recipient_id: t.otherId,
-      body: text,
-      read: false
-    }).select().single();
-    if (error) throw error;
-    // Prepend (newest-first) to thread cache and re-render
-    t.messages.unshift(data);
-    renderRealMessages(t.messages);
-    updateMsgDot();
-  } catch(e) {
-    console.error('Send error:', e);
-    // Optimistic fallback: show locally even if DB failed
-    t.messages.unshift({ sender_id: currentUser.id, body: text, created_at: new Date().toISOString() });
-    renderRealMessages(t.messages);
-    showToast('Sent locally — may not have saved.', '#E64A19');
-  }
+  renderMessages();
 }
 
 function showThreadList() {
@@ -2485,7 +2472,6 @@ async function loadMessages() {
       if (!msg.read && msg.recipient_id === currentUser.id) threads[key].unread = true;
     });
 
-    LOADED_THREADS = threads;
     const threadArr = Object.values(threads);
     empty.style.display = 'none';
     const hasUnread = threadArr.some(t => t.unread);
@@ -2520,49 +2506,8 @@ async function loadMessages() {
 }
 
 function openThreadById(key) {
-  const t = LOADED_THREADS[key];
-  if (!t) { showToast('Couldn\'t load this conversation — try again.', '#E64A19'); return; }
-  activeThreadKey = key;
-
-  document.getElementById('thread-list-view').style.display = 'none';
-  document.getElementById('chat-view').style.display = 'block';
-
-  const initials = t.otherName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-  const av = document.getElementById('chat-avatar');
-  av.textContent = initials;
-  av.style.background = t.color;
-  document.getElementById('chat-name').textContent = t.otherName;
-  document.getElementById('chat-item-title').textContent = t.listingEmoji + ' ' + t.listingTitle;
-
-  renderRealMessages(t.messages);
-}
-
-function renderRealMessages(messages) {
-  const box = document.getElementById('chat-messages');
-  box.innerHTML = '';
-  if (!messages || !messages.length) {
-    box.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--gray);font-size:0.85rem">No messages yet.</div>';
-    return;
-  }
-  // Messages arrive newest-first from DB — reverse for display
-  [...messages].reverse().forEach(m => {
-    const isMine = m.sender_id === currentUser?.id;
-    const t = LOADED_THREADS[activeThreadKey];
-    const initials = isMine ? 'ME' : (t?.otherName || 'N').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    const color = isMine ? '#AAAAAA' : (t?.color || 'var(--lagoon)');
-    const time = m.created_at
-      ? new Date(m.created_at).toLocaleString('en-CA', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' })
-      : 'Just now';
-    box.innerHTML += `
-      <div class="msg-bubble-wrap ${isMine?'mine':''}">
-        <div class="bubble-avatar" style="background:${color}">${initials}</div>
-        <div>
-          <div class="bubble ${isMine?'mine':'theirs'}">${m.body || m.text || ''}</div>
-          <div class="bubble-time">${time}</div>
-        </div>
-      </div>`;
-  });
-  box.scrollTop = box.scrollHeight;
+  // For now show a simple view — full thread UI is a future session
+  showToast('Full message threading coming soon! 💬');
 }
 
 // ── POST WITH DB SAVE ──────────────────────────────────────
