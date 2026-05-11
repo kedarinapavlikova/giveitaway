@@ -1081,7 +1081,7 @@ nav {
           </div>
         </div>
       </div>
-      <button class="supporter-cta" id="supporter-cta-btn" onclick="goToPayStep()" disabled>Select a tier — we'll notify you when live</button>
+      <button class="supporter-cta" id="supporter-cta-btn" onclick="goToPayStep()" disabled>Select a tier to continue</button>
       <div style="text-align:center;margin-top:0.6rem;font-size:0.72rem;color:var(--gray)">Cancel anytime. No pressure. You're already a hero for using the app. 💚</div>
     </div>
     <div id="supporter-step-pay" style="display:none">
@@ -2222,7 +2222,7 @@ function selectTier(tier) {
   document.getElementById('tier-'+tier).classList.add('selected');
   const btn = document.getElementById('supporter-cta-btn');
   btn.disabled = false;
-  btn.textContent = `✓ ${TIERS[tier].name} selected — we'll let you know when live!`;
+  btn.textContent = `✓ ${TIERS[tier].name} selected — continue to checkout`;
   btn.onclick = () => {
     showToast('💚 Thanks! We\'ll email you when supporter payments go live.');
     closeModal('supporter-modal');
