@@ -3,7 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GiveItAway</title>
+<title>GiveItAway — Share More, Waste Less</title>
+
+<!-- SEO -->
+<meta name="description" content="GiveItAway connects neighbours to share clothing, gear, toys, and more — for free. Less waste, more community.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://giveitaway.ca/">
+<meta name="theme-color" content="#FF8A65">
+
+<!-- Open Graph (Facebook, iMessage, WhatsApp, LinkedIn) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://giveitaway.ca/">
+<meta property="og:title" content="GiveItAway — Share More, Waste Less">
+<meta property="og:description" content="Your neighbourhood's free exchange. Clothes, gear, toys, and more — passed on, not thrown out.">
+<meta property="og:image" content="https://giveitaway.ca/og-image.png">
+<meta property="og:locale" content="en_CA">
+
+<!-- Twitter / X Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GiveItAway — Share More, Waste Less">
+<meta name="twitter:description" content="Your neighbourhood's free exchange. Clothes, gear, toys, and more — passed on, not thrown out.">
+<meta name="twitter:image" content="https://giveitaway.ca/og-image.png">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -1039,7 +1060,9 @@ nav {
       <button class="close-btn" onclick="closeModal('supporter-modal')">✕</button>
     </div>
     <div id="supporter-step-pick">
-
+      <div style="background:#FFF8E1;border:1px solid #FFB300;border-radius:var(--radius-xs);padding:0.65rem 0.9rem;margin-bottom:1rem;font-size:0.8rem;color:#7A4F00;display:flex;align-items:center;gap:8px">
+        🚧 <span><strong>Payments aren't live yet</strong> — but you can reserve your spot! We'll notify you when billing goes live.</span>
+      </div>
       <div class="supporter-why">
         🌿 GiveItAway is free to use — always. No ads, no selling your data, no cash for items. Ever.<br><br>
         Optional supporters help pay for hosting, keep the community moderated, and eventually help us expand to new cities. If you love what we're building, a few dollars a month makes a huge difference.
@@ -2221,7 +2244,10 @@ function selectTier(tier) {
   const btn = document.getElementById('supporter-cta-btn');
   btn.disabled = false;
   btn.textContent = `✓ ${TIERS[tier].name} selected — continue to checkout`;
-  btn.onclick = () => goToPayStep();
+  btn.onclick = () => {
+    showToast('💚 Thanks! We\'ll email you when supporter payments go live.');
+    closeModal('supporter-modal');
+  };
 }
 
 function goToPayStep() {
