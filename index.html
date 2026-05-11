@@ -1184,6 +1184,8 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 let _sb = null;
 let currentUser = null;
 let currentProfile = null;
+let _threads = {};
+let _activeThreadKey = null;
 
 // The CDN script tag in <head> loads window.supabase synchronously.
 // This function just initialises our client from it, with a short poll fallback.
@@ -1460,13 +1462,11 @@ const SHOE_SIZES = ['Infant 0–1','Infant 1–4','4T–5T','6T–7T','8T–9T',
 const COLORS = ['#FF8A65','#00BFA5','#5C6BC0','#AB47BC','#26A69A','#EF5350','#42A5F5','#66BB6A'];
 
 const LISTINGS = [];
-const THREADS = [];
 
 let activeCategory = 'all';
 let searchQuery = '';
 let areaFilter = 'all';
 let claimTarget = null;
-let activeThread = null;
 let userPostCount = 0;
 
 function highlight(text, query) {
@@ -2098,7 +2098,7 @@ function previewPhoto(input) {
 }
 
 function updateMsgDot() {
-  const hasUnread = THREADS.some(t => t.unread);
+  const hasUnread = Object.values(_threads).some(t => t.unread);
   ['nav-msg-dot', 'tab-msg-dot'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = hasUnread ? 'block' : 'none';
@@ -2114,54 +2114,6 @@ function renderThreadList() {
     list.innerHTML = '';
     empty.style.display = 'block';
   }
-}
-
-function openThread(id) {
-  activeThread = THREADS.find(t=>t.id===id);
-  activeThread.unread = false;
-  document.getElementById('thread-list-view').style.display = 'none';
-  document.getElementById('chat-view').style.display = 'block';
-  const initials = activeThread.name.split(' ').map(w=>w[0]).join('');
-  const av = document.getElementById('chat-avatar');
-  av.textContent = initials;
-  av.style.background = activeThread.color;
-  document.getElementById('chat-name').textContent = activeThread.name;
-  document.getElementById('chat-item-title').textContent = activeThread.emoji + ' ' + activeThread.itemTitle;
-  renderMessages();
-}
-
-function renderMessages() {
-  const box = document.getElementById('chat-messages');
-  box.innerHTML = '';
-  activeThread.messages.forEach(m => {
-    const isMine = m.from === 'me';
-    const initials = isMine ? 'ME' : activeThread.name.split(' ').map(w=>w[0]).join('');
-    const color = isMine ? '#AAAAAA' : activeThread.color;
-    box.innerHTML += `
-      <div class="msg-bubble-wrap ${isMine?'mine':''}">
-        <div class="bubble-avatar" style="background:${color}">${initials}</div>
-        <div>
-          <div class="bubble ${isMine?'mine':'theirs'}">${m.text}</div>
-          <div class="bubble-time">${m.time}</div>
-        </div>
-      </div>`;
-  });
-  box.scrollTop = box.scrollHeight;
-}
-
-function sendChatMsg() {
-  const input = document.getElementById('chat-input-box');
-  const text = input.value.trim();
-  if (!text) return;
-  activeThread.messages.push({from:'me',text,time:'Just now'});
-  input.value = '';
-  renderMessages();
-}
-
-function showThreadList() {
-  document.getElementById('chat-view').style.display = 'none';
-  document.getElementById('thread-list-view').style.display = 'block';
-  renderThreadList();
 }
 
 let toastTimer = null;
@@ -2472,6 +2424,7 @@ async function loadMessages() {
       if (!msg.read && msg.recipient_id === currentUser.id) threads[key].unread = true;
     });
 
+    _threads = threads;
     const threadArr = Object.values(threads);
     empty.style.display = 'none';
     const hasUnread = threadArr.some(t => t.unread);
@@ -2506,8 +2459,110 @@ async function loadMessages() {
 }
 
 function openThreadById(key) {
-  // For now show a simple view — full thread UI is a future session
-  showToast('Full message threading coming soon! 💬');
+  const thread = _threads[key];
+  if (!thread) return;
+  _activeThreadKey = key;
+
+  // Populate header
+  const initials = thread.otherName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const avatar = document.getElementById('chat-avatar');
+  avatar.textContent = initials;
+  avatar.style.background = thread.color;
+  document.getElementById('chat-name').textContent = thread.otherName;
+  document.getElementById('chat-item-title').textContent = `${thread.listingEmoji} ${thread.listingTitle}`;
+
+  // Render messages — oldest first
+  const msgs = [...thread.messages].reverse();
+  const chatEl = document.getElementById('chat-messages');
+  chatEl.innerHTML = msgs.map(msg => {
+    const isMine = msg.sender_id === currentUser.id;
+    const time = new Date(msg.created_at).toLocaleTimeString('en-CA', { hour:'numeric', minute:'2-digit' });
+    const avatarInitials = isMine
+      ? (currentProfile?.name || 'Me').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)
+      : initials;
+    const avatarColor = isMine ? 'var(--papaya-mid)' : thread.color;
+    return `
+      <div class="msg-bubble-wrap ${isMine ? 'mine' : ''}">
+        <div class="bubble-avatar" style="background:${avatarColor}">${avatarInitials}</div>
+        <div>
+          <div class="bubble ${isMine ? 'mine' : 'theirs'}">${escHtml(msg.body)}</div>
+          <div class="bubble-time">${time}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Scroll to bottom
+  chatEl.scrollTop = chatEl.scrollHeight;
+
+  // Mark unread messages as read
+  if (thread.unread && _sb) {
+    _sb.from('messages')
+      .update({ read: true })
+      .eq('listing_id', thread.messages[0]?.listing_id)
+      .eq('recipient_id', currentUser.id)
+      .then(() => updateMsgDot());
+  }
+
+  // Switch views
+  document.getElementById('thread-list-view').style.display = 'none';
+  document.getElementById('chat-view').style.display = 'block';
+  document.getElementById('chat-input-box').focus();
+}
+
+function showThreadList() {
+  document.getElementById('chat-view').style.display = 'none';
+  document.getElementById('thread-list-view').style.display = 'block';
+  _activeThreadKey = null;
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function sendChatMsg() {
+  if (!_activeThreadKey || !currentUser || !_sb) return;
+  const input = document.getElementById('chat-input-box');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  const thread = _threads[_activeThreadKey];
+  if (!thread) return;
+
+  // Optimistically append the bubble
+  const chatEl = document.getElementById('chat-messages');
+  const time = new Date().toLocaleTimeString('en-CA', { hour:'numeric', minute:'2-digit' });
+  const myInitials = (currentProfile?.name || 'Me').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  chatEl.innerHTML += `
+    <div class="msg-bubble-wrap mine">
+      <div class="bubble-avatar" style="background:var(--papaya-mid)">${myInitials}</div>
+      <div>
+        <div class="bubble mine">${escHtml(msg)}</div>
+        <div class="bubble-time">${time}</div>
+      </div>
+    </div>`;
+  chatEl.scrollTop = chatEl.scrollHeight;
+
+  // Determine the listing id and recipient from the thread key
+  const lastMsg = thread.messages[0];
+  const listingId = lastMsg?.listing_id;
+  const recipientId = thread.otherId;
+
+  try {
+    const { data, error } = await _sb.from('messages').insert({
+      listing_id: listingId,
+      sender_id: currentUser.id,
+      recipient_id: recipientId,
+      body: msg,
+      read: false
+    }).select().single();
+    if (error) throw error;
+    // Add to local thread so back-nav stays in sync
+    if (data) thread.messages.unshift(data);
+  } catch(e) {
+    console.error('sendChatMsg error:', e);
+    showToast('Couldn\'t send — check your connection.', '#E64A19');
+  }
 }
 
 // ── POST WITH DB SAVE ──────────────────────────────────────
