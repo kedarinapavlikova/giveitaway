@@ -1039,9 +1039,7 @@ nav {
       <button class="close-btn" onclick="closeModal('supporter-modal')">✕</button>
     </div>
     <div id="supporter-step-pick">
-      <div style="background:#FFF8E1;border:1px solid #FFB300;border-radius:var(--radius-xs);padding:0.65rem 0.9rem;margin-bottom:1rem;font-size:0.8rem;color:#7A4F00;display:flex;align-items:center;gap:8px">
-        🚧 <span><strong>Payments aren't live yet</strong> — but you can reserve your spot! We'll notify you when billing goes live.</span>
-      </div>
+
       <div class="supporter-why">
         🌿 GiveItAway is free to use — always. No ads, no selling your data, no cash for items. Ever.<br><br>
         Optional supporters help pay for hosting, keep the community moderated, and eventually help us expand to new cities. If you love what we're building, a few dollars a month makes a huge difference.
@@ -2223,10 +2221,7 @@ function selectTier(tier) {
   const btn = document.getElementById('supporter-cta-btn');
   btn.disabled = false;
   btn.textContent = `✓ ${TIERS[tier].name} selected — continue to checkout`;
-  btn.onclick = () => {
-    showToast('💚 Thanks! We\'ll email you when supporter payments go live.');
-    closeModal('supporter-modal');
-  };
+  btn.onclick = () => goToPayStep();
 }
 
 function goToPayStep() {
