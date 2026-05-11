@@ -734,6 +734,16 @@ nav {
       </ul>
     </div>
 
+    <div class="content-card">
+      <h3>🛡️ Safety & meetups</h3>
+      <p style="font-size:0.88rem;color:var(--gray);line-height:1.7;margin-bottom:0.85rem">Like any marketplace app, use caution when sharing personal information with other users. GiveItAway is not responsible for interactions that take place outside of the platform, but we want to help you have safe and positive experiences.</p>
+      <p style="font-size:0.88rem;color:var(--gray);line-height:1.7;margin-bottom:0.85rem">Every listing includes a <strong style="color:var(--charcoal)">Report</strong> button. Use it if you encounter anything that feels inappropriate, suspicious, or in violation of our Community Standards — including listings, messages, or user behaviour. Reports are reviewed by our team.</p>
+      <p style="font-size:0.88rem;color:var(--gray);line-height:1.7;margin-bottom:0;"><strong style="color:var(--charcoal)">Never pay or accept payment</strong> for an item on GiveItAway. If anyone requests money, an e-transfer, or a gift card, report it immediately and do not proceed.</p>
+      <div style="background:var(--lagoon-light);border-radius:10px;padding:0.7rem 0.9rem;margin-top:1rem;font-size:0.82rem;color:var(--lagoon-dark);line-height:1.6">
+        Something feel wrong? Use the <strong>Feedback</strong> button at any time — we read everything.
+      </div>
+    </div>
+
     <div class="content-card" style="background:var(--papaya-light);border:none">
       <h3>🚧 Full legal terms coming soon</h3>
       <p>We're a small beta — proper Terms of Service and Privacy Policy are in progress and will be published before any payment features go live. Questions? Use the Feedback button.</p>
@@ -1889,17 +1899,34 @@ async function loadProfileListings() {
 function reportCurrentListing() {
   if (!claimTarget) return;
   closeModal('claim-modal');
-  if (confirm(`Report "${claimTarget.title}"?\n\nThis will flag the listing for review by our community mods.`)) {
-    showToast('🚩 Reported — our mods will review this listing. Thank you!');
-  }
+  const reason = prompt(`What's wrong with this listing?\n\n"${claimTarget.title}"\n\n(Optional — leave blank to submit anyway)`);
+  if (reason === null) return;
+  submitReport(claimTarget.dbId || claimTarget.id, claimTarget.title, reason);
 }
 
 function reportListing(idx) {
   const filtered = getFiltered();
   const item = filtered[idx];
   if (!item) return;
-  if (confirm(`Report "${item.title}"?\n\nThis will flag the listing for review by our community mods.`)) {
-    showToast('🚩 Reported — our mods will review this listing. Thank you!');
+  const reason = prompt(`What's wrong with this listing?\n\n"${item.title}"\n\n(Optional — leave blank to submit anyway)`);
+  if (reason === null) return;
+  submitReport(item.dbId || item.id, item.title, reason);
+}
+
+async function submitReport(listingId, listingTitle, reason) {
+  try {
+    if (_sb) {
+      await _sb.from('reports').insert({
+        listing_id: listingId,
+        reported_by: currentUser?.id || null,
+        reason: reason || null,
+        status: 'pending'
+      });
+    }
+    showToast('🚩 Reported — our mods will review this. Thank you!');
+  } catch(e) {
+    console.error('Report error:', e);
+    showToast('🚩 Reported — our mods will review this. Thank you!');
   }
 }
 
