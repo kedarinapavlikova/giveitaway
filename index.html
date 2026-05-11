@@ -1092,26 +1092,11 @@ nav {
         </div>
         <button style="background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--lagoon-dark);font-weight:600" onclick="backToPick()">← Change</button>
       </div>
-      <div class="form-group">
-        <label class="form-label">Name on card</label>
-        <input class="form-input" type="text" placeholder="Jane Smith" id="pay-name">
+      <div style="text-align:center;padding:1rem 0 0.5rem;font-size:0.85rem;color:var(--gray);line-height:1.6">
+        You'll be taken to Stripe's secure checkout.<br>No card info touches GiveItAway's servers.
       </div>
-      <div class="form-group">
-        <label class="form-label">Card number</label>
-        <input class="form-input" type="text" placeholder="4242 4242 4242 4242" id="pay-card" maxlength="19" oninput="formatCard(this)">
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div class="form-group">
-          <label class="form-label">Expiry</label>
-          <input class="form-input" type="text" placeholder="MM/YY" maxlength="5">
-        </div>
-        <div class="form-group">
-          <label class="form-label">CVC</label>
-          <input class="form-input" type="text" placeholder="123" maxlength="3">
-        </div>
-      </div>
-      <button class="supporter-cta" onclick="completeSupport()">Subscribe — <span id="pay-btn-label">$3/mo</span></button>
-      <div style="text-align:center;margin-top:0.6rem;font-size:0.72rem;color:var(--gray)">🔒 Secure · Powered by Stripe · Cancel anytime</div>
+      <button class="supporter-cta" id="stripe-checkout-btn" onclick="completeSupport()">Go to secure checkout → <span id="pay-btn-label">$3/mo</span></button>
+      <div style="text-align:center;margin-top:0.6rem;font-size:0.72rem;color:var(--gray)">🔒 Secured by Stripe · Cancel anytime</div>
     </div>
     <div id="supporter-step-done" style="display:none;text-align:center;padding:1rem 0">
       <div style="font-size:3rem;margin-bottom:0.75rem">🎉</div>
@@ -2262,26 +2247,59 @@ function formatCard(input) {
   input.value = v.replace(/(.{4})/g,'$1 ').trim();
 }
 
-function completeSupport() {
-  const name = document.getElementById('pay-name').value.trim();
-  const card = document.getElementById('pay-card').value.trim();
-  if (!name || card.replace(/\s/g,'').length < 16) {
-    showToast('⚠️ Please fill in your card details', '#E64A19'); return;
+async function completeSupport() {
+  if (!selectedTier) return;
+  const btn = document.getElementById('stripe-checkout-btn');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to Stripe...';
+  try {
+    const res = await fetch('/api/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tier: selectedTier })
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || 'Something went wrong');
+    }
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = `Go to secure checkout → <span id="pay-btn-label">${TIERS[selectedTier].price}</span>`;
+    showToast('⚠️ Checkout failed — please try again.', '#E64A19');
   }
-  isSupporter = true;
-  const t = TIERS[selectedTier];
-  document.getElementById('supporter-step-pay').style.display = 'none';
-  document.getElementById('supporter-step-done').style.display = 'block';
-  document.getElementById('done-tier-name').textContent = t.name;
-  document.getElementById('supporter-modal-title').textContent = 'You\'re a supporter! ✦';
-  const badge = document.getElementById('profile-badge');
-  badge.innerHTML = `<span class="supporter-badge ${t.badgeClass}">${t.badge}</span>`;
-  badge.style.display = 'inline';
-  document.getElementById('supporter-profile-banner').style.display = 'none';
-  document.getElementById('supporter-profile-active').style.display = 'block';
-  document.getElementById('supporter-tier-label').textContent = `${t.name} · ${t.price} · Thank you so much.`;
-  document.getElementById('supporter-strip').innerHTML = `<strong>✦ You're a GiveItAway supporter!</strong> Thank you for keeping this community alive. 💚`;
-  document.getElementById('supporter-strip').style.background = 'var(--lagoon-dark)';
+}
+
+function handlePaymentReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const payment = params.get('payment');
+  const tier = params.get('tier');
+  if (payment === 'success' && tier && TIERS[tier]) {
+    const t = TIERS[tier];
+    isSupporter = true;
+    showToast('🎉 You\'re a supporter! Thank you so much. 💚', 'var(--lagoon-dark)');
+    const badge = document.getElementById('profile-badge');
+    if (badge) {
+      badge.innerHTML = `<span class="supporter-badge ${t.badgeClass}">${t.badge}</span>`;
+      badge.style.display = 'inline';
+    }
+    const strip = document.getElementById('supporter-strip');
+    if (strip) {
+      strip.innerHTML = `<strong>✦ You're a GiveItAway supporter!</strong> Thank you for keeping this community alive. 💚`;
+      strip.style.background = 'var(--lagoon-dark)';
+    }
+    const banner = document.getElementById('supporter-profile-banner');
+    const active = document.getElementById('supporter-profile-active');
+    const label = document.getElementById('supporter-tier-label');
+    if (banner) banner.style.display = 'none';
+    if (active) active.style.display = 'block';
+    if (label) label.textContent = `${t.name} · ${t.price} · Thank you so much.`;
+    window.history.replaceState({}, '', '/');
+  } else if (payment === 'cancelled') {
+    showToast('No worries — you can support anytime. 💚', 'var(--gray)');
+    window.history.replaceState({}, '', '/');
+  }
 }
 
 function toggleConditionTooltip() {
@@ -2594,6 +2612,7 @@ async function sendChatMsg() {
 
 // ── POST WITH DB SAVE ──────────────────────────────────────
 initApp();
+handlePaymentReturn();
 </script>
 </body>
 </html>
