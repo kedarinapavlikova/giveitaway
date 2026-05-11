@@ -437,8 +437,6 @@ Still standing. No new items added this session — the pre-fill was focused, co
 ## Session 6 — To Do
 
 - [ ] Real messaging backend (Supabase `messages` table — send AND receive)
-- [ ] Fix: sent messages not showing in thread view
-- [ ] Real stats from DB (Hearts Given + Givers count, not placeholder)
 - [ ] Supabase Storage for photos (base64 will not scale)
 - [ ] Stripe supporter payments + Vercel serverless function
 - [ ] Privacy nudge in claim/message flow
@@ -447,4 +445,63 @@ Still standing. No new items added this session — the pre-fill was focused, co
 - [ ] Tiny Humans — kid profiles (avatar, bday → size suggestions, editable)
 - [ ] Full T&C + Privacy Policy (before Stripe ever goes live)
 
+[DEVDIARY_session5.md](https://github.com/user-attachments/files/27614163/DEVDIARY_session5.md)
+---
+
+## Session 5 — May 11, 2026
+
+**Time:** ~1 hour
+**Versions shipped:** 1 (Stripe + skeleton patch)
+**Bugs squashed:** 2
+**Money spent:** $0 (Keddy's real card: TBD 👀)
+
+### What we built
+
+- **Stripe checkout is live.** Real money. Real modal. Real Stripe checkout page. CA$7.00 Champion tier loaded correctly, Keddy's email pre-filled, GiveItAway branding showing. The whole thing. 🎉
+- **Feed skeleton loading state.** Six shimmering placeholder cards now appear the instant the page loads. Real listings swap in once Supabase responds. No more jarring "No items" flash.
+
+### Bugs fixed
+
+**Bug 1 — "Payments aren't live yet" banner still showing**
+Yellow warning banner was still rendering inside the supporter modal even though Stripe was fully set up. Removed entirely.
+
+**Bug 2 — `selectTier()` showing stale toast**
+Selecting a tier was triggering a leftover `showToast('We'll email you when payments go live')` and closing the modal — completely bypassing the checkout step. Root cause: `btn.onclick` was still wired to the old no-op toast handler from pre-Stripe days. Fixed by replacing with `() => goToPayStep()`. The full flow now works: tier select → pay step → Stripe → redirect back with badge.
+
+### Testing notes
+
+- Stripe error on test card (`4242 4242 4242 4242`) in live mode = **correct behaviour.** Stripe blocks test cards in production. That's the system working, not a bug.
+- Full payment confirmation (real card, real charge, success redirect + badge) pending a guinea pig beta user. Keddy is not volunteering herself. Reasonable.
+
+### Design decisions
+
+- **Skeleton cards over spinner.** A full-screen loading overlay felt heavy. Six shimmer cards give the user immediate spatial orientation — they can see the masonry layout before content arrives. Feels faster even if it isn't.
+- **6 skeletons at varying heights** to match the natural rhythm of the masonry grid. Not all the same height — that would look like a PowerPoint template from 2009.
+
+### Lessons
+
+- Stale toast handlers are sneaky. When wiring up new flows, always grep for old `showToast` calls attached to the same button. They survive refactors like cockroaches.
+- The gap between "Stripe checkout loads" and "full payment confirmed" is a real gap. Don't call it done until someone actually pays. (Hi, beta user. Thank you for your service.)
+
+---
+
+## Progress Update
+
+```
+[██████████████████░░░░░░] 73%
+
+✅ Prototype    ✅ Live URL    ✅ Auth         ✅ Database
+✅ Stripe       🟡 Stability   🟡 Features     ⬜ Launch
+```
+
+---
+
+## Session 6 — To Do
+
+- [ ] Confirm Stripe full payment flow with real card (beta user)
+- [ ] Supabase Storage for photos (base64 won't scale)
+- [ ] Real messaging for givers
+- [ ] Karma tally + tiers
+- [ ] Filtering & sorting UI mockup → build
+- [ ] Tiny Humans (kid profiles)
 
