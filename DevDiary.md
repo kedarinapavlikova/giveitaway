@@ -505,3 +505,93 @@ Selecting a tier was triggering a leftover `showToast('We'll email you when paym
 - [ ] Filtering & sorting UI mockup → build
 - [ ] Tiny Humans (kid profiles)
 
+---
+
+## Session 6 — May 12, 2026
+
+**Time:** ~2 hours (est.)
+**Versions shipped:** 1 (legal + messaging patch)
+**Bugs squashed:** 4
+**Money spent:** $0 (lawyers hate her)
+
+---
+
+### What we built
+
+**Legal docs — full ToS + Privacy Policy**
+GiveItAway is now covered. We drafted a 9-section Terms of Service and a PIPEDA + BC PIPA-compliant Privacy Policy from scratch. Named providers: Supabase, Vercel, Stripe. Includes a children's clause, user rights, cookies disclosure, and safety/meetups guidance. Saved as `giveitaway-legal.md` for reference.
+
+The in-app Legal & Privacy view was rebuilt too — replaced the placeholder "coming soon" card with real collapsible ToS + Privacy sections, a TL;DR summary card at the top, and a contact card at the bottom. Contact email set to `pavlikkeddy+giveitaway@gmail.com` via Gmail alias.
+
+**Giver messaging — message badges on My Stuff**
+Givers can now see when someone's asked about their listing without going into Messages manually. Each listing card shows a `💬 N` badge when messages exist — teal with an unread count bubble if unread, gray if all read. Tapping it navigates straight to Messages and auto-opens the right thread.
+
+My Stuff now fetches listings and message counts in parallel via `Promise.all` — no extra load time.
+
+---
+
+### Bugs fixed
+
+**Bug 1 — Sent messages not persisting**
+`sendChatMsg` wasn't reloading the thread from the DB after sending — so sent messages would vanish on navigation. Fixed: thread now reloads from Supabase after every send. Sent messages stick.
+
+**Bug 2 — Messages empty state was confusing**
+The empty state copy made no sense if you were a giver (not a claimer). Rewrote it so both sides get it. Added a "Post something" CTA button alongside "Browse items."
+
+**Bug 3 — "Payments aren't live" banner (haunted)**
+This yellow 🚧 banner had the survival instincts of a horror movie villain. It came back. It was removed again. For real this time — confirmed gone from the project file.
+
+**Bug 4 — `selectTier()` still overriding checkout (again)**
+Same root cause as last session: `btn.onclick` was still firing the stale "we'll email you" toast instead of advancing to `goToPayStep()`. Fixed cleanly this time.
+
+**Bonus fix — Search field email autofill**
+Browsers were helpfully pre-filling the search bar with Keddy's login email. Nobody asked. Suppressed via `autocomplete="new-password"` + field rename.
+
+---
+
+### Testing notes
+
+- Legal links render and collapse correctly in-app ✅
+- Message badges show on listings with active threads ✅
+- Unread count bubbles update correctly ✅
+- Thread auto-opens on badge tap ✅
+- Sent messages persist after navigation ✅
+- Stripe full payment flow (real card → redirect → badge): **still pending a guinea pig beta user**
+
+---
+
+### Design decisions
+
+- **TL;DR card first in Legal view.** Nobody reads ToS. A plain-language summary at the top respects user time and builds trust faster than 3,000 words of legalese alone.
+- **Badge on the listing card, not just in Messages.** Givers shouldn't have to go looking. The notification comes to them.
+- **Gray vs. teal badge states.** Teal = action needed. Gray = you're caught up. No explanation required.
+
+---
+
+### Lessons
+
+- Legal docs feel like homework until you ship one. Then it feels like armour.
+- The `selectTier()` bug returned because the fix was applied to the in-session version but not the project file. Always confirm the patch made it into the source. Always.
+- Browser autofill is feral. It will fill whatever field it wants. `autocomplete="new-password"` is a hack and it works and that's fine.
+
+---
+
+## Progress Update
+
+```
+[████████████████████░░░░] 78%
+
+✅ Prototype    ✅ Live URL    ✅ Auth         ✅ Database
+✅ Stripe       ✅ Legal       🟡 Stability    🟡 Features     ⬜ Launch
+```
+
+---
+
+## Session 7 — To Do
+
+- [ ] Confirm Stripe full payment flow with real card (beta user)
+- [ ] Supabase Storage for photos (base64 won't scale)
+- [ ] Karma tally + tiers
+- [ ] Filtering & sorting UI mockup → build
+- [ ] Tiny Humans (kid profiles: avatar, bday → auto size suggestions)
+- [ ] AI photo → listing (snap a photo, Claude fills in title + category)
