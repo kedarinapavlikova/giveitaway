@@ -3,28 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GiveItAway — Free Neighbour Exchange for Clothes &amp; Gear</title>
-
-<!-- SEO -->
-<meta name="description" content="GiveItAway connects neighbours to share clothing, kids' gear, toys, and more — completely free. Less waste, more joy, stronger community.">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://giveitawayapp.com/">
-<meta name="theme-color" content="#FF8A65">
-
-<!-- Open Graph (Facebook, iMessage, WhatsApp, LinkedIn) -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://giveitawayapp.com/">
-<meta property="og:title" content="GiveItAway — Free Neighbour Exchange for Clothes &amp; Gear">
-<meta property="og:description" content="GiveItAway connects neighbours to share clothing, kids' gear, toys, and more — completely free. Less waste, more joy, stronger community.">
-<meta property="og:image" content="https://giveitawayapp.com/og-image.png">
-<meta property="og:locale" content="en_CA">
-
-<!-- Twitter / X Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="GiveItAway — Free Neighbour Exchange for Clothes &amp; Gear">
-<meta name="twitter:description" content="GiveItAway connects neighbours to share clothing, kids' gear, toys, and more — completely free. Less waste, more joy, stronger community.">
-<meta name="twitter:image" content="https://giveitawayapp.com/og-image.png">
-
+<title>GiveItAway</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -503,8 +482,11 @@ nav {
       <div id="messages-empty" style="display:none;text-align:center;padding:3rem 1rem;color:var(--gray)">
         <div style="font-size:3rem;margin-bottom:0.75rem">💬</div>
         <p style="font-weight:600;margin-bottom:6px">No messages yet!</p>
-        <p style="font-size:0.85rem;line-height:1.6">Click <strong>"I want this!"</strong> on an item to start a conversation with a neighbour.</p>
-        <button onclick="showView('feed')" style="margin-top:1rem;background:var(--lagoon);color:white;border:none;cursor:pointer;font-family:var(--font-body);font-size:0.85rem;font-weight:600;padding:0.5rem 1.25rem;border-radius:20px">Browse items</button>
+        <p style="font-size:0.85rem;line-height:1.6" id="messages-empty-hint">Post something or claim an item — conversations live here.</p>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:1rem;flex-wrap:wrap">
+          <button onclick="showView('feed')" style="background:var(--lagoon);color:white;border:none;cursor:pointer;font-family:var(--font-body);font-size:0.85rem;font-weight:600;padding:0.5rem 1.25rem;border-radius:20px">Browse items</button>
+          <button onclick="openPostForm()" style="background:var(--papaya-mid);color:white;border:none;cursor:pointer;font-family:var(--font-body);font-size:0.85rem;font-weight:600;padding:0.5rem 1.25rem;border-radius:20px">Post something</button>
+        </div>
       </div>
     </div>
     <div id="chat-view" style="display:none">
@@ -1853,9 +1835,12 @@ async function loadProfileListings() {
     return;
   }
 
-  const { data, error } = await _sb.from('listings')
-    .select('*').eq('user_id', currentUser.id)
-    .order('created_at', { ascending: false });
+  const [listingsResult, msgsResult] = await Promise.all([
+    _sb.from('listings').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+    _sb.from('messages').select('listing_id, read').eq('recipient_id', currentUser.id)
+  ]);
+
+  const { data, error } = listingsResult;
 
   if (error) {
     grid.innerHTML = `<div style="text-align:center;padding:1rem;color:var(--gray);font-size:0.85rem">Couldn't load listings — ${friendlyAuthError(error.message)}</div>`;
@@ -1871,21 +1856,39 @@ async function loadProfileListings() {
     return;
   }
 
+  // Build message count maps per listing
+  const msgData = msgsResult.data || [];
+  const totalMsgMap = {};
+  const unreadMsgMap = {};
+  msgData.forEach(m => {
+    totalMsgMap[m.listing_id] = (totalMsgMap[m.listing_id] || 0) + 1;
+    if (!m.read) unreadMsgMap[m.listing_id] = (unreadMsgMap[m.listing_id] || 0) + 1;
+  });
+
   const available = data.filter(l => l.status === 'available').length;
   countEl.textContent = `${data.length} item${data.length!==1?'s':''} posted`;
   document.getElementById('stat-items').textContent = available;
 
   const EMOJIS = { Clothes:'👕', Shoes:'👟', Maternity:'🤰', Gear:'🧺', Toys:'🧸', Bikes:'🚲', Books:'📚', Sports:'⚽', Other:'✨' };
-  grid.innerHTML = data.map((item, idx) => `
+  grid.innerHTML = data.map((item, idx) => {
+    const totalMsgs = totalMsgMap[item.id] || 0;
+    const unreadMsgs = unreadMsgMap[item.id] || 0;
+    const msgBadge = totalMsgs > 0
+      ? `<button onclick="jumpToListingMessages('${item.id}')" title="${totalMsgs} message${totalMsgs!==1?'s':''}" style="background:${unreadMsgs>0?'var(--lagoon)':'var(--gray-light)'};color:${unreadMsgs>0?'white':'var(--gray)'};border:none;cursor:pointer;font-family:var(--font-body);font-size:0.72rem;font-weight:700;padding:0.25rem 0.55rem;border-radius:20px;display:flex;align-items:center;gap:3px;white-space:nowrap">
+          💬 ${totalMsgs}${unreadMsgs>0?` <span style="background:white;color:var(--lagoon);border-radius:50%;width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;font-size:0.65rem">${unreadMsgs}</span>`:''}
+        </button>`
+      : '';
+    return `
     <div style="background:var(--white);border-radius:var(--radius-sm);box-shadow:var(--shadow);padding:0.9rem 1rem;display:flex;align-items:center;gap:12px">
       <div style="width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,var(--papaya-light),var(--lagoon-light));display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;overflow:hidden">
-        ${item.photo_url && item.photo_url.startsWith('data:') ? `<img src="${item.photo_url}" style="width:48px;height:48px;object-fit:cover">` : (EMOJIS[item.category]||'✨')}
+        ${item.photo_url ? `<img src="${item.photo_url}" style="width:48px;height:48px;object-fit:cover" onerror="this.style.display='none'">` : (EMOJIS[item.category]||'✨')}
       </div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:600;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.title}</div>
         <div style="font-size:0.75rem;color:var(--gray);margin-top:2px">${item.category} · ${item.condition} · ${item.neighbourhood}</div>
       </div>
       <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        ${msgBadge}
         <button onclick="openEditListingById('${item.id}')" class="edit-icon-btn" title="Edit">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         </button>
@@ -1899,7 +1902,8 @@ async function loadProfileListings() {
         </div>
         ${item.status !== 'available' ? `<span class="given-pill">💚 Given</span>` : ''}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function reportCurrentListing() {
@@ -2040,14 +2044,20 @@ async function submitPost() {
     showToast('⚠️ Fill in all required fields!','#E64A19'); return;
   }
   const sizes = [...document.querySelectorAll('.size-chip.selected')].map(c=>c.textContent);
-  const photoSrc = document.getElementById('photo-img').src || null;
-  const hasPhoto = photoSrc && photoSrc.startsWith('data:') && photoSrc.length > 100;
+  let photoUrl = null;
+  if (_sb && currentUser) {
+    showLoading('Posting your item...');
+    if (_pendingPhotoFile) {
+      showLoading('Uploading photo...');
+      photoUrl = await uploadPhotoToStorage(_pendingPhotoFile);
+    }
+  }
   const listingData = {
     title, category:cat, sizes, condition:cond,
     pickup: pickups.map(p=>p.textContent.trim()),
     location: loc, neighbourhood: hood,
     desc: document.getElementById('post-desc').value.trim(),
-    photo_url: hasPhoto ? photoSrc : null,
+    photo_url: photoUrl,
   };
   if (_sb && currentUser) {
     showLoading('Posting your item...');
@@ -2079,6 +2089,8 @@ async function submitPost() {
   document.getElementById('size-section').style.display='none';
   document.getElementById('photo-preview').style.display='none';
   document.getElementById('photo-placeholder').style.display='block';
+  document.getElementById('photo-file').value = '';
+  _pendingPhotoFile = null;
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -2119,8 +2131,11 @@ function updateClaimCount(el) {
   counter.style.color = remaining < 30 ? '#E64A19' : 'var(--gray)';
 }
 
+let _pendingPhotoFile = null;
+
 function previewPhoto(input) {
   if (!input.files || !input.files[0]) return;
+  _pendingPhotoFile = input.files[0];
   const reader = new FileReader();
   reader.onload = e => {
     document.getElementById('photo-img').src = e.target.result;
@@ -2128,6 +2143,24 @@ function previewPhoto(input) {
     document.getElementById('photo-placeholder').style.display = 'none';
   };
   reader.readAsDataURL(input.files[0]);
+}
+
+async function uploadPhotoToStorage(file) {
+  if (!_sb || !currentUser) return null;
+  try {
+    const ext = file.name.split('.').pop().toLowerCase().replace('jpg','jpeg') || 'jpeg';
+    const path = `${currentUser.id}/${Date.now()}.${ext}`;
+    const { error } = await _sb.storage.from('listing-photos').upload(path, file, {
+      contentType: file.type || 'image/jpeg',
+      upsert: false
+    });
+    if (error) { console.error('Photo upload error:', error); return null; }
+    const { data } = _sb.storage.from('listing-photos').getPublicUrl(path);
+    return data?.publicUrl || null;
+  } catch(e) {
+    console.error('uploadPhotoToStorage error:', e);
+    return null;
+  }
 }
 
 function updateMsgDot() {
@@ -2410,6 +2443,23 @@ async function fetchStats() {
   } catch(e) { console.error('Stats error:', e); }
 }
 
+// ── JUMP TO LISTING MESSAGES (giver shortcut from My Stuff) ────────────────
+function jumpToListingMessages(listingId) {
+  showView('messages');
+  // After messages load, open the thread for this listing
+  const tryOpen = (attempts) => {
+    const thread = Object.values(_threads).find(t => t.messages[0]?.listing_id === listingId);
+    if (thread) {
+      openThreadById(thread.key);
+    } else if (attempts > 0) {
+      setTimeout(() => tryOpen(attempts - 1), 300);
+    }
+  };
+  // loadMessages is triggered by showView('messages') → renderThreadList()
+  // Give it a moment to resolve before trying to open
+  setTimeout(() => tryOpen(10), 400);
+}
+
 // ── REAL MESSAGES ──────────────────────────────────────────
 async function sendClaim() {
   const msg = document.getElementById('claim-msg').value.trim();
@@ -2623,8 +2673,12 @@ async function sendChatMsg() {
       read: false
     }).select().single();
     if (error) throw error;
-    // Add to local thread so back-nav stays in sync
+    // Add to local thread cache for immediate sync
     if (data) thread.messages.unshift(data);
+    // Reload messages from DB so sent messages persist after navigation
+    await loadMessages();
+    // Re-open the thread so the refreshed messages are shown
+    if (_activeThreadKey) openThreadById(_activeThreadKey);
   } catch(e) {
     console.error('sendChatMsg error:', e);
     showToast('Couldn\'t send — check your connection.', '#E64A19');
