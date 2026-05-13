@@ -368,6 +368,153 @@ nav {
 .filter-chip { white-space: nowrap; flex-shrink: 0; background: var(--gray-light); border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.78rem; font-weight: 500; color: var(--charcoal); padding: 0.32rem 0.85rem; border-radius: 20px; transition: all 0.15s; display: inline-flex; align-items: center; line-height: 1.4; }
 .filter-chip:hover { background: var(--papaya-light); color: var(--papaya-dark); }
 .filter-chip.active { background: var(--papaya-mid); color: white; }
+
+/* ── FILTER SHEET ─────────────────────────────────────── */
+.filters-btn {
+  white-space: nowrap; flex-shrink: 0;
+  background: var(--charcoal); color: white;
+  border: none; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.78rem; font-weight: 600;
+  padding: 0.32rem 0.9rem; border-radius: 20px;
+  display: inline-flex; align-items: center; gap: 5px;
+  transition: all 0.15s;
+}
+.filters-btn:hover { background: #444; }
+.filters-btn.has-filters { background: var(--lagoon); }
+.filter-count-badge {
+  background: white; color: var(--lagoon);
+  border-radius: 50%; width: 16px; height: 16px;
+  font-size: 0.65rem; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+
+/* active filter strip */
+.active-filters-strip {
+  background: var(--white); padding: 0 1.25rem 0.5rem;
+  display: none; gap: 6px; flex-wrap: wrap;
+  border-bottom: 1px solid #EDE9E3;
+}
+.active-filters-strip.visible { display: flex; }
+.active-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--lagoon-light); color: var(--lagoon-dark);
+  border: 1px solid var(--lagoon); border-radius: 20px;
+  font-size: 0.72rem; font-weight: 600;
+  padding: 0.18rem 0.55rem 0.18rem 0.7rem;
+  cursor: pointer; transition: all 0.12s;
+}
+.active-tag:hover { background: var(--lagoon); color: white; }
+.active-tag .tag-x { font-size: 0.85rem; line-height: 1; margin-left: 1px; }
+.clear-all-tag {
+  display: inline-flex; align-items: center;
+  background: none; color: var(--gray);
+  border: 1px solid var(--gray-mid); border-radius: 20px;
+  font-size: 0.72rem; font-weight: 500;
+  padding: 0.18rem 0.7rem; cursor: pointer; transition: all 0.12s;
+}
+.clear-all-tag:hover { color: var(--papaya-dark); border-color: var(--papaya-mid); }
+
+/* sheet overlay */
+.sheet-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45); z-index: 500;
+  backdrop-filter: blur(1px);
+}
+.sheet-overlay.open { display: block; }
+
+/* bottom sheet */
+.filter-sheet {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--white);
+  border-radius: 20px 20px 0 0;
+  z-index: 501; max-height: 85vh; overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+}
+.filter-sheet.open { transform: translateY(0); }
+.sheet-handle { width: 36px; height: 4px; background: var(--gray-mid); border-radius: 4px; margin: 0.75rem auto 0; }
+.sheet-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.85rem 1.25rem 0.5rem;
+  border-bottom: 1px solid #EDE9E3;
+}
+.sheet-title { font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; }
+.sheet-clear-btn {
+  background: none; border: none; cursor: pointer;
+  font-family: var(--font-body); font-size: 0.8rem;
+  color: var(--papaya-dark); font-weight: 600; padding: 0.25rem 0.5rem;
+}
+.sheet-clear-btn:hover { text-decoration: underline; }
+.sheet-body { padding: 0 1.25rem; }
+.sheet-section { padding: 1rem 0 0.5rem; border-bottom: 1px solid #EDE9E3; }
+.sheet-section:last-child { border-bottom: none; }
+.sheet-section-label {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--gray); margin-bottom: 0.65rem;
+}
+.sheet-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.sheet-chip {
+  background: var(--gray-light); border: 1.5px solid transparent;
+  border-radius: 20px; padding: 0.35rem 0.85rem;
+  font-family: var(--font-body); font-size: 0.8rem; font-weight: 500;
+  cursor: pointer; transition: all 0.12s; user-select: none;
+}
+.sheet-chip:hover { border-color: var(--lagoon); }
+.sheet-chip.active { background: var(--lagoon-light); border-color: var(--lagoon); color: var(--lagoon-dark); font-weight: 600; }
+.sort-chip { background: var(--gray-light); border: 1.5px solid transparent; border-radius: 20px; padding: 0.35rem 0.85rem; font-family: var(--font-body); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.12s; }
+.sort-chip:hover { border-color: var(--papaya-mid); }
+.sort-chip.active { background: var(--papaya-light); border-color: var(--papaya-mid); color: var(--papaya-dark); font-weight: 600; }
+.sheet-footer {
+  padding: 1rem 1.25rem 0;
+  display: flex; gap: 10px; align-items: center;
+}
+.sheet-apply-btn {
+  flex: 1; background: var(--papaya-mid); color: white; border: none;
+  cursor: pointer; font-family: var(--font-body); font-size: 0.92rem;
+  font-weight: 700; padding: 0.8rem; border-radius: var(--radius-sm);
+  transition: all 0.15s;
+}
+.sheet-apply-btn:hover { background: var(--papaya-dark); transform: translateY(-1px); }
+.sheet-result-count { font-size: 0.78rem; color: var(--gray); text-align: center; white-space: nowrap; }
+
+/* ── KID PROFILES ─────────────────────────────────────────── */
+.kid-card { background: var(--white); border-radius: var(--radius-sm); box-shadow: var(--shadow); padding: 1rem; display: flex; align-items: flex-start; gap: 12px; transition: all 0.15s; }
+.kid-card:hover { box-shadow: var(--shadow-hover); }
+.kid-avatar-circle { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.45rem; flex-shrink: 0; background: var(--papaya-light); }
+.kid-info { flex: 1; min-width: 0; }
+.kid-name { font-weight: 700; font-size: 0.95rem; color: var(--charcoal); }
+.kid-meta { font-size: 0.75rem; color: var(--gray); margin-top: 2px; }
+.kid-sizes { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+.kid-size-chip { font-size: 0.68rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; background: var(--papaya-light); color: #BF360C; }
+.kid-shoe-chip { font-size: 0.68rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; background: #E8F5E9; color: #2E7D32; }
+.kid-interests { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+.kid-interest-chip { font-size: 0.68rem; font-weight: 500; padding: 2px 8px; border-radius: 20px; background: var(--lagoon-light); color: var(--lagoon-dark); }
+.kid-actions { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; align-self: flex-start; }
+.kid-edit-btn { background: var(--gray-light); border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.72rem; font-weight: 600; color: var(--gray); padding: 0.28rem 0.7rem; border-radius: 20px; transition: all 0.12s; white-space: nowrap; }
+.kid-edit-btn:hover { background: var(--gray-mid); color: var(--charcoal); }
+.add-kid-card { background: var(--white); border-radius: var(--radius-sm); box-shadow: var(--shadow); padding: 1rem; display: flex; align-items: center; gap: 12px; cursor: pointer; border: 1.5px dashed var(--papaya-mid); transition: all 0.15s; }
+.add-kid-card:hover { background: var(--papaya-light); border-color: var(--papaya-dark); }
+.add-kid-plus { width: 46px; height: 46px; border-radius: 50%; background: var(--papaya-light); color: var(--papaya-dark); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 700; flex-shrink: 0; }
+.emoji-picker { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.emoji-opt { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--gray-mid); background: var(--gray-light); font-size: 1.4rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.emoji-opt:hover { border-color: var(--papaya-mid); background: var(--papaya-light); }
+.emoji-opt.selected { border-color: var(--papaya-dark); background: var(--papaya-light); box-shadow: 0 0 0 2px var(--papaya); }
+.interest-chip { background: var(--gray-light); border: 1.5px solid transparent; border-radius: 20px; padding: 0.35rem 0.85rem; font-family: var(--font-body); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.12s; user-select: none; }
+.interest-chip:hover { border-color: var(--lagoon); }
+.interest-chip.selected { background: var(--lagoon-light); border-color: var(--lagoon); color: var(--lagoon-dark); font-weight: 600; }
+.wizard-steps { display: flex; gap: 6px; align-items: center; justify-content: center; margin-bottom: 1.4rem; }
+.wizard-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gray-mid); transition: all 0.2s; }
+.wizard-dot.active { background: var(--papaya-mid); transform: scale(1.25); }
+.wizard-dot.done { background: var(--lagoon); }
+
+/* ── KID PILLS STRIP ─────────────────────────────────────── */
+.kid-pills-strip { background: var(--white); padding: 0.45rem 1.25rem; border-bottom: 1px solid #EDE9E3; display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; align-items: center; }
+.kid-pills-strip::-webkit-scrollbar { display: none; }
+.kid-pill { display: inline-flex; align-items: center; gap: 5px; background: var(--gray-light); border: 1.5px solid transparent; border-radius: 20px; padding: 0.3rem 0.85rem; font-family: var(--font-body); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0; }
+.kid-pill:hover { border-color: var(--papaya-mid); background: var(--papaya-light); }
+.kid-pill.active { background: var(--papaya-light); border-color: var(--papaya-mid); color: var(--papaya-dark); font-weight: 600; }
+.kid-pill-age { opacity: 0.65; font-size: 0.72rem; }
 </style>
 </head>
 <body>
@@ -450,6 +597,9 @@ nav {
     </select>
   </div>
 
+  <!-- KID PILLS STRIP — hidden until signed in + has kids -->
+  <div class="kid-pills-strip" id="kid-pills-strip" style="display:none"></div>
+
   <div class="filters">
     <button class="filter-chip active" onclick="filterCategory(this,'all')">All</button>
     <button class="filter-chip" onclick="filterCategory(this,'Clothes')">👕 Clothes</button>
@@ -461,7 +611,14 @@ nav {
     <button class="filter-chip" onclick="filterCategory(this,'Books')">📚 Books</button>
     <button class="filter-chip" onclick="filterCategory(this,'Sports')">⚽ Sports</button>
     <button class="filter-chip" onclick="filterCategory(this,'Other')">✨ Other</button>
+    <button class="filters-btn" id="filters-btn" onclick="openFilterSheet()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+      Filters
+    </button>
   </div>
+
+  <!-- Active filter tags strip -->
+  <div class="active-filters-strip" id="active-filters-strip"></div>
 
   <div class="main">
     <div class="feed-meta">
@@ -522,6 +679,17 @@ nav {
           <span class="tag tag-size" id="profile-count">0 items posted</span>
           <button onclick="openModal('edit-profile-modal')" style="background:none;border:none;cursor:pointer;font-size:0.75rem;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;padding:0;font-family:var(--font-body)">Edit profile</button>
         </div>
+      </div>
+    </div>
+
+    <!-- YOUR KIDS -->
+    <div style="margin-bottom:1.25rem" id="kids-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem">
+        <div class="section-label">Your kids 👶</div>
+        <div style="font-size:0.72rem;color:var(--gray)">Sizes auto-calculated</div>
+      </div>
+      <div id="kids-grid" style="display:flex;flex-direction:column;gap:10px">
+        <div style="text-align:center;padding:1rem;color:var(--gray);font-size:0.82rem">Sign in to manage kid profiles.</div>
       </div>
     </div>
 
@@ -844,9 +1012,10 @@ nav {
             <li><strong style="color:var(--charcoal)">Messages</strong> — to enable item claims and pickups.</li>
             <li><strong style="color:var(--charcoal)">Approximate location</strong> — your neighbourhood, never your exact address.</li>
             <li><strong style="color:var(--charcoal)">Giving stats</strong> — items given and received, to power your profile.</li>
+            <li><strong style="color:var(--charcoal)">Kid profiles</strong> — name, birthday, and interests you add for your children. Used only to suggest sizes in your feed. Never shared with other users. No photos are collected.</li>
             <li><strong style="color:var(--charcoal)">Supporter status</strong> — to manage your optional subscription via Stripe.</li>
           </ul>
-          <p style="margin-top:0.5rem">We do <strong style="color:var(--charcoal)">not</strong> collect exact home addresses, payment card information, biometric data, or government ID.</p>
+          <p style="margin-top:0.5rem">We do <strong style="color:var(--charcoal)">not</strong> collect exact home addresses, payment card information, biometric data, government ID, or photos of children.</p>
         </div>
       </details>
 
@@ -1265,6 +1434,82 @@ nav {
   </div>
 </div>
 
+<!-- ADD / EDIT KID MODAL -->
+<div class="modal-overlay" id="kid-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title" id="kid-modal-title">Add a kid 👶</div>
+      <button class="close-btn" onclick="closeModal('kid-modal')">✕</button>
+    </div>
+    <div class="wizard-steps">
+      <div class="wizard-dot active" id="kid-dot-1"></div>
+      <div class="wizard-dot" id="kid-dot-2"></div>
+      <div class="wizard-dot" id="kid-dot-3"></div>
+    </div>
+    <div class="auth-error" id="kid-modal-error"></div>
+
+    <!-- Step 1: Name + Emoji -->
+    <div id="kid-step-1">
+      <div class="form-group">
+        <label class="form-label">Their name <span class="req">*</span></label>
+        <input class="form-input" type="text" id="kid-name" placeholder="Rosie, Jordie, Bug…" maxlength="30">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pick an emoji</label>
+        <div class="emoji-picker" id="kid-emoji-picker">
+          <div class="emoji-opt selected" data-emoji="👶" onclick="selectKidEmoji(this)">👶</div>
+          <div class="emoji-opt" data-emoji="🧒" onclick="selectKidEmoji(this)">🧒</div>
+          <div class="emoji-opt" data-emoji="👧" onclick="selectKidEmoji(this)">👧</div>
+          <div class="emoji-opt" data-emoji="👦" onclick="selectKidEmoji(this)">👦</div>
+          <div class="emoji-opt" data-emoji="🌟" onclick="selectKidEmoji(this)">🌟</div>
+          <div class="emoji-opt" data-emoji="🌈" onclick="selectKidEmoji(this)">🌈</div>
+          <div class="emoji-opt" data-emoji="🦄" onclick="selectKidEmoji(this)">🦄</div>
+          <div class="emoji-opt" data-emoji="🐼" onclick="selectKidEmoji(this)">🐼</div>
+        </div>
+      </div>
+      <button class="submit-btn" onclick="kidWizardNext(1)">Next →</button>
+    </div>
+
+    <!-- Step 2: Birthday -->
+    <div id="kid-step-2" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Birthday <span class="req">*</span></label>
+        <input class="form-input" type="date" id="kid-birthday" max="" onchange="previewKidAge()">
+      </div>
+      <div id="kid-age-preview" style="background:var(--papaya-light);border-radius:var(--radius-sm);padding:0.75rem 1rem;font-size:0.85rem;color:var(--papaya-dark);margin-bottom:1rem;display:none">
+        <strong id="kid-age-preview-text"></strong>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="kidWizardBack(2)" style="flex:1;background:none;border:2px solid var(--lagoon);color:var(--lagoon-dark);font-family:var(--font-body);font-size:0.9rem;font-weight:600;padding:0.65rem;border-radius:24px;cursor:pointer">← Back</button>
+        <button class="submit-btn" style="flex:2" onclick="kidWizardNext(2)">Next →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Interests -->
+    <div id="kid-step-3" style="display:none">
+      <div class="form-group">
+        <label class="form-label">What do they love? <span style="color:var(--gray);font-weight:400">(pick any)</span></label>
+        <div class="sheet-chips" style="margin-top:6px" id="kid-interests-picker">
+          <div class="interest-chip" data-interest="📚 Books" onclick="toggleInterestChip(this)">📚 Books</div>
+          <div class="interest-chip" data-interest="🚲 Bikes" onclick="toggleInterestChip(this)">🚲 Bikes</div>
+          <div class="interest-chip" data-interest="⚽ Sports" onclick="toggleInterestChip(this)">⚽ Sports</div>
+          <div class="interest-chip" data-interest="🎨 Arts &amp; Crafts" onclick="toggleInterestChip(this)">🎨 Arts &amp; Crafts</div>
+          <div class="interest-chip" data-interest="🧸 Toys" onclick="toggleInterestChip(this)">🧸 Toys</div>
+          <div class="interest-chip" data-interest="🌿 Outdoor" onclick="toggleInterestChip(this)">🌿 Outdoor</div>
+          <div class="interest-chip" data-interest="🎵 Music" onclick="toggleInterestChip(this)">🎵 Music</div>
+          <div class="interest-chip" data-interest="🐾 Animals" onclick="toggleInterestChip(this)">🐾 Animals</div>
+          <div class="interest-chip" data-interest="🎮 Gaming" onclick="toggleInterestChip(this)">🎮 Gaming</div>
+          <div class="interest-chip" data-interest="🍳 Cooking" onclick="toggleInterestChip(this)">🍳 Cooking</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:0.5rem">
+        <button onclick="kidWizardBack(3)" style="flex:1;background:none;border:2px solid var(--lagoon);color:var(--lagoon-dark);font-family:var(--font-body);font-size:0.9rem;font-weight:600;padding:0.65rem;border-radius:24px;cursor:pointer">← Back</button>
+        <button class="submit-btn" style="flex:2;background:var(--lagoon)" id="kid-save-btn" onclick="saveKid()">Save kid 💚</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- FEEDBACK FAB -->
 <button class="feedback-fab" onclick="openModal('feedback-modal')">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -1514,6 +1759,7 @@ async function loadUserProfile(user) {
   }
   currentProfile = profile;
   updateAuthUI(user, profile);
+  if (document.getElementById('view-profile').style.display !== 'none') loadKids();
 }
 
 function updateAuthUI(user, profile) {
@@ -1589,6 +1835,7 @@ function dbListingToLocal(item) {
     isNew,
     dbId: item.id,
     userId: item.user_id || null,
+    createdAt: new Date(item.created_at),
   };
 }
 
@@ -1619,6 +1866,17 @@ const LISTINGS = [];
 let activeCategory = 'all';
 let searchQuery = '';
 let areaFilter = 'all';
+let activeSort = 'newest';
+let activeConditions = new Set();
+let activePickups = new Set();
+let activeSizes = new Set();
+let activePostedWithin = null;
+let activeKidId = null;
+let _draftSort = 'newest';
+let _draftConditions = new Set();
+let _draftPickups = new Set();
+let _draftSizes = new Set();
+let _draftPostedWithin = null;
 let claimTarget = null;
 let userPostCount = 0;
 
@@ -1635,7 +1893,7 @@ function renderFeed(items) {
   if (!items.length) {
     const isSearch = searchQuery.length > 0;
     const isCategoryFilter = activeCategory !== 'all';
-    const isFiltered = isCategoryFilter || areaFilter !== 'all' || isSearch;
+    const isFiltered = isCategoryFilter || areaFilter !== 'all' || isSearch || activeConditions.size > 0 || activePickups.size > 0 || activeSizes.size > 0 || activePostedWithin;
     const msg = isSearch
       ? `<div class="empty-state"><div class="big">🔍</div><p style="font-weight:600">No results for "${searchQuery}"</p><p style="font-size:0.85rem;margin-top:5px;color:var(--gray)">Try different keywords or browse all categories.</p></div>`
       : isFiltered
@@ -1704,15 +1962,24 @@ function renderFeed(items) {
 
 function getFiltered() {
   const q = searchQuery.toLowerCase();
-  return LISTINGS.filter(l => {
+  const now = Date.now();
+  let items = LISTINGS.filter(l => {
     const matchCat = activeCategory === 'all' || l.category === activeCategory;
     const matchArea = areaFilter === 'all' || l.neighbourhood === areaFilter;
-    const matchSearch = !q || l.title.toLowerCase().includes(q) || (l.desc||'').toLowerCase().includes(q);
-    // Hide given items from feed unless it's the user's own (they see it with Given pill)
+    const matchSearch = !q || l.title.toLowerCase().includes(q) || (l.desc||''). toLowerCase().includes(q);
     const isOwn = currentUser && l.userId === currentUser.id;
     const showGiven = isOwn || l.status !== 'given';
-    return matchCat && matchArea && matchSearch && showGiven;
+    const matchCondition = activeConditions.size === 0 || activeConditions.has(l.condition);
+    const matchPickup = activePickups.size === 0 || (l.pickup || []).some(p => activePickups.has(p));
+    const matchSize = activeSizes.size === 0 || (l.sizes && l.sizes.some(s => activeSizes.has(s)));
+    const matchPosted = !activePostedWithin || !l.createdAt || (now - l.createdAt.getTime()) <= activePostedWithin * 86400000;
+    return matchCat && matchArea && matchSearch && showGiven && matchCondition && matchPickup && matchSize && matchPosted;
   });
+  // Sort
+  if (activeSort === 'newest') items.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+  else if (activeSort === 'oldest') items.sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
+  else if (activeSort === 'random') items.sort(() => Math.random() - 0.5);
+  return items;
 }
 
 function updateFeed() {
@@ -1723,7 +1990,172 @@ function updateFeed() {
   const base = parts.length ? parts.join(' · ') : 'All areas';
   document.getElementById('feed-label').textContent = `${filtered.length} item${filtered.length!==1?'s':''} · ${base}`;
   document.getElementById('search-info').textContent = searchQuery ? `Searching "${searchQuery}"` : '';
+  renderActiveFilterStrip();
   renderFeed(filtered);
+}
+
+// ── FILTER SHEET ──────────────────────────────────────────
+
+function openFilterSheet() {
+  // Copy active state into draft
+  _draftSort = activeSort;
+  _draftConditions = new Set(activeConditions);
+  _draftPickups = new Set(activePickups);
+  _draftSizes = new Set(activeSizes);
+  _draftPostedWithin = activePostedWithin;
+  // Sync chip UI to draft
+  syncSheetUI();
+  document.getElementById('filter-sheet').classList.add('open');
+  document.getElementById('filter-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  updateSheetCount();
+}
+
+function closeFilterSheet() {
+  document.getElementById('filter-sheet').classList.remove('open');
+  document.getElementById('filter-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function applyFilterSheet() {
+  activeSort = _draftSort;
+  activeConditions = new Set(_draftConditions);
+  activePickups = new Set(_draftPickups);
+  activeSizes = new Set(_draftSizes);
+  activePostedWithin = _draftPostedWithin;
+  closeFilterSheet();
+  updateFeed();
+  updateFiltersBtn();
+}
+
+function clearFilterSheet() {
+  _draftSort = 'newest';
+  _draftConditions = new Set();
+  _draftPickups = new Set();
+  _draftSizes = new Set();
+  _draftPostedWithin = null;
+  syncSheetUI();
+  updateSheetCount();
+}
+
+function syncSheetUI() {
+  // Sort chips
+  document.querySelectorAll('.sort-chip[data-sort]').forEach(c => {
+    c.classList.toggle('active', c.dataset.sort === _draftSort);
+  });
+  // Condition chips
+  document.querySelectorAll('#condition-chips .sheet-chip').forEach(c => {
+    c.classList.toggle('active', _draftConditions.has(c.dataset.val));
+  });
+  // Pickup chips
+  document.querySelectorAll('#pickup-chips .sheet-chip').forEach(c => {
+    c.classList.toggle('active', _draftPickups.has(c.dataset.val));
+  });
+  // Size chips
+  document.querySelectorAll('#size-chips .sheet-chip').forEach(c => {
+    c.classList.toggle('active', _draftSizes.has(c.dataset.val));
+  });
+  // Posted chips
+  document.querySelectorAll('.sort-chip[data-val]').forEach(c => {
+    c.classList.toggle('active', _draftPostedWithin !== null && String(_draftPostedWithin) === c.dataset.val);
+  });
+}
+
+function toggleSheetChip(el, type) {
+  const val = el.dataset.val;
+  const map = { condition: _draftConditions, pickup: _draftPickups, size: _draftSizes };
+  const set = map[type];
+  if (set.has(val)) { set.delete(val); el.classList.remove('active'); }
+  else { set.add(val); el.classList.add('active'); }
+  updateSheetCount();
+}
+
+function selectSort(el) {
+  _draftSort = el.dataset.sort;
+  document.querySelectorAll('.sort-chip[data-sort]').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  updateSheetCount();
+}
+
+function selectPosted(el) {
+  const val = parseInt(el.dataset.val, 10);
+  if (_draftPostedWithin === val) {
+    _draftPostedWithin = null;
+    el.classList.remove('active');
+  } else {
+    _draftPostedWithin = val;
+    document.querySelectorAll('.sort-chip[data-val]').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+  }
+  updateSheetCount();
+}
+
+function updateSheetCount() {
+  // Count how many items the draft filters would return
+  const saved = { activeSort, activeConditions, activePickups, activeSizes, activePostedWithin };
+  activeSort = _draftSort;
+  activeConditions = _draftConditions;
+  activePickups = _draftPickups;
+  activeSizes = _draftSizes;
+  activePostedWithin = _draftPostedWithin;
+  const count = getFiltered().length;
+  // Restore
+  activeSort = saved.activeSort;
+  activeConditions = saved.activeConditions;
+  activePickups = saved.activePickups;
+  activeSizes = saved.activeSizes;
+  activePostedWithin = saved.activePostedWithin;
+  const el = document.getElementById('sheet-result-count');
+  if (el) el.textContent = `${count} result${count!==1?'s':''}`;
+}
+
+function updateFiltersBtn() {
+  const btn = document.getElementById('filters-btn');
+  if (!btn) return;
+  const count = activeConditions.size + activePickups.size + activeSizes.size +
+    (activePostedWithin ? 1 : 0) + (activeSort !== 'newest' ? 1 : 0);
+  if (count > 0) {
+    btn.classList.add('has-filters');
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg> Filters <span class="filter-count-badge">${count}</span>`;
+  } else {
+    btn.classList.remove('has-filters');
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg> Filters`;
+  }
+}
+
+function renderActiveFilterStrip() {
+  const strip = document.getElementById('active-filters-strip');
+  if (!strip) return;
+  const tags = [];
+  const postedLabels = { 1: 'Today', 7: 'This week', 30: 'This month' };
+  const sortLabels = { oldest: '🕰️ Oldest first', random: '🎲 Surprise me' };
+  if (activeSort !== 'newest') tags.push({ label: sortLabels[activeSort], action: `activeSort='newest';updateFeed();updateFiltersBtn()` });
+  activeConditions.forEach(v => tags.push({ label: v, action: `activeConditions.delete('${v}');updateFeed();updateFiltersBtn()` }));
+  activePickups.forEach(v => tags.push({ label: v, action: `activePickups.delete('${v.replace(/'/g,"\\'")}');updateFeed();updateFiltersBtn()` }));
+  if (activeKidId) {
+    const kid = _kids.find(k => k.id === activeKidId);
+    if (kid) tags.push({ label: `${kid.emoji} ${kid.name}'s sizes`, action: `selectKidPill(null)` });
+  } else {
+    activeSizes.forEach(v => tags.push({ label: `Size: ${v}`, action: `activeSizes.delete('${v}');updateFeed();updateFiltersBtn()` }));
+  }
+  if (activePostedWithin) tags.push({ label: postedLabels[activePostedWithin], action: `activePostedWithin=null;updateFeed();updateFiltersBtn()` });
+  if (tags.length === 0) { strip.classList.remove('visible'); strip.innerHTML = ''; return; }
+  strip.classList.add('visible');
+  strip.innerHTML = tags.map(t => `<span class="active-tag" onclick="${t.action}"><span>${t.label}</span><span class="tag-x">×</span></span>`).join('') +
+    `<button class="clear-all-tag" onclick="clearAllActiveFilters()">Clear all</button>`;
+  updateFiltersBtn();
+}
+
+function clearAllActiveFilters() {
+  activeSort = 'newest';
+  activeConditions = new Set();
+  activePickups = new Set();
+  activeSizes = new Set();
+  activePostedWithin = null;
+  activeKidId = null;
+  renderKidPills();
+  updateFeed();
+  updateFiltersBtn();
 }
 
 function handleSearch() {
@@ -2264,6 +2696,7 @@ function showView(v) {
   if (v==='messages') renderThreadList();
   if (v==='profile') {
     loadProfileListings();
+    loadKids();
     if (currentProfile) {
       const initials = (currentProfile.name||'U').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
       document.getElementById('profile-avatar').textContent = initials;
@@ -2837,9 +3270,372 @@ async function sendChatMsg() {
   }
 }
 
+// ── KID PROFILES ─────────────────────────────────────────────
+let _kids = [];
+let _editingKidId = null;
+let _kidWizardEmoji = '👶';
+
+function kidsMonths(birthday) {
+  const now = new Date();
+  const bday = new Date(birthday);
+  return (now.getFullYear() - bday.getFullYear()) * 12 + (now.getMonth() - bday.getMonth());
+}
+
+function kidsAgeLabel(birthday) {
+  const months = kidsMonths(birthday);
+  if (months < 1) return 'Newborn';
+  if (months < 12) return `${months}mo`;
+  const yrs = Math.floor(months / 12);
+  const rem = months % 12;
+  return rem > 0 ? `${yrs}y ${rem}mo` : `${yrs}y`;
+}
+
+function ageToFit(months) {
+  if (months < 3)   return ['NB', '0-3m'];
+  if (months < 6)   return ['0-3m', '3-6m'];
+  if (months < 9)   return ['3-6m', '6-9m'];
+  if (months < 12)  return ['6-9m', '9-12m'];
+  if (months < 18)  return ['9-12m', '12-18m'];
+  if (months < 24)  return ['12-18m', '18-24m'];
+  if (months < 36)  return ['18-24m', '2T'];
+  if (months < 48)  return ['2T', '3T'];
+  if (months < 60)  return ['3T', '4T'];
+  if (months < 72)  return ['4T', '5T'];
+  if (months < 84)  return ['5', '6'];
+  if (months < 96)  return ['6', '7'];
+  if (months < 108) return ['7', '8'];
+  if (months < 120) return ['8', '10'];
+  if (months < 132) return ['10', '12'];
+  if (months < 144) return ['12', '14'];
+  return ['14', '16'];
+}
+
+function ageToShoe(months) {
+  if (months < 12)  return ['4c', '5c'];
+  if (months < 18)  return ['5c', '6c'];
+  if (months < 24)  return ['6c', '7c'];
+  if (months < 30)  return ['7c', '8c'];
+  if (months < 36)  return ['8c', '9c'];
+  if (months < 42)  return ['9c', '10c'];
+  if (months < 48)  return ['10c', '11c'];
+  if (months < 54)  return ['11c', '12c'];
+  if (months < 60)  return ['12c', '13c'];
+  if (months < 66)  return ['13c', '1Y'];
+  if (months < 72)  return ['1Y', '2Y'];
+  if (months < 84)  return ['2Y', '3Y'];
+  if (months < 96)  return ['3Y', '4Y'];
+  if (months < 108) return ['4Y', '5Y'];
+  return ['5Y', '6Y'];
+}
+
+async function loadKids() {
+  if (!currentUser || !_sb) return;
+  try {
+    const { data, error } = await _sb.from('kids')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .is('archived_at', null)
+      .order('created_at', { ascending: true });
+    if (error) throw error;
+    _kids = data || [];
+    renderKids();
+    renderKidPills();
+  } catch(e) {
+    console.error('loadKids error:', e);
+  }
+}
+
+function renderKidPills() {
+  const strip = document.getElementById('kid-pills-strip');
+  if (!strip) return;
+  if (!currentUser || !_kids.length) { strip.style.display = 'none'; return; }
+  strip.style.display = 'flex';
+  let html = `<button class="kid-pill${!activeKidId ? ' active' : ''}" onclick="selectKidPill(null)">All</button>`;
+  _kids.forEach(kid => {
+    const age = kidsAgeLabel(kid.birthday);
+    const isActive = activeKidId === kid.id;
+    html += `<button class="kid-pill${isActive ? ' active' : ''}" onclick="selectKidPill('${kid.id}')">${kid.emoji} ${kid.name} <span class="kid-pill-age">· ${age}</span></button>`;
+  });
+  strip.innerHTML = html;
+}
+
+function selectKidPill(id) {
+  activeKidId = id;
+  if (id) {
+    const kid = _kids.find(k => k.id === id);
+    if (kid) {
+      const months = kidsMonths(kid.birthday);
+      activeSizes = new Set([...ageToFit(months), ...ageToShoe(months)]);
+    }
+  } else {
+    activeSizes = new Set();
+  }
+  renderKidPills();
+  updateFeed();
+  updateFiltersBtn();
+}
+
+function renderKids() {
+  const grid = document.getElementById('kids-grid');
+  if (!grid) return;
+  let html = '';
+  _kids.forEach(kid => {
+    const months = kidsMonths(kid.birthday);
+    const ageLabel = kidsAgeLabel(kid.birthday);
+    const fits = ageToFit(months);
+    const shoes = ageToShoe(months);
+    const fitChips = fits.map(s => `<span class="kid-size-chip">${s}</span>`).join('');
+    const shoeChips = shoes.map(s => `<span class="kid-shoe-chip">${s} shoe</span>`).join('');
+    const interestChips = (kid.interests || []).map(i => `<span class="kid-interest-chip">${i}</span>`).join('');
+    const bdayDisplay = new Date(kid.birthday + 'T12:00:00').toLocaleDateString('en-CA', { month: 'short', year: 'numeric' });
+    html += `
+    <div class="kid-card">
+      <div class="kid-avatar-circle">${kid.emoji || '👶'}</div>
+      <div class="kid-info">
+        <div class="kid-name">${kid.name}</div>
+        <div class="kid-meta">${ageLabel} · born ${bdayDisplay}</div>
+        <div class="kid-sizes">${fitChips}${shoeChips}</div>
+        ${interestChips ? `<div class="kid-interests">${interestChips}</div>` : ''}
+      </div>
+      <div class="kid-actions">
+        <button class="kid-edit-btn" onclick="openEditKid('${kid.id}')">Edit</button>
+        <button class="kid-edit-btn" style="color:#C62828" onclick="archiveKid('${kid.id}','${kid.name.replace(/'/g,"\\'")}')">Archive</button>
+      </div>
+    </div>`;
+  });
+  html += `
+  <div class="add-kid-card" onclick="openAddKidWizard()">
+    <div class="add-kid-plus">+</div>
+    <div>
+      <div style="font-weight:600;font-size:0.88rem;color:var(--charcoal)">Add a kid</div>
+      <div style="font-size:0.75rem;color:var(--gray);margin-top:2px">Takes about 30 seconds</div>
+    </div>
+  </div>`;
+  grid.innerHTML = html;
+}
+
+function openAddKidWizard() {
+  if (!requireAuth('add a kid profile')) return;
+  _editingKidId = null;
+  _kidWizardEmoji = '👶';
+  document.getElementById('kid-modal-title').textContent = 'Add a kid 👶';
+  document.getElementById('kid-name').value = '';
+  document.getElementById('kid-birthday').value = '';
+  document.getElementById('kid-birthday').max = new Date().toISOString().split('T')[0];
+  document.getElementById('kid-age-preview').style.display = 'none';
+  document.getElementById('kid-modal-error').classList.remove('show');
+  document.querySelectorAll('.interest-chip').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.emoji-opt').forEach(c => c.classList.toggle('selected', c.dataset.emoji === '👶'));
+  showKidStep(1);
+  openModal('kid-modal');
+}
+
+function openEditKid(id) {
+  const kid = _kids.find(k => k.id === id);
+  if (!kid) return;
+  _editingKidId = id;
+  _kidWizardEmoji = kid.emoji || '👶';
+  document.getElementById('kid-modal-title').textContent = `Edit ${kid.name}`;
+  document.getElementById('kid-name').value = kid.name;
+  document.getElementById('kid-birthday').value = kid.birthday;
+  document.getElementById('kid-birthday').max = new Date().toISOString().split('T')[0];
+  document.getElementById('kid-modal-error').classList.remove('show');
+  document.querySelectorAll('.emoji-opt').forEach(c => c.classList.toggle('selected', c.dataset.emoji === kid.emoji));
+  const interests = kid.interests || [];
+  document.querySelectorAll('.interest-chip').forEach(c => c.classList.toggle('selected', interests.includes(c.dataset.interest)));
+  previewKidAge();
+  showKidStep(1);
+  openModal('kid-modal');
+}
+
+function showKidStep(step) {
+  [1, 2, 3].forEach(n => {
+    document.getElementById(`kid-step-${n}`).style.display = n === step ? 'block' : 'none';
+    const dot = document.getElementById(`kid-dot-${n}`);
+    dot.className = 'wizard-dot' + (n < step ? ' done' : n === step ? ' active' : '');
+  });
+}
+
+function kidWizardNext(currentStep) {
+  const errEl = document.getElementById('kid-modal-error');
+  errEl.classList.remove('show');
+  if (currentStep === 1) {
+    const name = document.getElementById('kid-name').value.trim();
+    if (!name) { errEl.textContent = 'Give them a name!'; errEl.classList.add('show'); return; }
+    showKidStep(2);
+  } else if (currentStep === 2) {
+    const bday = document.getElementById('kid-birthday').value;
+    if (!bday) { errEl.textContent = 'We need their birthday to suggest sizes!'; errEl.classList.add('show'); return; }
+    if (new Date(bday) > new Date()) { errEl.textContent = "Birthday can't be in the future."; errEl.classList.add('show'); return; }
+    showKidStep(3);
+  }
+}
+
+function kidWizardBack(currentStep) { showKidStep(currentStep - 1); }
+
+function selectKidEmoji(el) {
+  _kidWizardEmoji = el.dataset.emoji;
+  document.querySelectorAll('.emoji-opt').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function toggleInterestChip(el) { el.classList.toggle('selected'); }
+
+function previewKidAge() {
+  const bday = document.getElementById('kid-birthday').value;
+  const preview = document.getElementById('kid-age-preview');
+  const text = document.getElementById('kid-age-preview-text');
+  if (!bday) { preview.style.display = 'none'; return; }
+  const months = kidsMonths(bday);
+  const age = kidsAgeLabel(bday);
+  const fits = ageToFit(months);
+  preview.style.display = 'block';
+  text.textContent = `${age} old · wears ${fits.join(' – ')} clothing`;
+}
+
+async function saveKid() {
+  const name = document.getElementById('kid-name').value.trim();
+  const birthday = document.getElementById('kid-birthday').value;
+  const interests = [...document.querySelectorAll('.interest-chip.selected')].map(c => c.dataset.interest);
+  const errEl = document.getElementById('kid-modal-error');
+  if (!name || !birthday) {
+    errEl.textContent = 'Name and birthday are required.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (!_sb || !currentUser) return;
+  const btn = document.getElementById('kid-save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  showLoading(_editingKidId ? 'Updating…' : 'Adding to the crew…');
+  try {
+    if (_editingKidId) {
+      const { error } = await _sb.from('kids')
+        .update({ name, birthday, emoji: _kidWizardEmoji, interests, updated_at: new Date().toISOString() })
+        .eq('id', _editingKidId)
+        .eq('user_id', currentUser.id);
+      if (error) throw error;
+    } else {
+      const { error } = await _sb.from('kids').insert({
+        user_id: currentUser.id,
+        name, birthday,
+        emoji: _kidWizardEmoji,
+        interests,
+      });
+      if (error) throw error;
+    }
+    closeModal('kid-modal');
+    await loadKids();
+    showToast(_editingKidId ? `${name} updated 🌿` : `${name} added to the crew! 👶`);
+  } catch(e) {
+    errEl.textContent = friendlyAuthError(e.message);
+    errEl.classList.add('show');
+  } finally {
+    hideLoading();
+    btn.disabled = false;
+    btn.textContent = 'Save kid 💚';
+  }
+}
+
+async function archiveKid(id, name) {
+  if (!confirm(`Archive ${name}?\n\nThey'll move to "Grown Out" — your history stays intact.`)) return;
+  if (!_sb || !currentUser) return;
+  showLoading('Archiving…');
+  try {
+    const { error } = await _sb.from('kids')
+      .update({ archived_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('user_id', currentUser.id);
+    if (error) throw error;
+    await loadKids();
+    showToast(`${name} moved to Grown Out 🌿`);
+  } catch(e) {
+    showToast('Something went wrong — ' + friendlyAuthError(e.message), '#E64A19');
+  } finally { hideLoading(); }
+}
+
 // ── POST WITH DB SAVE ──────────────────────────────────────
 initApp();
 handlePaymentReturn();
 </script>
 </body>
 </html>
+
+<!-- FILTER SHEET OVERLAY -->
+<div class="sheet-overlay" id="filter-overlay" onclick="closeFilterSheet()"></div>
+
+<!-- FILTER BOTTOM SHEET -->
+<div class="filter-sheet" id="filter-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <span class="sheet-title">Filter &amp; Sort</span>
+    <button class="sheet-clear-btn" onclick="clearFilterSheet()">Clear all</button>
+  </div>
+  <div class="sheet-body">
+    <div class="sheet-section">
+      <div class="sheet-section-label">Sort by</div>
+      <div class="sheet-chips">
+        <button class="sort-chip active" data-sort="newest" onclick="selectSort(this)">🆕 Newest first</button>
+        <button class="sort-chip" data-sort="oldest" onclick="selectSort(this)">🕰️ Oldest first</button>
+        <button class="sort-chip" data-sort="random" onclick="selectSort(this)">🎲 Surprise me</button>
+      </div>
+    </div>
+    <div class="sheet-section">
+      <div class="sheet-section-label">Condition</div>
+      <div class="sheet-chips" id="condition-chips">
+        <button class="sheet-chip" data-val="New" onclick="toggleSheetChip(this,'condition')">🌟 New</button>
+        <button class="sheet-chip" data-val="Like New" onclick="toggleSheetChip(this,'condition')">✨ Like New</button>
+        <button class="sheet-chip" data-val="Good" onclick="toggleSheetChip(this,'condition')">👍 Good</button>
+        <button class="sheet-chip" data-val="Well Loved" onclick="toggleSheetChip(this,'condition')">💪 Well Loved</button>
+      </div>
+    </div>
+    <div class="sheet-section">
+      <div class="sheet-section-label">Pickup method</div>
+      <div class="sheet-chips" id="pickup-chips">
+        <button class="sheet-chip" data-val="🚪 Porch Pickup" onclick="toggleSheetChip(this,'pickup')">🚪 Porch Pickup</button>
+        <button class="sheet-chip" data-val="🤝 Meetup" onclick="toggleSheetChip(this,'pickup')">🤝 Meetup</button>
+        <button class="sheet-chip" data-val="📦 Drop Off" onclick="toggleSheetChip(this,'pickup')">📦 Drop Off</button>
+      </div>
+    </div>
+    <div class="sheet-section">
+      <div class="sheet-section-label">Posted within</div>
+      <div class="sheet-chips">
+        <button class="sort-chip" data-val="1" onclick="selectPosted(this)">Today</button>
+        <button class="sort-chip" data-val="7" onclick="selectPosted(this)">This week</button>
+        <button class="sort-chip" data-val="30" onclick="selectPosted(this)">This month</button>
+      </div>
+    </div>
+    <div class="sheet-section">
+      <div class="sheet-section-label">Size</div>
+      <div class="sheet-chips" id="size-chips">
+        <button class="sheet-chip" data-val="Preemie" onclick="toggleSheetChip(this,'size')">Preemie</button>
+        <button class="sheet-chip" data-val="Newborn" onclick="toggleSheetChip(this,'size')">Newborn</button>
+        <button class="sheet-chip" data-val="0–3m" onclick="toggleSheetChip(this,'size')">0–3m</button>
+        <button class="sheet-chip" data-val="3–6m" onclick="toggleSheetChip(this,'size')">3–6m</button>
+        <button class="sheet-chip" data-val="6–12m" onclick="toggleSheetChip(this,'size')">6–12m</button>
+        <button class="sheet-chip" data-val="12–18m" onclick="toggleSheetChip(this,'size')">12–18m</button>
+        <button class="sheet-chip" data-val="18–24m" onclick="toggleSheetChip(this,'size')">18–24m</button>
+        <button class="sheet-chip" data-val="2T" onclick="toggleSheetChip(this,'size')">2T</button>
+        <button class="sheet-chip" data-val="3T" onclick="toggleSheetChip(this,'size')">3T</button>
+        <button class="sheet-chip" data-val="4T" onclick="toggleSheetChip(this,'size')">4T</button>
+        <button class="sheet-chip" data-val="5T" onclick="toggleSheetChip(this,'size')">5T</button>
+        <button class="sheet-chip" data-val="6" onclick="toggleSheetChip(this,'size')">6</button>
+        <button class="sheet-chip" data-val="7" onclick="toggleSheetChip(this,'size')">7</button>
+        <button class="sheet-chip" data-val="8" onclick="toggleSheetChip(this,'size')">8</button>
+        <button class="sheet-chip" data-val="10" onclick="toggleSheetChip(this,'size')">10</button>
+        <button class="sheet-chip" data-val="12" onclick="toggleSheetChip(this,'size')">12</button>
+        <button class="sheet-chip" data-val="14" onclick="toggleSheetChip(this,'size')">14</button>
+        <button class="sheet-chip" data-val="XS" onclick="toggleSheetChip(this,'size')">XS</button>
+        <button class="sheet-chip" data-val="S" onclick="toggleSheetChip(this,'size')">S</button>
+        <button class="sheet-chip" data-val="M" onclick="toggleSheetChip(this,'size')">M</button>
+        <button class="sheet-chip" data-val="L" onclick="toggleSheetChip(this,'size')">L</button>
+        <button class="sheet-chip" data-val="XL" onclick="toggleSheetChip(this,'size')">XL</button>
+        <button class="sheet-chip" data-val="XXL" onclick="toggleSheetChip(this,'size')">XXL</button>
+      </div>
+    </div>
+  </div>
+  <div class="sheet-footer">
+    <span class="sheet-result-count" id="sheet-result-count"></span>
+    <button class="sheet-apply-btn" onclick="applyFilterSheet()">Show results</button>
+  </div>
+</div>
