@@ -507,14 +507,6 @@ nav {
 .wizard-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gray-mid); transition: all 0.2s; }
 .wizard-dot.active { background: var(--papaya-mid); transform: scale(1.25); }
 .wizard-dot.done { background: var(--lagoon); }
-
-/* ── KID PILLS STRIP ─────────────────────────────────────── */
-.kid-pills-strip { background: var(--white); padding: 0.45rem 1.25rem; border-bottom: 1px solid #EDE9E3; display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; align-items: center; }
-.kid-pills-strip::-webkit-scrollbar { display: none; }
-.kid-pill { display: inline-flex; align-items: center; gap: 5px; background: var(--gray-light); border: 1.5px solid transparent; border-radius: 20px; padding: 0.3rem 0.85rem; font-family: var(--font-body); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0; }
-.kid-pill:hover { border-color: var(--papaya-mid); background: var(--papaya-light); }
-.kid-pill.active { background: var(--papaya-light); border-color: var(--papaya-mid); color: var(--papaya-dark); font-weight: 600; }
-.kid-pill-age { opacity: 0.65; font-size: 0.72rem; }
 </style>
 </head>
 <body>
@@ -581,7 +573,7 @@ nav {
     <div class="search-input-wrap">
       <input type="text" style="display:none" aria-hidden="true">
       <span class="search-icon">🔍</span>
-      <input class="search-input" type="search" id="search-input" placeholder="Search items, descriptions…" oninput="handleSearch()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" name="search_gia_x">
+      <input class="search-input" type="search" id="search-input" placeholder="Search items, descriptions…" oninput="handleSearch()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="gia_search_x7q" onfocus="this.removeAttribute('readonly')" readonly>
       <button class="clear-search" id="clear-btn" onclick="clearSearch()">✕</button>
     </div>
     <select class="area-select" id="area-select" onchange="handleSearch()">
@@ -596,9 +588,6 @@ nav {
       <option>Rutland North</option>
     </select>
   </div>
-
-  <!-- KID PILLS STRIP — hidden until signed in + has kids -->
-  <div class="kid-pills-strip" id="kid-pills-strip" style="display:none"></div>
 
   <div class="filters">
     <button class="filter-chip active" onclick="filterCategory(this,'all')">All</button>
@@ -1012,10 +1001,9 @@ nav {
             <li><strong style="color:var(--charcoal)">Messages</strong> — to enable item claims and pickups.</li>
             <li><strong style="color:var(--charcoal)">Approximate location</strong> — your neighbourhood, never your exact address.</li>
             <li><strong style="color:var(--charcoal)">Giving stats</strong> — items given and received, to power your profile.</li>
-            <li><strong style="color:var(--charcoal)">Kid profiles</strong> — name, birthday, and interests you add for your children. Used only to suggest sizes in your feed. Never shared with other users. No photos are collected.</li>
             <li><strong style="color:var(--charcoal)">Supporter status</strong> — to manage your optional subscription via Stripe.</li>
           </ul>
-          <p style="margin-top:0.5rem">We do <strong style="color:var(--charcoal)">not</strong> collect exact home addresses, payment card information, biometric data, government ID, or photos of children.</p>
+          <p style="margin-top:0.5rem">We do <strong style="color:var(--charcoal)">not</strong> collect exact home addresses, payment card information, biometric data, or government ID.</p>
         </div>
       </details>
 
@@ -1452,7 +1440,7 @@ nav {
     <div id="kid-step-1">
       <div class="form-group">
         <label class="form-label">Their name <span class="req">*</span></label>
-        <input class="form-input" type="text" id="kid-name" placeholder="Rosie, Jordie, Bug…" maxlength="30">
+        <input class="form-input" type="text" id="kid-name" placeholder="Big Kid, Lil Bro, Lil Sis, the Baby" maxlength="30">
       </div>
       <div class="form-group">
         <label class="form-label">Pick an emoji</label>
@@ -1465,16 +1453,31 @@ nav {
           <div class="emoji-opt" data-emoji="🌈" onclick="selectKidEmoji(this)">🌈</div>
           <div class="emoji-opt" data-emoji="🦄" onclick="selectKidEmoji(this)">🦄</div>
           <div class="emoji-opt" data-emoji="🐼" onclick="selectKidEmoji(this)">🐼</div>
+          <div class="emoji-opt" data-emoji="🌸" onclick="selectKidEmoji(this)">🌸</div>
+          <div class="emoji-opt" data-emoji="🐶" onclick="selectKidEmoji(this)">🐶</div>
+          <div class="emoji-opt" data-emoji="🐱" onclick="selectKidEmoji(this)">🐱</div>
+          <div class="emoji-opt" data-emoji="🐒" onclick="selectKidEmoji(this)">🐒</div>
+          <div class="emoji-opt" data-emoji="🦦" onclick="selectKidEmoji(this)">🦦</div>
+          <div class="emoji-opt" data-emoji="🦥" onclick="selectKidEmoji(this)">🦥</div>
+          <div class="emoji-opt" data-emoji="🍼" onclick="selectKidEmoji(this)">🍼</div>
+          <div class="emoji-opt" data-emoji="⚽" onclick="selectKidEmoji(this)">⚽</div>
+          <div class="emoji-opt" data-emoji="🏒" onclick="selectKidEmoji(this)">🏒</div>
+          <div class="emoji-opt" data-emoji="🚜" onclick="selectKidEmoji(this)">🚜</div>
+          <div class="emoji-opt" data-emoji="🩰" onclick="selectKidEmoji(this)">🩰</div>
+          <div class="emoji-opt" data-emoji="🧸" onclick="selectKidEmoji(this)">🧸</div>
+          <div class="emoji-opt" data-emoji="🎀" onclick="selectKidEmoji(this)">🎀</div>
         </div>
       </div>
       <button class="submit-btn" onclick="kidWizardNext(1)">Next →</button>
+      <button class="submit-btn kid-edit-save-btn" style="display:none;margin-top:8px;background:var(--lagoon)" onclick="saveKid()">Save &amp; done 💚</button>
     </div>
 
-    <!-- Step 2: Birthday -->
+    <!-- Step 2: Birthday (optional) -->
     <div id="kid-step-2" style="display:none">
       <div class="form-group">
-        <label class="form-label">Birthday <span class="req">*</span></label>
-        <input class="form-input" type="date" id="kid-birthday" max="" onchange="previewKidAge()">
+        <label class="form-label">Birthday <span style="color:var(--gray);font-weight:400;font-size:0.78rem">(optional — helps suggest sizes)</span></label>
+        <input class="form-input" type="month" id="kid-birthday" oninput="previewKidAge()">
+        <div class="hint">Month and year is all we need.</div>
       </div>
       <div id="kid-age-preview" style="background:var(--papaya-light);border-radius:var(--radius-sm);padding:0.75rem 1rem;font-size:0.85rem;color:var(--papaya-dark);margin-bottom:1rem;display:none">
         <strong id="kid-age-preview-text"></strong>
@@ -1483,24 +1486,18 @@ nav {
         <button onclick="kidWizardBack(2)" style="flex:1;background:none;border:2px solid var(--lagoon);color:var(--lagoon-dark);font-family:var(--font-body);font-size:0.9rem;font-weight:600;padding:0.65rem;border-radius:24px;cursor:pointer">← Back</button>
         <button class="submit-btn" style="flex:2" onclick="kidWizardNext(2)">Next →</button>
       </div>
+      <button class="submit-btn kid-edit-save-btn" style="display:none;margin-top:8px;background:var(--lagoon)" onclick="saveKid()">Save &amp; done 💚</button>
     </div>
 
-    <!-- Step 3: Interests -->
+    <!-- Step 3: Sizes -->
     <div id="kid-step-3" style="display:none">
       <div class="form-group">
-        <label class="form-label">What do they love? <span style="color:var(--gray);font-weight:400">(pick any)</span></label>
-        <div class="sheet-chips" style="margin-top:6px" id="kid-interests-picker">
-          <div class="interest-chip" data-interest="📚 Books" onclick="toggleInterestChip(this)">📚 Books</div>
-          <div class="interest-chip" data-interest="🚲 Bikes" onclick="toggleInterestChip(this)">🚲 Bikes</div>
-          <div class="interest-chip" data-interest="⚽ Sports" onclick="toggleInterestChip(this)">⚽ Sports</div>
-          <div class="interest-chip" data-interest="🎨 Arts &amp; Crafts" onclick="toggleInterestChip(this)">🎨 Arts &amp; Crafts</div>
-          <div class="interest-chip" data-interest="🧸 Toys" onclick="toggleInterestChip(this)">🧸 Toys</div>
-          <div class="interest-chip" data-interest="🌿 Outdoor" onclick="toggleInterestChip(this)">🌿 Outdoor</div>
-          <div class="interest-chip" data-interest="🎵 Music" onclick="toggleInterestChip(this)">🎵 Music</div>
-          <div class="interest-chip" data-interest="🐾 Animals" onclick="toggleInterestChip(this)">🐾 Animals</div>
-          <div class="interest-chip" data-interest="🎮 Gaming" onclick="toggleInterestChip(this)">🎮 Gaming</div>
-          <div class="interest-chip" data-interest="🍳 Cooking" onclick="toggleInterestChip(this)">🍳 Cooking</div>
-        </div>
+        <label class="form-label">What sizes do they wear? 👕</label>
+        <div class="hint" id="kid-size-hint" style="margin-bottom:0.6rem">Tap to select all that apply.</div>
+        <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem">Clothing</div>
+        <div class="size-grid" id="kid-clothing-size-grid"></div>
+        <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray);margin-top:0.85rem;margin-bottom:0.5rem">Shoes</div>
+        <div class="size-grid" id="kid-shoe-size-grid"></div>
       </div>
       <div style="display:flex;gap:10px;margin-top:0.5rem">
         <button onclick="kidWizardBack(3)" style="flex:1;background:none;border:2px solid var(--lagoon);color:var(--lagoon-dark);font-family:var(--font-body);font-size:0.9rem;font-weight:600;padding:0.65rem;border-radius:24px;cursor:pointer">← Back</button>
@@ -1584,6 +1581,7 @@ let currentUser = null;
 let currentProfile = null;
 let _threads = {};
 let _activeThreadKey = null;
+let _isNewProfile = false;
 
 // The CDN script tag in <head> loads window.supabase synchronously.
 // This function just initialises our client from it, with a short poll fallback.
@@ -1748,7 +1746,9 @@ async function handleSignOut() {
 async function loadUserProfile(user) {
   currentUser = user;
   let { data: profile } = await _sb.from('profiles').select('*').eq('id', user.id).single();
+  _isNewProfile = false;
   if (!profile) {
+    _isNewProfile = true;
     const meta = user.user_metadata || {};
     const { data: newProfile } = await _sb.from('profiles').insert({
       id: user.id,
@@ -1760,6 +1760,13 @@ async function loadUserProfile(user) {
   currentProfile = profile;
   updateAuthUI(user, profile);
   if (document.getElementById('view-profile').style.display !== 'none') loadKids();
+  // Prompt new users to add kids after first sign-in
+  if (!profile || !profile.name || _isNewProfile) {
+    _isNewProfile = false;
+    setTimeout(() => {
+      showToast('👶 Want to add kid profiles for size-matching? Head to My Stuff → Add a kid!', 'var(--lagoon-dark)', 6000);
+    }, 1200);
+  }
 }
 
 function updateAuthUI(user, profile) {
@@ -1866,12 +1873,12 @@ const LISTINGS = [];
 let activeCategory = 'all';
 let searchQuery = '';
 let areaFilter = 'all';
+let _feedLoading = true;
 let activeSort = 'newest';
 let activeConditions = new Set();
 let activePickups = new Set();
 let activeSizes = new Set();
 let activePostedWithin = null;
-let activeKidId = null;
 let _draftSort = 'newest';
 let _draftConditions = new Set();
 let _draftPickups = new Set();
@@ -1891,6 +1898,10 @@ function renderFeed(items) {
   const query = searchQuery.toLowerCase();
   feed.innerHTML = '';
   if (!items.length) {
+    if (_feedLoading) {
+      feed.innerHTML = `<div class="empty-state"><div style="width:32px;height:32px;border:3px solid var(--lagoon-light);border-top-color:var(--lagoon);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 0.75rem"></div><p style="font-weight:600;color:var(--gray)">Finding things to give away…</p></div>`;
+      return;
+    }
     const isSearch = searchQuery.length > 0;
     const isCategoryFilter = activeCategory !== 'all';
     const isFiltered = isCategoryFilter || areaFilter !== 'all' || isSearch || activeConditions.size > 0 || activePickups.size > 0 || activeSizes.size > 0 || activePostedWithin;
@@ -2132,12 +2143,7 @@ function renderActiveFilterStrip() {
   if (activeSort !== 'newest') tags.push({ label: sortLabels[activeSort], action: `activeSort='newest';updateFeed();updateFiltersBtn()` });
   activeConditions.forEach(v => tags.push({ label: v, action: `activeConditions.delete('${v}');updateFeed();updateFiltersBtn()` }));
   activePickups.forEach(v => tags.push({ label: v, action: `activePickups.delete('${v.replace(/'/g,"\\'")}');updateFeed();updateFiltersBtn()` }));
-  if (activeKidId) {
-    const kid = _kids.find(k => k.id === activeKidId);
-    if (kid) tags.push({ label: `${kid.emoji} ${kid.name}'s sizes`, action: `selectKidPill(null)` });
-  } else {
-    activeSizes.forEach(v => tags.push({ label: `Size: ${v}`, action: `activeSizes.delete('${v}');updateFeed();updateFiltersBtn()` }));
-  }
+  activeSizes.forEach(v => tags.push({ label: `Size: ${v}`, action: `activeSizes.delete('${v}');updateFeed();updateFiltersBtn()` }));
   if (activePostedWithin) tags.push({ label: postedLabels[activePostedWithin], action: `activePostedWithin=null;updateFeed();updateFiltersBtn()` });
   if (tags.length === 0) { strip.classList.remove('visible'); strip.innerHTML = ''; return; }
   strip.classList.add('visible');
@@ -2152,8 +2158,6 @@ function clearAllActiveFilters() {
   activePickups = new Set();
   activeSizes = new Set();
   activePostedWithin = null;
-  activeKidId = null;
-  renderKidPills();
   updateFeed();
   updateFiltersBtn();
 }
@@ -2771,13 +2775,13 @@ function renderThreadList() {
 }
 
 let toastTimer = null;
-function showToast(msg, color) {
+function showToast(msg, color, duration) {
   const t = document.getElementById('toast');
   t.style.background = color || 'var(--lagoon)';
   document.getElementById('toast-msg').textContent = msg;
   t.classList.add('show');
   if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(dismissToast, 3500);
+  toastTimer = setTimeout(dismissToast, duration || 3500);
 }
 function dismissToast() {
   document.getElementById('toast').classList.remove('show');
@@ -3000,10 +3004,12 @@ async function initApp() {
         LISTINGS.length = 0;
         dbListings.forEach(l => LISTINGS.push(dbListingToLocal(l)));
       }
+      _feedLoading = false;
       document.getElementById('stat-items').textContent = LISTINGS.filter(l=>l.status!=='given').length;
       fetchStats();
     } catch(e) {
       console.error('Listings load error:', e);
+      _feedLoading = false;
     }
   }
 
@@ -3276,13 +3282,15 @@ let _editingKidId = null;
 let _kidWizardEmoji = '👶';
 
 function kidsMonths(birthday) {
+  if (!birthday) return null;
   const now = new Date();
-  const bday = new Date(birthday);
+  const bday = new Date(birthday + (birthday.length === 7 ? '-01' : ''));
   return (now.getFullYear() - bday.getFullYear()) * 12 + (now.getMonth() - bday.getMonth());
 }
 
 function kidsAgeLabel(birthday) {
   const months = kidsMonths(birthday);
+  if (months === null) return null;
   if (months < 1) return 'Newborn';
   if (months < 12) return `${months}mo`;
   const yrs = Math.floor(months / 12);
@@ -3339,40 +3347,9 @@ async function loadKids() {
     if (error) throw error;
     _kids = data || [];
     renderKids();
-    renderKidPills();
   } catch(e) {
     console.error('loadKids error:', e);
   }
-}
-
-function renderKidPills() {
-  const strip = document.getElementById('kid-pills-strip');
-  if (!strip) return;
-  if (!currentUser || !_kids.length) { strip.style.display = 'none'; return; }
-  strip.style.display = 'flex';
-  let html = `<button class="kid-pill${!activeKidId ? ' active' : ''}" onclick="selectKidPill(null)">All</button>`;
-  _kids.forEach(kid => {
-    const age = kidsAgeLabel(kid.birthday);
-    const isActive = activeKidId === kid.id;
-    html += `<button class="kid-pill${isActive ? ' active' : ''}" onclick="selectKidPill('${kid.id}')">${kid.emoji} ${kid.name} <span class="kid-pill-age">· ${age}</span></button>`;
-  });
-  strip.innerHTML = html;
-}
-
-function selectKidPill(id) {
-  activeKidId = id;
-  if (id) {
-    const kid = _kids.find(k => k.id === id);
-    if (kid) {
-      const months = kidsMonths(kid.birthday);
-      activeSizes = new Set([...ageToFit(months), ...ageToShoe(months)]);
-    }
-  } else {
-    activeSizes = new Set();
-  }
-  renderKidPills();
-  updateFeed();
-  updateFiltersBtn();
 }
 
 function renderKids() {
@@ -3382,20 +3359,40 @@ function renderKids() {
   _kids.forEach(kid => {
     const months = kidsMonths(kid.birthday);
     const ageLabel = kidsAgeLabel(kid.birthday);
-    const fits = ageToFit(months);
-    const shoes = ageToShoe(months);
-    const fitChips = fits.map(s => `<span class="kid-size-chip">${s}</span>`).join('');
-    const shoeChips = shoes.map(s => `<span class="kid-shoe-chip">${s} shoe</span>`).join('');
-    const interestChips = (kid.interests || []).map(i => `<span class="kid-interest-chip">${i}</span>`).join('');
-    const bdayDisplay = new Date(kid.birthday + 'T12:00:00').toLocaleDateString('en-CA', { month: 'short', year: 'numeric' });
+    // kid.interests is repurposed to store custom sizes: [{clothing:[...]},{shoes:[...]}] or legacy flat array
+    let clothingSizes = [], shoeSizes = [];
+    if (kid.interests && kid.interests.length > 0 && typeof kid.interests[0] === 'object' && kid.interests[0] !== null && !Array.isArray(kid.interests[0])) {
+      // structured format {clothing, shoes}
+      clothingSizes = kid.interests[0].clothing || [];
+      shoeSizes = kid.interests[0].shoes || [];
+    } else if (kid.interests && kid.interests.length > 0) {
+      // legacy flat array — check if it looks like sizes (starts with digit, T, NB, XS, S, M, L)
+      const sizePattern = /^(NB|Preemie|[0-9]|[2-9]T|XS|S$|M$|L$|XL|XXL)/i;
+      const allLookLikeSizes = kid.interests.every(i => sizePattern.test(i));
+      if (allLookLikeSizes) {
+        clothingSizes = kid.interests;
+      } else {
+        // old interests data — fall back to auto-calc
+        if (months !== null) { clothingSizes = ageToFit(months); shoeSizes = ageToShoe(months); }
+      }
+    } else if (months !== null) {
+      clothingSizes = ageToFit(months);
+      shoeSizes = ageToShoe(months);
+    }
+    const fitChips = clothingSizes.map(s => `<span class="kid-size-chip">${s}</span>`).join('');
+    const shoeChips = shoeSizes.map(s => `<span class="kid-shoe-chip">${s} shoe</span>`).join('');
+    let metaLine = '';
+    if (ageLabel) {
+      const bdayDisplay = kid.birthday ? new Date((kid.birthday.length === 7 ? kid.birthday + '-01' : kid.birthday) + 'T12:00:00').toLocaleDateString('en-CA', { month: 'short', year: 'numeric' }) : '';
+      metaLine = `${ageLabel}${bdayDisplay ? ' · born ' + bdayDisplay : ''}`;
+    }
     html += `
     <div class="kid-card">
       <div class="kid-avatar-circle">${kid.emoji || '👶'}</div>
       <div class="kid-info">
         <div class="kid-name">${kid.name}</div>
-        <div class="kid-meta">${ageLabel} · born ${bdayDisplay}</div>
+        ${metaLine ? `<div class="kid-meta">${metaLine}</div>` : ''}
         <div class="kid-sizes">${fitChips}${shoeChips}</div>
-        ${interestChips ? `<div class="kid-interests">${interestChips}</div>` : ''}
       </div>
       <div class="kid-actions">
         <button class="kid-edit-btn" onclick="openEditKid('${kid.id}')">Edit</button>
@@ -3421,10 +3418,9 @@ function openAddKidWizard() {
   document.getElementById('kid-modal-title').textContent = 'Add a kid 👶';
   document.getElementById('kid-name').value = '';
   document.getElementById('kid-birthday').value = '';
-  document.getElementById('kid-birthday').max = new Date().toISOString().split('T')[0];
   document.getElementById('kid-age-preview').style.display = 'none';
   document.getElementById('kid-modal-error').classList.remove('show');
-  document.querySelectorAll('.interest-chip').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.kid-edit-save-btn').forEach(b => b.style.display = 'none');
   document.querySelectorAll('.emoji-opt').forEach(c => c.classList.toggle('selected', c.dataset.emoji === '👶'));
   showKidStep(1);
   openModal('kid-modal');
@@ -3437,12 +3433,12 @@ function openEditKid(id) {
   _kidWizardEmoji = kid.emoji || '👶';
   document.getElementById('kid-modal-title').textContent = `Edit ${kid.name}`;
   document.getElementById('kid-name').value = kid.name;
-  document.getElementById('kid-birthday').value = kid.birthday;
-  document.getElementById('kid-birthday').max = new Date().toISOString().split('T')[0];
+  // Handle both "YYYY-MM-DD" and "YYYY-MM" stored formats
+  document.getElementById('kid-birthday').value = kid.birthday ? kid.birthday.substring(0, 7) : '';
   document.getElementById('kid-modal-error').classList.remove('show');
   document.querySelectorAll('.emoji-opt').forEach(c => c.classList.toggle('selected', c.dataset.emoji === kid.emoji));
-  const interests = kid.interests || [];
-  document.querySelectorAll('.interest-chip').forEach(c => c.classList.toggle('selected', interests.includes(c.dataset.interest)));
+  // Show "Save & done" buttons on every step for edit mode
+  document.querySelectorAll('.kid-edit-save-btn').forEach(b => b.style.display = 'block');
   previewKidAge();
   showKidStep(1);
   openModal('kid-modal');
@@ -3464,14 +3460,62 @@ function kidWizardNext(currentStep) {
     if (!name) { errEl.textContent = 'Give them a name!'; errEl.classList.add('show'); return; }
     showKidStep(2);
   } else if (currentStep === 2) {
+    // Birthday is optional — just validate if entered
     const bday = document.getElementById('kid-birthday').value;
-    if (!bday) { errEl.textContent = 'We need their birthday to suggest sizes!'; errEl.classList.add('show'); return; }
-    if (new Date(bday) > new Date()) { errEl.textContent = "Birthday can't be in the future."; errEl.classList.add('show'); return; }
+    if (bday) {
+      const fullDate = new Date(bday + '-01');
+      if (fullDate > new Date()) { errEl.textContent = "Birthday can't be in the future."; errEl.classList.add('show'); return; }
+    }
+    populateKidSizeGrid(bday);
     showKidStep(3);
   }
 }
 
 function kidWizardBack(currentStep) { showKidStep(currentStep - 1); }
+
+const KID_CLOTHING_SIZES = ['Preemie','Newborn','0–3m','3–6m','6–12m','12–18m','18–24m','2T','3T','4T','5T','6','7','8','10','12','14','XS','S','M','L','XL'];
+const KID_SHOE_SIZES = ['Infant 0–1','1C–4C','5C','6C','7C','8C','9C','10C','11C','12C','13C','1Y','2Y','3Y','4Y','5Y','6Y+'];
+
+function populateKidSizeGrid(bdayMonth) {
+  const cGrid = document.getElementById('kid-clothing-size-grid');
+  const sGrid = document.getElementById('kid-shoe-size-grid');
+  const hint = document.getElementById('kid-size-hint');
+  if (!cGrid || !sGrid) return;
+  const months = bdayMonth ? kidsMonths(bdayMonth + '-01') : null;
+  const suggestedClothing = months !== null ? ageToFit(months) : [];
+  const suggestedShoes = months !== null ? ageToShoe(months) : [];
+  const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  hint.textContent = months !== null
+    ? 'Auto-suggested from birthday — tap to add or remove sizes.'
+    : 'No birthday entered — tap to select sizes manually.';
+
+  cGrid.innerHTML = KID_CLOTHING_SIZES.map(s => {
+    const pre = suggestedClothing.some(sg => norm(sg) === norm(s));
+    return `<div class="size-chip${pre ? ' selected' : ''}" data-size="${s}" onclick="this.classList.toggle('selected')">${s}</div>`;
+  }).join('');
+
+  sGrid.innerHTML = KID_SHOE_SIZES.map(s => {
+    const pre = suggestedShoes.some(sg => norm(sg) === norm(s));
+    return `<div class="size-chip${pre ? ' selected' : ''}" data-size="${s}" onclick="this.classList.toggle('selected')">${s}</div>`;
+  }).join('');
+
+  // When editing, override with saved custom sizes
+  if (_editingKidId) {
+    const kid = _kids.find(k => k.id === _editingKidId);
+    if (kid && Array.isArray(kid.interests) && kid.interests.length > 0) {
+      let savedClothing = [], savedShoes = [];
+      if (typeof kid.interests[0] === 'object' && kid.interests[0] !== null) {
+        savedClothing = kid.interests[0].clothing || [];
+        savedShoes = kid.interests[0].shoes || [];
+      }
+      if (savedClothing.length || savedShoes.length) {
+        cGrid.querySelectorAll('.size-chip').forEach(c => c.classList.toggle('selected', savedClothing.includes(c.dataset.size)));
+        sGrid.querySelectorAll('.size-chip').forEach(c => c.classList.toggle('selected', savedShoes.includes(c.dataset.size)));
+      }
+    }
+  }
+}
 
 function selectKidEmoji(el) {
   _kidWizardEmoji = el.dataset.emoji;
@@ -3482,45 +3526,64 @@ function selectKidEmoji(el) {
 function toggleInterestChip(el) { el.classList.toggle('selected'); }
 
 function previewKidAge() {
-  const bday = document.getElementById('kid-birthday').value;
+  const bdayMonth = document.getElementById('kid-birthday').value; // "YYYY-MM"
   const preview = document.getElementById('kid-age-preview');
   const text = document.getElementById('kid-age-preview-text');
-  if (!bday) { preview.style.display = 'none'; return; }
+  if (!bdayMonth) { preview.style.display = 'none'; return; }
+  const bday = bdayMonth + '-01';
   const months = kidsMonths(bday);
+  if (months === null) { preview.style.display = 'none'; return; }
   const age = kidsAgeLabel(bday);
   const fits = ageToFit(months);
   preview.style.display = 'block';
-  text.textContent = `${age} old · wears ${fits.join(' – ')} clothing`;
+  text.textContent = `${age} old · likely wearing ${fits.join(' – ')} clothing`;
 }
 
 async function saveKid() {
   const name = document.getElementById('kid-name').value.trim();
-  const birthday = document.getElementById('kid-birthday').value;
-  const interests = [...document.querySelectorAll('.interest-chip.selected')].map(c => c.dataset.interest);
+  const bdayMonth = document.getElementById('kid-birthday').value; // "YYYY-MM" or ""
+  const birthday = bdayMonth ? bdayMonth + '-01' : null;
+  // Collect custom sizes from step 3 if it was visited; otherwise use auto-calc
+  const cGrid = document.getElementById('kid-clothing-size-grid');
+  const sGrid = document.getElementById('kid-shoe-size-grid');
+  let customSizes = null;
+  if (cGrid && cGrid.children.length > 0) {
+    const clothing = [...cGrid.querySelectorAll('.size-chip.selected')].map(c => c.dataset.size);
+    const shoes = [...(sGrid ? sGrid.querySelectorAll('.size-chip.selected') : [])].map(c => c.dataset.size);
+    customSizes = [{ clothing, shoes }];
+  }
   const errEl = document.getElementById('kid-modal-error');
-  if (!name || !birthday) {
-    errEl.textContent = 'Name and birthday are required.';
+  if (!name) {
+    errEl.textContent = 'Name is required.';
     errEl.classList.add('show');
     return;
   }
   if (!_sb || !currentUser) return;
-  const btn = document.getElementById('kid-save-btn');
-  btn.disabled = true;
-  btn.textContent = 'Saving…';
+  const saveBtn = document.getElementById('kid-save-btn');
+  document.querySelectorAll('.kid-edit-save-btn').forEach(b => { b.disabled = true; b.textContent = 'Saving…'; });
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
   showLoading(_editingKidId ? 'Updating…' : 'Adding to the crew…');
   try {
+    const payload = {
+      name,
+      birthday,
+      emoji: _kidWizardEmoji,
+      interests: customSizes,
+      updated_at: new Date().toISOString()
+    };
     if (_editingKidId) {
       const { error } = await _sb.from('kids')
-        .update({ name, birthday, emoji: _kidWizardEmoji, interests, updated_at: new Date().toISOString() })
+        .update(payload)
         .eq('id', _editingKidId)
         .eq('user_id', currentUser.id);
       if (error) throw error;
     } else {
       const { error } = await _sb.from('kids').insert({
         user_id: currentUser.id,
-        name, birthday,
+        name,
+        birthday,
         emoji: _kidWizardEmoji,
-        interests,
+        interests: customSizes,
       });
       if (error) throw error;
     }
@@ -3532,8 +3595,8 @@ async function saveKid() {
     errEl.classList.add('show');
   } finally {
     hideLoading();
-    btn.disabled = false;
-    btn.textContent = 'Save kid 💚';
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save kid 💚'; }
+    document.querySelectorAll('.kid-edit-save-btn').forEach(b => { b.disabled = false; b.textContent = 'Save & done 💚'; });
   }
 }
 
