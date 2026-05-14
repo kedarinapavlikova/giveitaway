@@ -25,6 +25,10 @@
   --shadow: 0 2px 14px rgba(0,0,0,0.07);
   --shadow-hover: 0 8px 28px rgba(0,0,0,0.12);
   --radius: 16px;
+  --iso-blue: #1E88E5;
+  --iso-blue-light: #E3F2FD;
+  --iso-blue-dark: #1565C0;
+  --iso-blue-mid: #42A5F5;
   --radius-sm: 12px;
   --font-display: 'Fraunces', serif;
   --font-body: 'DM Sans', sans-serif;
@@ -388,6 +392,65 @@ nav {
   display: inline-flex; align-items: center; justify-content: center;
 }
 
+/* FEED TYPE TABS */
+.feed-type-tabs {
+  background: var(--white);
+  border-bottom: 1px solid #EDE9E3;
+  padding: 0.5rem 1.25rem 0;
+  display: flex; gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.feed-type-tabs::-webkit-scrollbar { display: none; }
+.feed-type-tab {
+  background: none; border: none; border-bottom: 2.5px solid transparent;
+  cursor: pointer; font-family: var(--font-body); font-size: 0.85rem;
+  font-weight: 600; color: var(--gray); padding: 0.5rem 1rem 0.55rem;
+  transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
+}
+.feed-type-tab:hover { color: var(--charcoal); }
+.feed-type-tab.active { color: var(--iso-blue); border-bottom-color: var(--iso-blue); }
+.feed-type-tab.active.giving { color: var(--papaya-dark); border-bottom-color: var(--papaya-mid); }
+
+/* ISO REQUEST CARD */
+.card.iso-card {
+  border: 2px dashed var(--iso-blue);
+  background: var(--iso-blue-light);
+}
+.card.iso-card:hover { box-shadow: 0 8px 28px rgba(30,136,229,0.18); transform: translateY(-3px); }
+.iso-badge {
+  position: absolute; top: 9px; left: 9px;
+  background: var(--iso-blue); color: white;
+  font-size: 0.65rem; font-weight: 700;
+  padding: 2px 9px; border-radius: 20px;
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.iso-cta-btn {
+  background: var(--iso-blue); color: white;
+  border: none; cursor: pointer; font-family: var(--font-body);
+  font-size: 0.78rem; font-weight: 700;
+  padding: 0.38rem 0.9rem; border-radius: 20px;
+  transition: all 0.15s; white-space: nowrap;
+}
+.iso-cta-btn:hover { background: var(--iso-blue-dark); transform: translateY(-1px); }
+
+/* POST TYPE TOGGLE */
+.post-type-toggle {
+  display: flex; border: 2px solid #EDE9E3; border-radius: 12px; overflow: hidden;
+  margin-bottom: 1.1rem;
+}
+.post-type-btn {
+  flex: 1; background: none; border: none; cursor: pointer;
+  font-family: var(--font-body); font-size: 0.85rem; font-weight: 600;
+  color: var(--gray); padding: 0.6rem 0.5rem; transition: all 0.15s;
+  line-height: 1.3;
+}
+.post-type-btn.active {
+  background: var(--papaya-light); color: var(--papaya-dark);
+}
+.post-type-btn.active.iso {
+  background: var(--iso-blue-light); color: var(--iso-blue-dark);
+}
+
 /* active filter strip */
 .active-filters-strip {
   background: var(--white); padding: 0 1.25rem 0.5rem;
@@ -567,6 +630,13 @@ nav {
 
   <div class="feed-supporter-strip" id="supporter-strip" onclick="openModal('supporter-modal')">
     <strong>GiveItAway runs on community love.</strong><br class="strip-break"> Support us for $3/mo and get a ✦ on your profile.
+  </div>
+
+  <!-- Feed type tabs: All / Giving / Requests -->
+  <div class="feed-type-tabs">
+    <button class="feed-type-tab active giving" id="ftt-all" onclick="filterFeedType('all',this)">All</button>
+    <button class="feed-type-tab" id="ftt-giving" onclick="filterFeedType('giving',this)">🎁 Giving</button>
+    <button class="feed-type-tab" id="ftt-requests" onclick="filterFeedType('requests',this)">🙋 Requests</button>
   </div>
 
   <div class="search-bar-wrap">
@@ -1240,8 +1310,17 @@ nav {
 <div class="modal-overlay" id="post-modal">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">Post an item</div>
+      <div class="modal-title" id="post-modal-title">Post an item</div>
       <button class="close-btn" onclick="closeModal('post-modal')">✕</button>
+    </div>
+    <!-- Post type toggle -->
+    <div class="post-type-toggle">
+      <button class="post-type-btn active" id="ptt-giving" onclick="setPostType('giving',this)">🎁 Giving away</button>
+      <button class="post-type-btn" id="ptt-iso" onclick="setPostType('iso',this)">🙋 Looking for</button>
+    </div>
+    <!-- ISO hint (hidden by default) -->
+    <div id="iso-hint" style="display:none;background:var(--iso-blue-light);border-radius:10px;padding:0.65rem 0.85rem;font-size:0.8rem;color:var(--iso-blue-dark);margin-bottom:0.85rem;line-height:1.5">
+      Let the neighbourhood know what you're searching for! If someone has it, they'll message you. 💙
     </div>
     <div class="form-group">
       <label class="form-label">Item title <span class="req">*</span></label>
@@ -1259,32 +1338,35 @@ nav {
       <label class="form-label">Size(s) — select all that apply <span class="req">*</span></label>
       <div class="size-grid" id="size-chips"></div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Condition <span class="req">*</span>
-        <span class="info-wrap">
-          <button type="button" class="info-btn" id="condition-info-btn" onclick="toggleConditionTooltip()" aria-label="Condition guide">i</button>
-          <div class="info-tooltip" id="condition-tooltip">
-            <div class="grade">🌟 New <span class="grade-desc">— tags on, never used</span></div>
-            <div class="grade">✨ Like New <span class="grade-desc">— worn once or twice, no visible wear</span></div>
-            <div class="grade">👍 Good <span class="grade-desc">— gently used, minor fade or small mark</span></div>
-            <div class="grade">💪 Well Loved <span class="grade-desc">— visible wear, rips or stains, still totally usable</span></div>
-            <div style="margin-top:8px;font-size:0.7rem;color:var(--lagoon-dark);font-weight:500">🧺 Please wash items before pickup!</div>
-          </div>
-        </span>
-      </label>
-      <select class="form-select" id="post-condition">
-        <option value="">Select condition</option>
-        <option>New (never used)</option><option>Like New</option><option>Good</option><option>Well Loved</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Pickup options <span class="req">*</span></label>
-      <div class="pickup-grid">
-        <div class="pickup-chip" onclick="this.classList.toggle('selected')">🚪 Porch Pickup</div>
-        <div class="pickup-chip" onclick="this.classList.toggle('selected')">🤝 Meetup</div>
-        <div class="pickup-chip" onclick="this.classList.toggle('selected')">📦 Drop Off</div>
+    <!-- Giving-only fields (hidden for ISO requests) -->
+    <div id="giving-only-fields">
+      <div class="form-group">
+        <label class="form-label">Condition <span class="req">*</span>
+          <span class="info-wrap">
+            <button type="button" class="info-btn" id="condition-info-btn" onclick="toggleConditionTooltip()" aria-label="Condition guide">i</button>
+            <div class="info-tooltip" id="condition-tooltip">
+              <div class="grade">🌟 New <span class="grade-desc">— tags on, never used</span></div>
+              <div class="grade">✨ Like New <span class="grade-desc">— worn once or twice, no visible wear</span></div>
+              <div class="grade">👍 Good <span class="grade-desc">— gently used, minor fade or small mark</span></div>
+              <div class="grade">💪 Well Loved <span class="grade-desc">— visible wear, rips or stains, still totally usable</span></div>
+              <div style="margin-top:8px;font-size:0.7rem;color:var(--lagoon-dark);font-weight:500">🧺 Please wash items before pickup!</div>
+            </div>
+          </span>
+        </label>
+        <select class="form-select" id="post-condition">
+          <option value="">Select condition</option>
+          <option>New (never used)</option><option>Like New</option><option>Good</option><option>Well Loved</option>
+        </select>
       </div>
-    </div>
+      <div class="form-group">
+        <label class="form-label">Pickup options <span class="req">*</span></label>
+        <div class="pickup-grid">
+          <div class="pickup-chip" onclick="this.classList.toggle('selected')">🚪 Porch Pickup</div>
+          <div class="pickup-chip" onclick="this.classList.toggle('selected')">🤝 Meetup</div>
+          <div class="pickup-chip" onclick="this.classList.toggle('selected')">📦 Drop Off</div>
+        </div>
+      </div>
+    </div><!-- /giving-only-fields -->
     <div class="form-group">
       <label class="form-label">Location <span class="req">*</span></label>
       <input class="form-input" type="text" placeholder="e.g. Gordon Dr & KLO Rd, Kelowna" id="post-location">
@@ -1299,7 +1381,8 @@ nav {
         <option>SE Kelowna</option><option>Rutland North</option><option>Other</option>
       </select>
     </div>
-    <div class="form-group">
+    <!-- Photo (hidden for ISO) -->
+    <div class="form-group" id="photo-field">
       <label class="form-label">Photo <span style="color:var(--gray);font-weight:400">(recommended)</span></label>
       <div id="photo-drop" onclick="document.getElementById('photo-file').click()" style="background:var(--gray-light);border:2px dashed var(--gray-mid);border-radius:var(--radius-sm);padding:1.25rem;text-align:center;cursor:pointer;transition:border-color 0.15s">
         <div id="photo-preview" style="display:none;margin-bottom:8px"><img id="photo-img" style="max-height:140px;border-radius:8px;object-fit:cover"></div>
@@ -1314,7 +1397,7 @@ nav {
       <label class="form-label">Description</label>
       <textarea class="form-textarea" placeholder="Colours, brand, how many pieces, anything helpful…" id="post-desc"></textarea>
     </div>
-    <button class="submit-btn" onclick="submitPost()">Give it away!</button>
+    <button class="submit-btn" id="post-submit-btn" onclick="submitPost()">Give it away!</button>
   </div>
 </div>
 
@@ -1843,6 +1926,7 @@ function dbListingToLocal(item) {
     dbId: item.id,
     userId: item.user_id || null,
     createdAt: new Date(item.created_at),
+    postType: item.post_type || 'giving',
   };
 }
 
@@ -1859,6 +1943,7 @@ async function saveListingToDb(listingData) {
     location_text: listingData.location,
     neighbourhood: listingData.neighbourhood,
     photo_url: listingData.photo_url || null,
+    post_type: listingData.post_type || 'giving',
   }).select().single();
   if (error) { console.error(error); return null; }
   return data;
@@ -1871,6 +1956,8 @@ const COLORS = ['#FF8A65','#00BFA5','#5C6BC0','#AB47BC','#26A69A','#EF5350','#42
 const LISTINGS = [];
 
 let activeCategory = 'all';
+let activeFeedType = 'all'; // 'all' | 'giving' | 'requests'
+let activePostType = 'giving'; // 'giving' | 'iso'
 let searchQuery = '';
 let areaFilter = 'all';
 let _feedLoading = true;
@@ -1918,34 +2005,55 @@ function renderFeed(items) {
     const sizeTags = item.sizes.map(s=>`<span class="tag tag-size">${s}</span>`).join('');
     const pickupTags = item.pickup.map(p=>`<span class="tag tag-pickup">${p}</span>`).join('');
     const h = 110 + (idx * 37 % 80);
-    const imgHTML = item.photo
+    const isISO = item.postType === 'iso';
+    const imgHTML = isISO
+      ? `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--iso-blue-light) 0%,#E8EAF6 100%);font-size:${Math.round(h*0.36)}px">${item.emoji}</div>`
+      : item.photo
       ? `<img src="${item.photo}" style="width:100%;height:${h}px;object-fit:cover;display:block" loading="lazy" onerror="this.style.display='none'">`
       : `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--papaya-light) 0%,var(--lagoon-light) 100%);font-size:${Math.round(h*0.36)}px">${item.emoji}</div>`;
     const titleHL = highlight(item.title, query);
     const descHL = highlight(item.desc, query);
     const isOwn = currentUser && item.userId === currentUser.id;
     const isGiven = item.status === 'given';
-    const actionBtn = isOwn
-      ? isGiven
-        ? `<span class="given-pill">💚 Given</span>`
-        : `<div style="position:relative;display:flex;align-items:center;gap:6px">
+    let actionBtn;
+    if (isISO) {
+      actionBtn = isOwn
+        ? `<div style="position:relative;display:flex;align-items:center;gap:6px">
             <button class="edit-icon-btn" onclick="event.stopPropagation();openEditListing(${idx})" title="Edit listing">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </button>
             <div style="position:relative">
               <button class="dots-btn" onclick="event.stopPropagation();toggleDotsMenu(${idx}, this)">···</button>
               <div class="dots-menu" id="dots-menu-${idx}" style="display:none">
-                <button onclick="event.stopPropagation();closeAllMenus();openEditListing(${idx})">✏️ Edit listing</button>
-                <button onclick="event.stopPropagation();closeAllMenus();openMarkGiven(${idx})">💚 Mark as given</button>
-                <button class="danger" onclick="event.stopPropagation();closeAllMenus();removeListing(${idx})">🗑️ Remove listing</button>
+                <button onclick="event.stopPropagation();closeAllMenus();openEditListing(${idx})">✏️ Edit</button>
+                <button class="danger" onclick="event.stopPropagation();closeAllMenus();removeListing(${idx})">🗑️ Remove</button>
               </div>
             </div>
           </div>`
-      : `<button class="claim-btn" onclick="event.stopPropagation();openClaimByIndex(${idx})">I want this!</button>`;
+        : `<button class="iso-cta-btn" onclick="event.stopPropagation();openClaimByIndex(${idx})">I have this! 🙌</button>`;
+    } else {
+      actionBtn = isOwn
+        ? isGiven
+          ? `<span class="given-pill">💚 Given</span>`
+          : `<div style="position:relative;display:flex;align-items:center;gap:6px">
+              <button class="edit-icon-btn" onclick="event.stopPropagation();openEditListing(${idx})" title="Edit listing">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <div style="position:relative">
+                <button class="dots-btn" onclick="event.stopPropagation();toggleDotsMenu(${idx}, this)">···</button>
+                <div class="dots-menu" id="dots-menu-${idx}" style="display:none">
+                  <button onclick="event.stopPropagation();closeAllMenus();openEditListing(${idx})">✏️ Edit listing</button>
+                  <button onclick="event.stopPropagation();closeAllMenus();openMarkGiven(${idx})">💚 Mark as given</button>
+                  <button class="danger" onclick="event.stopPropagation();closeAllMenus();removeListing(${idx})">🗑️ Remove listing</button>
+                </div>
+              </div>
+            </div>`
+        : `<button class="claim-btn" onclick="event.stopPropagation();openClaimByIndex(${idx})">I want this!</button>`;
+    }
     const cardClick = isOwn ? '' : `onclick="openClaimByIndex(${idx})"`;
     feed.innerHTML += `
-      <div class="card" ${cardClick} style="${isOwn ? '' : 'cursor:pointer'}${isGiven ? ';opacity:0.7' : ''}">
-        ${isOwn ? '<div class="your-post-badge">Your Post</div>' : (item.isNew ? '<div class="new-badge">New</div>' : '')}
+      <div class="card${isISO ? ' iso-card' : ''}" ${cardClick} style="${isOwn ? '' : 'cursor:pointer'}${isGiven ? ';opacity:0.7' : ''}">
+        ${isISO ? '<div class="iso-badge">🙋 Looking For</div>' : isOwn ? '<div class="your-post-badge">Your Post</div>' : (item.isNew ? '<div class="new-badge">New</div>' : '')}
         ${imgHTML}
         <div class="card-body">
           <div class="card-title">${titleHL}</div>
@@ -1954,8 +2062,8 @@ function renderFeed(items) {
           <div class="card-tags">
             <span class="tag tag-category">${item.category}</span>
             ${sizeTags}
-            <span class="tag tag-condition">${item.condition}</span>
-            ${pickupTags}
+            ${isISO ? '' : `<span class="tag tag-condition">${item.condition}</span>`}
+            ${isISO ? '' : pickupTags}
           </div>
           <div class="card-footer">
             <div class="giver">
@@ -1984,7 +2092,10 @@ function getFiltered() {
     const matchPickup = activePickups.size === 0 || (l.pickup || []).some(p => activePickups.has(p));
     const matchSize = activeSizes.size === 0 || (l.sizes && l.sizes.some(s => activeSizes.has(s)));
     const matchPosted = !activePostedWithin || !l.createdAt || (now - l.createdAt.getTime()) <= activePostedWithin * 86400000;
-    return matchCat && matchArea && matchSearch && showGiven && matchCondition && matchPickup && matchSize && matchPosted;
+    // Feed type filter
+    const pt = l.postType || 'giving';
+    const matchFeedType = activeFeedType === 'all' || (activeFeedType === 'giving' && pt === 'giving') || (activeFeedType === 'requests' && pt === 'iso');
+    return matchCat && matchArea && matchSearch && showGiven && matchCondition && matchPickup && matchSize && matchPosted && matchFeedType;
   });
   // Sort
   if (activeSort === 'newest') items.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
@@ -2175,6 +2286,45 @@ function clearSearch() {
   searchQuery = '';
   document.getElementById('clear-btn').classList.remove('show');
   updateFeed();
+}
+
+function filterFeedType(type, btn) {
+  activeFeedType = type;
+  document.querySelectorAll('.feed-type-tab').forEach(b => {
+    b.classList.remove('active','giving');
+  });
+  btn.classList.add('active');
+  if (type === 'all' || type === 'giving') btn.classList.add('giving');
+  updateFeed();
+}
+
+function setPostType(type, btn) {
+  activePostType = type;
+  // Toggle buttons
+  document.querySelectorAll('.post-type-btn').forEach(b => {
+    b.classList.remove('active','iso');
+  });
+  btn.classList.add('active');
+  if (type === 'iso') btn.classList.add('iso');
+  // Show/hide ISO hint
+  document.getElementById('iso-hint').style.display = type === 'iso' ? 'block' : 'none';
+  // Show/hide giving-only fields
+  const givingFields = document.getElementById('giving-only-fields');
+  const photoField = document.getElementById('photo-field');
+  if (givingFields) givingFields.style.display = type === 'iso' ? 'none' : 'block';
+  if (photoField) photoField.style.display = type === 'iso' ? 'none' : 'block';
+  // Update submit button + title
+  const submitBtn = document.getElementById('post-submit-btn');
+  const modalTitle = document.getElementById('post-modal-title');
+  if (submitBtn) submitBtn.textContent = type === 'iso' ? 'Post request! 🙋' : 'Give it away!';
+  if (submitBtn) submitBtn.style.background = type === 'iso' ? 'var(--iso-blue)' : '';
+  if (modalTitle) modalTitle.textContent = type === 'iso' ? 'Looking for...' : 'Post an item';
+  // Update title placeholder
+  const titleInput = document.getElementById('post-title');
+  if (titleInput) titleInput.placeholder = type === 'iso' ? 'e.g. Size 4T winter jacket' : 'e.g. Bundle of 3-6m onesies';
+  // Update desc placeholder
+  const descInput = document.getElementById('post-desc');
+  if (descInput) descInput.placeholder = type === 'iso' ? 'Any specific brand, colour, or details?' : 'Colours, brand, how many pieces, anything helpful…';
 }
 
 function filterCategory(el, cat) {
@@ -2583,6 +2733,8 @@ function openPostModal() {
   if (!requireAuth('post an item')) return;
   openModal('post-modal');
   buildSizeChips();
+  // Always reset to "giving away" mode when opening
+  setPostType('giving', document.getElementById('ptt-giving'));
   // Pre-fill location from profile (editable)
   if (currentProfile) {
     const locField = document.getElementById('post-location');
@@ -2628,30 +2780,35 @@ async function submitPost() {
   const title = document.getElementById('post-title').value.trim();
   const loc = document.getElementById('post-location').value.trim();
   const cat = document.getElementById('post-category').value;
-  const cond = document.getElementById('post-condition').value;
   const hood = document.getElementById('post-neighbourhood').value;
-  const pickups = [...document.querySelectorAll('.pickup-chip.selected')];
-  if (!title||!loc||!cat||!cond||!hood||!pickups.length) {
+  const isISO = activePostType === 'iso';
+  const cond = isISO ? '' : document.getElementById('post-condition').value;
+  const pickups = isISO ? [] : [...document.querySelectorAll('.pickup-chip.selected')];
+  if (!title || !loc || !cat || !hood) {
+    showToast('⚠️ Fill in all required fields!','#E64A19'); return;
+  }
+  if (!isISO && (!cond || !pickups.length)) {
     showToast('⚠️ Fill in all required fields!','#E64A19'); return;
   }
   const sizes = [...document.querySelectorAll('.size-chip.selected')].map(c=>c.textContent);
   let photoUrl = null;
   if (_sb && currentUser) {
     showLoading('Posting your item...');
-    if (_pendingPhotoFile) {
+    if (!isISO && _pendingPhotoFile) {
       showLoading('Uploading photo...');
       photoUrl = await uploadPhotoToStorage(_pendingPhotoFile);
     }
   }
   const listingData = {
-    title, category:cat, sizes, condition:cond,
+    title, category:cat, sizes, condition: cond,
     pickup: pickups.map(p=>p.textContent.trim()),
     location: loc, neighbourhood: hood,
     desc: document.getElementById('post-desc').value.trim(),
     photo_url: photoUrl,
+    post_type: activePostType,
   };
   if (_sb && currentUser) {
-    showLoading('Posting your item...');
+    showLoading(isISO ? 'Posting your request...' : 'Posting your item...');
     const saved = await saveListingToDb(listingData);
     hideLoading();
     if (saved) {
@@ -2659,12 +2816,11 @@ async function submitPost() {
       LISTINGS.unshift(localItem);
     }
   } else {
-    // Offline fallback
     const EMOJIS = { Clothes:'👕', Shoes:'👟', Maternity:'🤰', Gear:'🧺', Toys:'🧸', Bikes:'🚲', Books:'📚', Sports:'⚽', Other:'✨' };
     LISTINGS.unshift({ id: Date.now(), title, category:cat, sizes, condition:cond,
       pickup: pickups.map(p=>p.textContent.trim()), location:loc, neighbourhood:hood,
       desc: listingData.desc, photo:null, emoji: EMOJIS[cat]||'✨',
-      giver: currentProfile?.name || 'You', giverColor:'#FF8A65', isNew:true });
+      giver: currentProfile?.name || 'You', giverColor:'#FF8A65', isNew:true, postType: activePostType });
   }
   document.getElementById('stat-items').textContent = LISTINGS.length;
   userPostCount++;
@@ -2672,7 +2828,7 @@ async function submitPost() {
   closeModal('post-modal');
   updateFeed();
   if (document.getElementById('view-profile').style.display !== 'none') loadProfileListings();
-  showToast('🎉 Posted! Someone out there is going to love this.');
+  showToast(isISO ? '🙋 Request posted! Your neighbours will let you know.' : '🎉 Posted! Someone out there is going to love this.');
   ['post-title','post-location','post-desc'].forEach(id => document.getElementById(id).value='');
   ['post-category','post-condition','post-neighbourhood'].forEach(id => document.getElementById(id).value='');
   document.querySelectorAll('.pickup-chip.selected').forEach(c=>c.classList.remove('selected'));
@@ -2682,6 +2838,8 @@ async function submitPost() {
   document.getElementById('photo-placeholder').style.display='block';
   document.getElementById('photo-file').value = '';
   _pendingPhotoFile = null;
+  // Reset post type toggle back to giving
+  setPostType('giving', document.getElementById('ptt-giving'));
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
