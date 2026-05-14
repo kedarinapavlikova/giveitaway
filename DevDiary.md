@@ -595,3 +595,152 @@ Browsers were helpfully pre-filling the search bar with Keddy's login email. Nob
 - [ ] Filtering & sorting UI mockup → build
 - [ ] Tiny Humans (kid profiles: avatar, bday → auto size suggestions)
 - [ ] AI photo → listing (snap a photo, Claude fills in title + category)
+
+[DEVDIARY_session6to9.md](https://github.com/user-attachments/files/27780146/DEVDIARY_session6to9.md)
+---
+
+## Sessions 6–9 — May 12–14, 2026
+
+**Time:** ~3 sessions over 3 days (Keddy was on a roll 🔥)
+**Versions shipped:** 4
+**Bugs squashed:** 3 confirmed + 1 sneaky one you won't even notice until it's gone
+**Money spent:** $0 (Stripe still technically unconfirmed by a real human with a real card, but let's not talk about that)
+
+---
+
+### Session 6 — May 12 | Pre-Launch Audit & RLS
+
+The vibe: *tightening the bolts before anyone else touches this thing.*
+
+#### What we built
+
+- **Messages RLS — fully audited and fixed.** Row Level Security on the `messages` table had some gaps. Plugged them. 4 clean policies. Users can only see their own threads. Lurkers: 0.
+- **Photo storage confirmed live.** `listing-photos` bucket is active in Supabase Storage. Real photos, real cloud, no more base64 nonsense crammed into the DB like a digital hoarder.
+
+#### Lessons
+
+- RLS is invisible when it works and catastrophic when it doesn't. Audit it before launch, not after someone's messages show up in a stranger's inbox.
+- "It works on my account" ≠ "it works." Always test as a second user.
+
+---
+
+### Session 7 — May 13 | Kid Profiles + Advanced Filtering
+
+The vibe: *this is the feature Rosie deserves.*
+
+#### What we built
+
+**Kid profiles:**
+- Loading state fix (no more phantom flash of emptiness)
+- Email autofill in search bar — fixed; was being extremely unhelpful
+- 13 new kid emoji options (the kids deserve options)
+- Birthday → month/year only, now optional; age preview updates live as you type
+- New Step 3: **size picker** — auto-selects from birthday, parent can override (because kids are feral and don't grow on schedule)
+- "Save & done" button on every wizard step in edit mode
+- Post-signup nudge: 6-second toast after first login prompting parents to add their kids
+
+**Advanced filtering:**
+- Filter & Sort bottom sheet — Sort, Condition, Pickup method, Posted within, Size
+- Active filter chips strip — removable, "Clear all" included
+- Filters button shows teal + count badge when active
+- Live result count inside the sheet so you know you're not filtering yourself into a void
+
+#### Design decisions
+
+- **Birthday as month/year only.** Full birthdates felt like overkill for a neighbourhood app. We don't need to know Jordie's exact birth minute to know he needs 0–3 month onesies.
+- **Auto-size from birthday.** Parents don't think in size charts. They think in "he was born last month." Let the app do the math.
+- **Toast nudge at 6 seconds.** Long enough to let the user breathe after signing up; short enough that it actually lands before they tap away.
+
+#### Lessons
+
+- Sizing charts for kids are a crime against humanity. Every brand is different. Our auto-size is a *suggestion*, not a contract. Copy makes this clear.
+- Filtering is only useful if it doesn't feel like filing taxes. The bottom sheet keeps it contained and dismissable.
+
+---
+
+### Session 8 — May 14 | "Looking For" / ISO Requests
+
+The vibe: *the other side of the exchange.*
+
+#### What we built
+
+- **"Looking For" post type** — full feature, fully wired. Someone needs size 4T snow pants before February? They can ask for them now.
+- **Supabase migration applied** — `post_type text NOT NULL DEFAULT 'giving'` column added to `listings`. Existing posts: unaffected.
+- **Feed tabs** — All / 🎁 Giving / 🙋 Requests. Clean toggle, no page reload.
+- **ISO card design** — blue dashed border, "🙋 LOOKING FOR" badge, "I have this! 🙌" CTA. Visually distinct from giving cards so the feed doesn't get confusing.
+- **Post form toggle** — ISO posts hide condition, pickup method, and photo fields (because you're not uploading a photo of something you don't own yet, obviously).
+
+#### Design decisions
+
+- **Blue dashed border.** Giving cards are solid. Requesting cards are dashed — visually signals "this is open, waiting, incomplete." Feels right.
+- **"I have this! 🙌"** instead of "Claim." You're not claiming anything — you're volunteering. The copy matters.
+
+#### Lessons
+
+- Two-sided markets are hard. GiveItAway is mostly one-directional (givers → takers) but ISO opens it up. Keep the distinction clear in the UI or users get confused about what they're looking at.
+
+---
+
+### Session 9 — May 14 | PWA + UI Polish + Supporter Tier Persistence
+
+The vibe: *making this feel like a real app, because it is.*
+
+#### What we built
+
+**PWA (Progressive Web App):**
+- `manifest.json` — icons, theme colour (#FF8A65 papaya), display: standalone
+- `sw.js` — service worker; network-first for Supabase, cache-first for shell/fonts/icons
+- 8 icon sizes (72–512px) generated from the real GiveItAway logo; rounded square, black border removed, clean
+- `index.html` patched — PWA meta tags in `<head>`, service worker registered before `</body>`
+- "Add to Home Screen" banner — auto-detects iOS vs Android, shows correct instructions, dismisses permanently, hides if already installed
+- About page install section — step-by-step for iPhone (Safari) and Android (Chrome); always visible
+
+**UI polish:**
+- Supporter modal copy cleaned up — removed undeliverable perks; replaced with honest, fun copy
+- `supporter_tier` column added to Supabase `profiles` table; tier saves to DB on Stripe return (finally persists between sessions)
+- Mobile: tier modal perk list center-aligns in 1-column layout
+- Mobile: supporter strip in feed is now single-line, tighter padding
+- Mobile: supporter banner on profile stacks button above "$3/mo" copy
+- Filters button repositioned — right after "All" chip; always visible without horizontal scroll
+- Feed now shows 20 items by default; "Load more (X remaining)" button appears when there's more to load
+- About page copy updated
+
+#### Design decisions
+
+- **PWA over App Store (for now).** No Xcode, no review process, no $99/year Apple dev fee. Users install it from their browser like a regular app. Does 90% of what a native app does. We can go native later when there's a community to justify it.
+- **Cache-first for shell, network-first for data.** The app loads instantly from cache; listings are always fresh from Supabase. Best of both worlds.
+- **8 icon sizes.** iOS and Android between them need approximately one million icon sizes. We made them all so the home screen icon doesn't look like it was uploaded in 2007.
+- **"Load more" over infinite scroll.** Infinite scroll is a doom loop. Load more gives users control. Also: less jank on mobile.
+
+#### Lessons
+
+- PWA manifests are fussy. `display: standalone` is the magic word. Without it, the browser chrome shows and it just feels like a website. Not the vibe.
+- Service workers cache aggressively. If you update the app and users see the old version, the service worker is probably the culprit. Version your cache keys.
+- Supporter tier persistence should have been in from day one. Lesson: any user state that matters → DB. Session memory is not a feature.
+
+---
+
+## Progress Update
+
+```
+[████████████████████░░░░] 82%
+
+✅ Prototype    ✅ Live URL    ✅ Auth         ✅ Database
+✅ Stripe       ✅ PWA         ✅ Kid Profiles  🟡 Launch
+```
+
+---
+
+## Session 10 — Up Next
+
+- [ ] Stripe full payment flow — someone needs to actually pay (it's not going to be me)
+- [ ] Backfill `supporter_tier` for any existing supporters via Supabase dashboard
+- [ ] Soft launch — share with real neighbours; collect feedback
+- [ ] Filtering Phase 2 — filter by kid's saved sizes
+- [ ] Karma tiers — real data, real milestones, real badges
+- [ ] AI photo → listing (snap it, Claude names it)
+
+---
+
+*Built by Keddy Pavlik. Powered by Supabase, Vercel, and the sincere belief that your neighbour wants your old snow pants.*
+
