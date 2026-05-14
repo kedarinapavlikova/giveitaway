@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GiveItAway</title>
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF8A65">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="GiveItAway">
+<link rel="apple-touch-icon" href="/icons/icon-192x192.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -341,12 +349,13 @@ nav {
 .tag-chip:hover { border-color: var(--papaya-mid); }
 .tag-chip.selected { background: var(--papaya-light); border-color: var(--papaya-mid); color: #BF360C; }
 .supporter-banner { background: var(--lagoon-light); border: 1px solid #B2DFDB; border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+@media (max-width: 600px) { .supporter-banner { flex-direction: column; align-items: stretch; text-align: center; padding: 0.85rem 1rem; gap: 0.6rem; } .supporter-banner > button { order: -1; } }
 .supporter-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 700; padding: 2px 9px; border-radius: 20px; letter-spacing: 0.03em; vertical-align: middle; margin-left: 5px; }
 .badge-neighbour { background: var(--lagoon-light); color: var(--lagoon-dark); border: 1px solid var(--lagoon); }
 .badge-champion { background: var(--papaya-light); color: #BF360C; border: 1px solid var(--papaya-mid); }
 .badge-founding { background: #FFF8E1; color: #E65100; border: 1px solid #FFB300; }
 .tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 1.1rem 0; }
-@media (max-width: 500px) { .tier-grid { grid-template-columns: 1fr; } }
+@media (max-width: 500px) { .tier-grid { grid-template-columns: 1fr; } .tier-perk { text-align: center; } .tier-perk div { justify-content: center; } }
 .tier-card { border: 1.5px solid var(--gray-mid); border-radius: var(--radius-sm); padding: 1rem 0.9rem; cursor: pointer; transition: all 0.15s; text-align: center; position: relative; background: var(--white); }
 .tier-card:hover { border-color: var(--lagoon); transform: translateY(-2px); box-shadow: var(--shadow); }
 .tier-card.selected { border-color: var(--lagoon); border-width: 2px; background: var(--lagoon-light); }
@@ -368,7 +377,7 @@ nav {
 .feed-supporter-strip:hover { background: var(--lagoon-dark); }
 .feed-supporter-strip strong { font-weight: 700; }
 .strip-break { display: none; }
-@media (max-width: 600px) { .strip-break { display: block; } .feed-supporter-strip { font-size: 0.75rem; padding: 0.55rem 1rem; } }
+@media (max-width: 600px) { .feed-supporter-strip { font-size: 0.72rem; padding: 0.35rem 0.75rem; } }
 .filter-chip { white-space: nowrap; flex-shrink: 0; background: var(--gray-light); border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.78rem; font-weight: 500; color: var(--charcoal); padding: 0.32rem 0.85rem; border-radius: 20px; transition: all 0.15s; display: inline-flex; align-items: center; line-height: 1.4; }
 .filter-chip:hover { background: var(--papaya-light); color: var(--papaya-dark); }
 .filter-chip.active { background: var(--papaya-mid); color: white; }
@@ -661,6 +670,10 @@ nav {
 
   <div class="filters">
     <button class="filter-chip active" onclick="filterCategory(this,'all')">All</button>
+    <button class="filters-btn" id="filters-btn" onclick="openFilterSheet()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+      Filters
+    </button>
     <button class="filter-chip" onclick="filterCategory(this,'Clothes')">👕 Clothes</button>
     <button class="filter-chip" onclick="filterCategory(this,'Shoes')">👟 Shoes</button>
     <button class="filter-chip" onclick="filterCategory(this,'Maternity')">🤰 Maternity</button>
@@ -670,10 +683,6 @@ nav {
     <button class="filter-chip" onclick="filterCategory(this,'Books')">📚 Books</button>
     <button class="filter-chip" onclick="filterCategory(this,'Sports')">⚽ Sports</button>
     <button class="filter-chip" onclick="filterCategory(this,'Other')">✨ Other</button>
-    <button class="filters-btn" id="filters-btn" onclick="openFilterSheet()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
-      Filters
-    </button>
   </div>
 
   <!-- Active filter tags strip -->
@@ -685,6 +694,9 @@ nav {
       <div class="search-result-info" id="search-info"></div>
     </div>
     <div class="masonry" id="feed"></div>
+    <div id="load-more-wrap" style="display:none;text-align:center;padding:1.25rem 0 0.5rem">
+      <button id="load-more-btn" onclick="loadMoreItems()" style="background:var(--white);border:1.5px solid var(--lagoon);color:var(--lagoon-dark);font-family:var(--font-body);font-size:0.85rem;font-weight:600;padding:0.6rem 1.75rem;border-radius:20px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.background='var(--lagoon-light)'" onmouseout="this.style.background='var(--white)'">Load more</button>
+    </div>
   </div>
 </div>
 
@@ -823,10 +835,9 @@ nav {
     <div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.25rem 1.5rem;margin-bottom:1.25rem">
       <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:0.75rem">How we do things around here</div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="display:flex;gap:10px;align-items:flex-start;font-size:0.85rem;line-height:1.5"><span style="color:var(--lagoon);font-weight:700;flex-shrink:0">✦</span><span>No money ever changes hands — ever. Not $1, not a trade for cash.</span></div>
-        <div style="display:flex;gap:10px;align-items:flex-start;font-size:0.85rem;line-height:1.5"><span style="color:var(--lagoon);font-weight:700;flex-shrink:0">✦</span><span>Givers choose who receives — based on vibe, not speed.</span></div>
-        <div style="display:flex;gap:10px;align-items:flex-start;font-size:0.85rem;line-height:1.5"><span style="color:var(--lagoon);font-weight:700;flex-shrink:0">✦</span><span>Be kind. This is a community, not a marketplace.</span></div>
-        <div style="display:flex;gap:10px;align-items:flex-start;font-size:0.85rem;line-height:1.5"><span style="color:var(--lagoon);font-weight:700;flex-shrink:0">✦</span><span>Location required on every listing — so pickups are actually possible.</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;font-size:0.85rem;line-height:1.5"><span style="color:var(--lagoon);font-weight:700;flex-shrink:0">✦</span><span>No money ever changes hands. Not $1, no trades.</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;font-size:0.85rem;line-height:1.5"><span style="color:var(--lagoon);font-weight:700;flex-shrink:0">✦</span><span>Be kind. This is a community, not just a marketplace.</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;font-size:0.85rem;line-height:1.5"><span style="color:var(--lagoon);font-weight:700;flex-shrink:0">✦</span><span>Location areas required on every listing so users can determine which pickups are realistic.</span></div>
       </div>
     </div>
     <div style="text-align:center;padding:0.5rem 0 1rem">
@@ -1452,7 +1463,7 @@ nav {
           <div class="tier-perk">
             <div><span class="check">✦</span><span>Profile badge</span></div>
             <div><span class="check">✦</span><span>Warm fuzzies</span></div>
-            <div><span class="check">✦</span><span>Priority support</span></div>
+            <div><span class="check">✦</span><span>Good karma</span></div>
           </div>
         </div>
         <div class="tier-card" id="tier-champion" onclick="selectTier('champion')" style="border-color:var(--papaya-mid)">
@@ -1463,8 +1474,7 @@ nav {
           <div class="tier-perk">
             <div><span class="check">✦</span><span>Everything above</span></div>
             <div><span class="check">✦</span><span>Champion badge</span></div>
-            <div><span class="check">✦</span><span>Name in credits</span></div>
-            <div><span class="check">✦</span><span>Early features</span></div>
+            <div><span class="check">✦</span><span>Extra warm fuzzies</span></div>
           </div>
         </div>
         <div class="tier-card" id="tier-founding" onclick="selectTier('founding')">
@@ -1474,8 +1484,7 @@ nav {
           <div class="tier-perk">
             <div><span class="check">✦</span><span>Everything above</span></div>
             <div><span class="check">✦</span><span>Gold founder badge</span></div>
-            <div><span class="check">✦</span><span>Direct input on features</span></div>
-            <div><span class="check">✦</span><span>Forever founding status</span></div>
+            <div><span class="check">✦</span><span>Legendary status</span></div>
           </div>
         </div>
       </div>
@@ -1842,6 +1851,27 @@ async function loadUserProfile(user) {
   }
   currentProfile = profile;
   updateAuthUI(user, profile);
+  // Restore supporter badge from DB
+  if (profile && profile.supporter_tier && TIERS[profile.supporter_tier]) {
+    const t = TIERS[profile.supporter_tier];
+    isSupporter = true;
+    const badge = document.getElementById('profile-badge');
+    if (badge) {
+      badge.innerHTML = `<span class="supporter-badge ${t.badgeClass}">${t.badge}</span>`;
+      badge.style.display = 'inline';
+    }
+    const strip = document.getElementById('supporter-strip');
+    if (strip) {
+      strip.innerHTML = `<strong>✦ You're a GiveItAway supporter!</strong> Thank you for keeping this community alive. 💚`;
+      strip.style.background = 'var(--lagoon-dark)';
+    }
+    const banner = document.getElementById('supporter-profile-banner');
+    const active = document.getElementById('supporter-profile-active');
+    const label = document.getElementById('supporter-tier-label');
+    if (banner) banner.style.display = 'none';
+    if (active) active.style.display = 'block';
+    if (label) label.textContent = `${t.name} · ${t.price} · Thank you for your support.`;
+  }
   if (document.getElementById('view-profile').style.display !== 'none') loadKids();
   // Prompt new users to add kids after first sign-in
   if (!profile || !profile.name || _isNewProfile) {
@@ -1980,6 +2010,13 @@ function highlight(text, query) {
   return text.replace(re, '<mark>$1</mark>');
 }
 
+let visibleCount = 20;
+
+function loadMoreItems() {
+  visibleCount += 20;
+  renderFeed(getFiltered());
+}
+
 function renderFeed(items) {
   const feed = document.getElementById('feed');
   const query = searchQuery.toLowerCase();
@@ -1998,9 +2035,16 @@ function renderFeed(items) {
       ? `<div class="empty-state"><div class="big">🌿</div><p style="font-weight:600">Nothing in this category yet!</p><p style="font-size:0.85rem;margin-top:5px">${currentUser ? 'Be the first — hit the <strong>+</strong> button!' : '<button onclick="openModal(\'auth-modal\')" style="background:none;border:none;cursor:pointer;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;font-size:0.85rem;padding:0">Sign in to post the first item.</button>'}</p></div>`
       : `<div class="empty-state"><div class="big">📦</div><p style="font-weight:600">No listings yet!</p><p style="font-size:0.85rem;margin-top:5px">${currentUser ? 'Be the first to give something away — hit the <strong>+</strong> button!' : 'Be the first! <button onclick="openModal(\'auth-modal\')" style="background:none;border:none;cursor:pointer;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;font-size:0.85rem;padding:0">Sign in to post an item.</button>'}</p></div>`;
     feed.innerHTML = msg;
+    document.getElementById('load-more-wrap').style.display = 'none';
     return;
   }
-  items.forEach((item, idx) => {
+  const visible = items.slice(0, visibleCount);
+  const loadMoreWrap = document.getElementById('load-more-wrap');
+  if (loadMoreWrap) loadMoreWrap.style.display = items.length > visibleCount ? 'block' : 'none';
+  if (loadMoreWrap && items.length > visibleCount) {
+    document.getElementById('load-more-btn').textContent = `Load more (${items.length - visibleCount} remaining)`;
+  }
+  visible.forEach((item, idx) => {
     const initials = item.giver.split(' ').map(w=>w[0]).join('').toUpperCase();
     const sizeTags = item.sizes.map(s=>`<span class="tag tag-size">${s}</span>`).join('');
     const pickupTags = item.pickup.map(p=>`<span class="tag tag-pickup">${p}</span>`).join('');
@@ -2105,6 +2149,7 @@ function getFiltered() {
 }
 
 function updateFeed() {
+  visibleCount = 20;
   const filtered = getFiltered();
   const parts = [];
   if (activeCategory !== 'all') parts.push(activeCategory);
@@ -3096,6 +3141,12 @@ function handlePaymentReturn() {
     if (banner) banner.style.display = 'none';
     if (active) active.style.display = 'block';
     if (label) label.textContent = `${t.name} · ${t.price} · Thank you so much.`;
+    // Persist to DB
+    if (_sb && currentUser) {
+      _sb.from('profiles').update({ supporter_tier: tier }).eq('id', currentUser.id).then(({ error }) => {
+        if (error) console.error('Could not save supporter tier:', error);
+      });
+    }
     window.history.replaceState({}, '', '/');
   } else if (payment === 'cancelled') {
     showToast('No worries — you can support anytime. 💚', 'var(--gray)');
@@ -3778,6 +3829,17 @@ async function archiveKid(id, name) {
 // ── POST WITH DB SAVE ──────────────────────────────────────
 initApp();
 handlePaymentReturn();
+</script>
+
+<!-- PWA Service Worker -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('GiveItAway SW registered:', reg.scope))
+        .catch(err => console.warn('SW registration failed:', err));
+    });
+  }
 </script>
 </body>
 </html>
