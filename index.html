@@ -287,6 +287,46 @@ nav {
 .toast-close:hover { background: rgba(255,255,255,0.4); }
 @media (max-width: 600px) { .toast { bottom: 5.5rem; font-size: 0.8rem; padding: 0.55rem 0.85rem 0.55rem 1rem; } }
 
+/* ── PWA Install Banner ─────────────────────────────────────────── */
+#pwa-install-banner {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 999;
+  background: var(--charcoal);
+  color: white;
+  padding: 0.75rem 1rem;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+#pwa-install-banner.visible { display: flex; }
+#pwa-install-banner .pwa-icon { font-size: 1.4rem; flex-shrink: 0; }
+#pwa-install-banner .pwa-text { flex: 1; }
+#pwa-install-banner .pwa-text strong { color: var(--papaya); }
+#pwa-install-banner .pwa-dismiss {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+#pwa-install-banner .pwa-dismiss:hover { background: rgba(255,255,255,0.3); }
+/* Push content down when banner is visible */
+body.pwa-banner-visible nav { top: 48px; }
+body.pwa-banner-visible .main-scroll { padding-top: calc(48px + 60px); }
+@media (max-width: 600px) {
+  body.pwa-banner-visible nav { top: 52px; }
+  body.pwa-banner-visible .main-scroll { padding-top: calc(52px + 60px); }
+}
+
 /* FEEDBACK */
 .feedback-fab { position: fixed; bottom: 1.5rem; right: 1.25rem; z-index: 150; background: var(--white); border: 1.5px solid var(--lagoon); border-radius: 24px; padding: 0.45rem 0.9rem; font-family: var(--font-body); font-size: 0.78rem; font-weight: 600; color: var(--lagoon-dark); cursor: pointer; box-shadow: 0 2px 12px rgba(0,191,165,0.2); transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
 .feedback-fab:hover { background: var(--lagoon-light); transform: translateY(-2px); }
@@ -583,6 +623,15 @@ nav {
 </head>
 <body>
 
+<!-- PWA Install Banner -->
+<div id="pwa-install-banner" role="banner" aria-label="Install GiveItAway">
+  <span class="pwa-icon">📱</span>
+  <span class="pwa-text" id="pwa-banner-text">
+    <strong>Add to your home screen</strong> — use GiveItAway like a real app.
+  </span>
+  <button class="pwa-dismiss" onclick="dismissInstallBanner()" aria-label="Dismiss">✕</button>
+</div>
+
 <nav>
   <div class="logo" onclick="showView('feed')">Give<em>It</em><span>Away</span></div>
   <div class="nav-links">
@@ -637,7 +686,7 @@ nav {
     </div>
   </div>
 
-  <div class="feed-supporter-strip" id="supporter-strip" onclick="openModal('supporter-modal')" style="display:none">
+  <div class="feed-supporter-strip" id="supporter-strip" onclick="openModal('supporter-modal')">
     <strong>GiveItAway runs on community love.</strong><br class="strip-break"> Support us for $3/mo and get a ✦ on your profile.
   </div>
 
@@ -829,6 +878,24 @@ nav {
           <span class="tag tag-condition">🌿 Zero waste mission</span>
           <span class="tag tag-size">👧 Built for Rosie & Jordie</span>
           <span class="tag tag-category">📍 Kelowna, BC</span>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.25rem 1.5rem;margin-bottom:1.25rem">
+      <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:0.5rem">📱 Add GiveItAway to your home screen</div>
+      <p style="font-size:0.82rem;color:var(--gray);line-height:1.5;margin-bottom:1rem">No app store. No download. Just tap a button and it lives on your phone like a real app — free, forever.</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:var(--cream);border-radius:var(--radius-sm);padding:0.85rem 1rem">
+          <div style="font-weight:600;font-size:0.85rem;margin-bottom:4px">🍎 iPhone (Safari)</div>
+          <div style="font-size:0.82rem;color:var(--charcoal);line-height:1.6">
+            Tap the <strong>Share</strong> button at the bottom of your screen (the box with the arrow) → scroll down → tap <strong>"Add to Home Screen"</strong> → tap <strong>Add</strong>.
+          </div>
+        </div>
+        <div style="background:var(--cream);border-radius:var(--radius-sm);padding:0.85rem 1rem">
+          <div style="font-weight:600;font-size:0.85rem;margin-bottom:4px">🤖 Android (Chrome)</div>
+          <div style="font-size:0.82rem;color:var(--charcoal);line-height:1.6">
+            Tap the <strong>three dots</strong> (⋮) in the top-right corner → tap <strong>"Add to Home Screen"</strong> → tap <strong>Add</strong>.
+          </div>
         </div>
       </div>
     </div>
@@ -1159,7 +1226,6 @@ nav {
   &nbsp;·&nbsp; <button onclick="showView('community')">Community Standards</button>
   &nbsp;·&nbsp; <button onclick="showView('terms')">Terms &amp; Privacy</button>
   &nbsp;·&nbsp; <button onclick="openModal('feedback-modal')">Feedback</button>
-  &nbsp;·&nbsp; <button onclick="openModal('supporter-modal')">Support us ✦</button>
 </footer>
 
 <!-- LOADING OVERLAY -->
@@ -3830,6 +3896,44 @@ async function archiveKid(id, name) {
 // ── POST WITH DB SAVE ──────────────────────────────────────
 initApp();
 handlePaymentReturn();
+</script>
+
+<!-- PWA Install Banner Logic -->
+<script>
+(function() {
+  // Don't show if already installed as PWA
+  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) return;
+  // Don't show if user already dismissed
+  if (localStorage.getItem('pwa-banner-dismissed')) return;
+
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isAndroid = /android/i.test(navigator.userAgent);
+  const isMobile = isIOS || isAndroid;
+
+  if (!isMobile) return; // desktop doesn't need this
+
+  const banner = document.getElementById('pwa-install-banner');
+  const text = document.getElementById('pwa-banner-text');
+
+  if (isIOS) {
+    text.innerHTML = '<strong>Add to your home screen:</strong> tap Share → "Add to Home Screen"';
+  } else {
+    text.innerHTML = '<strong>Add to your home screen:</strong> tap ⋮ → "Add to Home Screen"';
+  }
+
+  // Small delay so it doesn't flash in on first paint
+  setTimeout(() => {
+    banner.classList.add('visible');
+    document.body.classList.add('pwa-banner-visible');
+  }, 1500);
+})();
+
+function dismissInstallBanner() {
+  const banner = document.getElementById('pwa-install-banner');
+  banner.classList.remove('visible');
+  document.body.classList.remove('pwa-banner-visible');
+  localStorage.setItem('pwa-banner-dismissed', '1');
+}
 </script>
 
 <!-- PWA Service Worker -->
