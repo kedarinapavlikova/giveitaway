@@ -320,6 +320,7 @@ nav {
 .loading-overlay.show { display: flex; }
 .spinner { width: 32px; height: 32px; border: 3px solid var(--lagoon-light); border-top-color: var(--lagoon); border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+@keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: none; } }
 .feed-empty { text-align: center; padding: 3rem 1rem; color: var(--gray); }
 .feed-empty .big { font-size: 3rem; margin-bottom: 0.5rem; }
 
@@ -550,6 +551,24 @@ nav {
 .sheet-apply-btn:hover { background: var(--papaya-dark); transform: translateY(-1px); }
 .sheet-result-count { font-size: 0.78rem; color: var(--gray); text-align: center; white-space: nowrap; }
 
+/* ── KID FEED PILL ROW ───────────────────────────────────── */
+.kid-pill-row {
+  background: var(--white); padding: 6px 12px 8px;
+  display: none; gap: 8px; overflow-x: auto; scrollbar-width: none;
+  border-bottom: 1px solid #EDE9E3; align-items: center;
+}
+.kid-pill-row::-webkit-scrollbar { display: none; }
+.kid-feed-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--gray-light); border: 1.5px solid transparent;
+  border-radius: 20px; padding: 5px 12px 5px 9px;
+  font-family: var(--font-body); font-size: 0.8rem; font-weight: 600;
+  cursor: pointer; white-space: nowrap; transition: all 0.15s;
+  color: var(--charcoal); flex-shrink: 0;
+}
+.kid-feed-pill:hover { background: var(--papaya-light); border-color: var(--papaya-mid); }
+.kid-feed-pill.active { background: var(--papaya-light); border-color: var(--papaya-mid); color: var(--papaya-dark); }
+
 /* ── KID PROFILES ─────────────────────────────────────────── */
 .kid-card { background: var(--white); border-radius: var(--radius-sm); box-shadow: var(--shadow); padding: 1rem; display: flex; align-items: flex-start; gap: 12px; transition: all 0.15s; }
 .kid-card:hover { box-shadow: var(--shadow-hover); }
@@ -667,6 +686,9 @@ nav {
       <option>Rutland North</option>
     </select>
   </div>
+
+  <!-- Kid profile filter row — dynamically populated, hidden until user has kids -->
+  <div class="kid-pill-row" id="kid-pill-row" role="group" aria-label="Filter by child"></div>
 
   <div class="filters">
     <button class="filter-chip active" onclick="filterCategory(this,'all')">All</button>
@@ -901,6 +923,7 @@ nav {
     <div class="content-card">
       <h3>✦ What is the Supporter program?</h3>
       <p>GiveItAway is free to use and always will be. Optional supporters ($3–$15/mo) help cover hosting costs and get a badge on their profile. No pressure — using the app and giving generously is contribution enough.</p>
+      <button onclick="openModal('supporter-modal')" style="margin-top:0.85rem;width:100%;background:var(--lagoon);color:white;border:none;cursor:pointer;font-family:var(--font-body);font-size:0.92rem;font-weight:600;padding:0.75rem;border-radius:var(--radius-sm);transition:all 0.15s" onmouseover="this.style.background='var(--lagoon-dark)'" onmouseout="this.style.background='var(--lagoon)'">Become a supporter ✦</button>
     </div>
   </div>
 </div>
@@ -1160,7 +1183,62 @@ nav {
   &nbsp;·&nbsp; <button onclick="showView('terms')">Terms &amp; Privacy</button>
   &nbsp;·&nbsp; <button onclick="openModal('feedback-modal')">Feedback</button>
   &nbsp;·&nbsp; <button onclick="openModal('supporter-modal')">Support us ✦</button>
+  &nbsp;·&nbsp; <button id="footer-install-btn" onclick="showInstallPrompt()" style="display:none">📱 Add to Home Screen</button>
 </footer>
+
+<!-- PWA INSTALL BANNER (shown after a delay on first visit) -->
+<div id="pwa-banner" style="display:none;position:fixed;bottom:max(80px,calc(70px + env(safe-area-inset-bottom)));left:12px;right:12px;z-index:190;background:var(--charcoal);color:var(--white);border-radius:var(--radius);padding:0.85rem 1rem;box-shadow:0 8px 32px rgba(0,0,0,0.22);align-items:center;gap:10px;animation:slideUp 0.35s cubic-bezier(.2,.8,.2,1)" role="alert">
+  <span style="font-size:1.4rem;flex-shrink:0">📱</span>
+  <div style="flex:1;min-width:0">
+    <div style="font-weight:700;font-size:0.88rem;margin-bottom:2px">Add GiveItAway to your home screen</div>
+    <div style="font-size:0.75rem;opacity:0.8">Faster access, works offline, no app store needed.</div>
+  </div>
+  <button onclick="showInstallPrompt()" style="background:var(--papaya-mid);color:white;border:none;border-radius:20px;font-family:var(--font-body);font-size:0.8rem;font-weight:700;padding:0.45rem 0.9rem;cursor:pointer;white-space:nowrap;flex-shrink:0">Add it</button>
+  <button onclick="dismissInstallBanner()" aria-label="Dismiss" style="background:none;border:none;color:rgba(255,255,255,0.6);font-size:1.1rem;cursor:pointer;padding:0 2px;flex-shrink:0;line-height:1">✕</button>
+</div>
+
+<!-- PWA INSTALL MODAL (iOS instructions or fallback) -->
+<div class="modal-overlay" id="pwa-modal">
+  <div class="modal-card" style="max-width:380px;width:100%">
+    <div class="modal-header">
+      <div class="modal-title">Add to Home Screen 📱</div>
+      <button class="close-btn" onclick="closeModal('pwa-modal')">✕</button>
+    </div>
+    <div id="pwa-ios-instructions" style="display:none">
+      <p style="font-size:0.88rem;color:var(--gray);margin-bottom:1.1rem;line-height:1.6">GiveItAway works like an app — no App Store needed. Here's how to add it in Safari:</p>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:1.25rem">
+        <div style="display:flex;align-items:center;gap:12px;background:var(--gray-light);border-radius:var(--radius-sm);padding:0.75rem 1rem">
+          <span style="font-size:1.5rem;flex-shrink:0">1️⃣</span>
+          <span style="font-size:0.85rem">Tap the <strong>Share button</strong> <span style="font-size:1rem">⎙</span> at the bottom of Safari</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;background:var(--gray-light);border-radius:var(--radius-sm);padding:0.75rem 1rem">
+          <span style="font-size:1.5rem;flex-shrink:0">2️⃣</span>
+          <span style="font-size:0.85rem">Scroll down and tap <strong>"Add to Home Screen"</strong></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;background:var(--gray-light);border-radius:var(--radius-sm);padding:0.75rem 1rem">
+          <span style="font-size:1.5rem;flex-shrink:0">3️⃣</span>
+          <span style="font-size:0.85rem">Tap <strong>Add</strong> — and you're done! 🎉</span>
+        </div>
+      </div>
+      <p style="font-size:0.75rem;color:var(--gray);text-align:center">Must be using <strong>Safari</strong> on iPhone or iPad.</p>
+    </div>
+    <div id="pwa-android-instructions" style="display:none">
+      <p style="font-size:0.88rem;color:var(--gray);margin-bottom:1.1rem;line-height:1.6">GiveItAway works like an app — no Play Store needed. One tap to install:</p>
+      <button id="pwa-install-btn" onclick="triggerAndroidInstall()" style="width:100%;background:var(--lagoon);color:white;border:none;cursor:pointer;font-family:var(--font-body);font-size:0.95rem;font-weight:700;padding:0.85rem;border-radius:var(--radius-sm);transition:all 0.15s;margin-bottom:0.75rem">📲 Install GiveItAway</button>
+      <p style="font-size:0.75rem;color:var(--gray);text-align:center">Works on Chrome for Android.</p>
+    </div>
+    <div id="pwa-already-installed" style="display:none">
+      <p style="font-size:0.88rem;color:var(--lagoon-dark);text-align:center;padding:1rem 0">✅ You already have GiveItAway on your home screen!</p>
+    </div>
+    <div id="pwa-generic-instructions" style="display:none">
+      <p style="font-size:0.88rem;color:var(--gray);margin-bottom:0.75rem;line-height:1.6">To add GiveItAway to your home screen:</p>
+      <ul style="font-size:0.85rem;color:var(--charcoal);line-height:1.8;padding-left:1.2rem;margin-bottom:0.75rem">
+        <li><strong>iPhone/iPad (Safari):</strong> tap Share ⎙ → Add to Home Screen</li>
+        <li><strong>Android (Chrome):</strong> tap Menu ⋮ → Add to Home screen</li>
+      </ul>
+    </div>
+  </div>
+</div>
 
 <!-- LOADING OVERLAY -->
 <div class="loading-overlay" id="loading-overlay">
@@ -1831,6 +1909,9 @@ async function handleSignOut() {
   finally { hideLoading(); }
   currentUser = null;
   currentProfile = null;
+  _kids = [];
+  _activeKidId = null;
+  renderKidPillRow();
   updateAuthUI(null);
   showToast('Signed out — see you soon! 🌿');
   showView('feed');
@@ -2135,7 +2216,19 @@ function getFiltered() {
     const showGiven = isOwn || l.status !== 'given';
     const matchCondition = activeConditions.size === 0 || activeConditions.has(l.condition);
     const matchPickup = activePickups.size === 0 || (l.pickup || []).some(p => activePickups.has(p));
-    const matchSize = activeSizes.size === 0 || (l.sizes && l.sizes.some(s => activeSizes.has(s)));
+    // Kid filter: inferred sizes from active kid profile, merged with manual size picks
+    let effectiveSizes = new Set(activeSizes);
+    if (_activeKidId) {
+      const kidF = _kids.find(k => k.id === _activeKidId);
+      if (kidF) {
+        const kidMonths = kidsMonths(kidF.birthday);
+        if (kidMonths !== null) {
+          ageToFit(kidMonths).forEach(s => effectiveSizes.add(s));
+          ageToShoe(kidMonths).forEach(s => effectiveSizes.add(s));
+        }
+      }
+    }
+    const matchSize = effectiveSizes.size === 0 || (l.sizes && l.sizes.some(s => effectiveSizes.has(s)));
     const matchPosted = !activePostedWithin || !l.createdAt || (now - l.createdAt.getTime()) <= activePostedWithin * 86400000;
     // Feed type filter
     const pt = l.postType || 'giving';
@@ -3489,6 +3582,7 @@ async function sendChatMsg() {
 // ── KID PROFILES ─────────────────────────────────────────────
 let _kids = [];
 let _editingKidId = null;
+let _activeKidId = null; // kid selected in browse feed filter
 let _kidWizardEmoji = '👶';
 
 function kidsMonths(birthday) {
@@ -3546,6 +3640,32 @@ function ageToShoe(months) {
   return ['5Y', '6Y'];
 }
 
+function renderKidPillRow() {
+  const row = document.getElementById('kid-pill-row');
+  if (!row) return;
+  if (!currentUser || _kids.length === 0) {
+    row.style.display = 'none';
+    return;
+  }
+  row.style.display = 'flex';
+  let html = `<button class="kid-feed-pill${!_activeKidId ? ' active' : ''}" onclick="selectKidFilter(null)" aria-label="Show all items">🌿 Everything</button>`;
+  _kids.forEach(kid => {
+    const ageLabel = kid.birthday ? ' · ' + kidsAgeLabel(kid.birthday) : '';
+    const emoji = kid.emoji || '👶';
+    const isActive = _activeKidId === kid.id;
+    html += `<button class="kid-feed-pill${isActive ? ' active' : ''}" onclick="selectKidFilter('${kid.id}')" aria-label="Filter for ${kid.name}">
+      <span aria-hidden="true">${emoji}</span>${kid.name}${ageLabel}
+    </button>`;
+  });
+  row.innerHTML = html;
+}
+
+function selectKidFilter(kidId) {
+  _activeKidId = kidId;
+  renderKidPillRow();
+  updateFeed();
+}
+
 async function loadKids() {
   if (!currentUser || !_sb) return;
   try {
@@ -3557,6 +3677,7 @@ async function loadKids() {
     if (error) throw error;
     _kids = data || [];
     renderKids();
+    renderKidPillRow();
   } catch(e) {
     console.error('loadKids error:', e);
   }
@@ -3830,6 +3951,95 @@ async function archiveKid(id, name) {
 // ── POST WITH DB SAVE ──────────────────────────────────────
 initApp();
 handlePaymentReturn();
+
+// ── PWA INSTALL ────────────────────────────────────────────
+let _deferredInstallPrompt = null;
+const _isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+const _isAndroid = /Android/.test(navigator.userAgent);
+const _isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+const _installDismissedKey = 'gia_install_dismissed';
+
+// Capture the Android/Chrome install prompt
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  _deferredInstallPrompt = e;
+  // Show footer button
+  const fb = document.getElementById('footer-install-btn');
+  if (fb) fb.style.display = 'inline';
+  // Show banner after 25s if not dismissed and not installed
+  if (!_isStandalone && !localStorage.getItem(_installDismissedKey)) {
+    setTimeout(showInstallBanner, 25000);
+  }
+});
+
+// iOS: show banner after 25s if in Safari, not standalone, not dismissed
+if (_isIOS && !_isStandalone && !localStorage.getItem(_installDismissedKey)) {
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  if (isSafari) {
+    setTimeout(showInstallBanner, 25000);
+    const fb = document.getElementById('footer-install-btn');
+    if (fb) fb.style.display = 'inline';
+  }
+}
+
+function showInstallBanner() {
+  if (_isStandalone) return;
+  const banner = document.getElementById('pwa-banner');
+  if (banner) { banner.style.display = 'flex'; }
+}
+
+function dismissInstallBanner() {
+  const banner = document.getElementById('pwa-banner');
+  if (banner) banner.style.display = 'none';
+  localStorage.setItem(_installDismissedKey, '1');
+}
+
+function showInstallPrompt() {
+  // Hide the banner if open
+  const banner = document.getElementById('pwa-banner');
+  if (banner) banner.style.display = 'none';
+
+  if (_isStandalone) {
+    // Already installed
+    document.getElementById('pwa-ios-instructions').style.display = 'none';
+    document.getElementById('pwa-android-instructions').style.display = 'none';
+    document.getElementById('pwa-generic-instructions').style.display = 'none';
+    document.getElementById('pwa-already-installed').style.display = 'block';
+  } else if (_deferredInstallPrompt) {
+    // Android Chrome — can trigger native prompt directly, skip modal
+    triggerAndroidInstall();
+    return;
+  } else if (_isIOS) {
+    document.getElementById('pwa-ios-instructions').style.display = 'block';
+    document.getElementById('pwa-android-instructions').style.display = 'none';
+    document.getElementById('pwa-generic-instructions').style.display = 'none';
+    document.getElementById('pwa-already-installed').style.display = 'none';
+  } else if (_isAndroid) {
+    document.getElementById('pwa-android-instructions').style.display = 'block';
+    document.getElementById('pwa-ios-instructions').style.display = 'none';
+    document.getElementById('pwa-generic-instructions').style.display = 'none';
+    document.getElementById('pwa-already-installed').style.display = 'none';
+  } else {
+    document.getElementById('pwa-generic-instructions').style.display = 'block';
+    document.getElementById('pwa-ios-instructions').style.display = 'none';
+    document.getElementById('pwa-android-instructions').style.display = 'none';
+    document.getElementById('pwa-already-installed').style.display = 'none';
+  }
+  openModal('pwa-modal');
+}
+
+async function triggerAndroidInstall() {
+  if (!_deferredInstallPrompt) return;
+  _deferredInstallPrompt.prompt();
+  const { outcome } = await _deferredInstallPrompt.userChoice;
+  _deferredInstallPrompt = null;
+  closeModal('pwa-modal');
+  if (outcome === 'accepted') {
+    showToast('GiveItAway added to your home screen! 🌿');
+    const fb = document.getElementById('footer-install-btn');
+    if (fb) fb.style.display = 'none';
+  }
+}
 </script>
 
 <!-- PWA Service Worker -->
