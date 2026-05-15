@@ -735,7 +735,7 @@ nav {
         <p style="font-size:0.85rem;line-height:1.6" id="messages-empty-hint">Post something or claim an item — conversations live here.</p>
         <div style="display:flex;gap:8px;justify-content:center;margin-top:1rem;flex-wrap:wrap">
           <button onclick="showView('feed')" style="background:var(--lagoon);color:white;border:none;cursor:pointer;font-family:var(--font-body);font-size:0.85rem;font-weight:600;padding:0.5rem 1.25rem;border-radius:20px">Browse items</button>
-          <button onclick="openPostForm()" style="background:var(--papaya-mid);color:white;border:none;cursor:pointer;font-family:var(--font-body);font-size:0.85rem;font-weight:600;padding:0.5rem 1.25rem;border-radius:20px">Post something</button>
+          <button onclick="openPostModal()" style="background:var(--papaya-mid);color:white;border:none;cursor:pointer;font-family:var(--font-body);font-size:0.85rem;font-weight:600;padding:0.5rem 1.25rem;border-radius:20px">Post something</button>
         </div>
       </div>
     </div>
@@ -1209,7 +1209,7 @@ nav {
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:1.25rem">
         <div style="display:flex;align-items:center;gap:12px;background:var(--gray-light);border-radius:var(--radius-sm);padding:0.75rem 1rem">
           <span style="font-size:1.5rem;flex-shrink:0">1️⃣</span>
-          <span style="font-size:0.85rem">Tap the <strong>Share button</strong> <span style="font-size:1rem">⎙</span> at the bottom of Safari</span>
+          <span style="font-size:0.85rem">Tap the <strong>Share button</strong> (the box with an arrow pointing up) at the bottom of Safari</span>
         </div>
         <div style="display:flex;align-items:center;gap:12px;background:var(--gray-light);border-radius:var(--radius-sm);padding:0.75rem 1rem">
           <span style="font-size:1.5rem;flex-shrink:0">2️⃣</span>
@@ -1233,7 +1233,7 @@ nav {
     <div id="pwa-generic-instructions" style="display:none">
       <p style="font-size:0.88rem;color:var(--gray);margin-bottom:0.75rem;line-height:1.6">To add GiveItAway to your home screen:</p>
       <ul style="font-size:0.85rem;color:var(--charcoal);line-height:1.8;padding-left:1.2rem;margin-bottom:0.75rem">
-        <li><strong>iPhone/iPad (Safari):</strong> tap Share ⎙ → Add to Home Screen</li>
+        <li><strong>iPhone/iPad (Safari):</strong> tap Share (box with arrow up) → Add to Home Screen</li>
         <li><strong>Android (Chrome):</strong> tap Menu ⋮ → Add to Home screen</li>
       </ul>
     </div>
@@ -1954,7 +1954,7 @@ async function loadUserProfile(user) {
     if (active) active.style.display = 'block';
     if (label) label.textContent = `${t.name} · ${t.price} · Thank you for your support.`;
   }
-  if (document.getElementById('view-profile').style.display !== 'none') loadKids();
+  loadKids(); // always load so kid pills appear in the feed immediately
   // Prompt new users to add kids after first sign-in
   if (!profile || !profile.name || _isNewProfile) {
     _isNewProfile = false;
@@ -3603,17 +3603,16 @@ function kidsAgeLabel(birthday) {
 }
 
 function ageToFit(months) {
-  if (months < 3)   return ['NB', '0-3m'];
-  if (months < 6)   return ['0-3m', '3-6m'];
-  if (months < 9)   return ['3-6m', '6-9m'];
-  if (months < 12)  return ['6-9m', '9-12m'];
-  if (months < 18)  return ['9-12m', '12-18m'];
-  if (months < 24)  return ['12-18m', '18-24m'];
-  if (months < 36)  return ['18-24m', '2T'];
+  // Strings must match SIZES array exactly (note: en-dash –, not hyphen -)
+  if (months < 3)   return ['Newborn', '0–3m'];
+  if (months < 6)   return ['0–3m', '3–6m'];
+  if (months < 18)  return ['3–6m', '6–12m', '12m', '12–18m'];
+  if (months < 24)  return ['12–18m', '18–24m'];
+  if (months < 36)  return ['18–24m', '2T'];
   if (months < 48)  return ['2T', '3T'];
   if (months < 60)  return ['3T', '4T'];
   if (months < 72)  return ['4T', '5T'];
-  if (months < 84)  return ['5', '6'];
+  if (months < 84)  return ['5T', '6'];
   if (months < 96)  return ['6', '7'];
   if (months < 108) return ['7', '8'];
   if (months < 120) return ['8', '10'];
@@ -3623,21 +3622,23 @@ function ageToFit(months) {
 }
 
 function ageToShoe(months) {
-  if (months < 12)  return ['4c', '5c'];
-  if (months < 18)  return ['5c', '6c'];
-  if (months < 24)  return ['6c', '7c'];
-  if (months < 30)  return ['7c', '8c'];
-  if (months < 36)  return ['8c', '9c'];
-  if (months < 42)  return ['9c', '10c'];
-  if (months < 48)  return ['10c', '11c'];
-  if (months < 54)  return ['11c', '12c'];
-  if (months < 60)  return ['12c', '13c'];
-  if (months < 66)  return ['13c', '1Y'];
-  if (months < 72)  return ['1Y', '2Y'];
-  if (months < 84)  return ['2Y', '3Y'];
-  if (months < 96)  return ['3Y', '4Y'];
-  if (months < 108) return ['4Y', '5Y'];
-  return ['5Y', '6Y'];
+  // Strings must match SHOE_SIZES array exactly
+  if (months < 6)   return ['Infant 0–1', 'Infant 1–4'];
+  if (months < 12)  return ['Infant 1–4', '4T–5T'];
+  if (months < 18)  return ['4T–5T', '6T–7T'];
+  if (months < 24)  return ['6T–7T', '8T–9T'];
+  if (months < 30)  return ['8T–9T', '10T–12T'];
+  if (months < 36)  return ['10T–12T', '1C'];
+  if (months < 42)  return ['1C', '2C'];
+  if (months < 48)  return ['2C', '3C'];
+  if (months < 54)  return ['3C', '4C'];
+  if (months < 60)  return ['4C', '5C'];
+  if (months < 66)  return ['5C', '6C'];
+  if (months < 72)  return ['6C', '7C'];
+  if (months < 84)  return ['7C', '8C'];
+  if (months < 96)  return ['8C', '9C'];
+  if (months < 108) return ['9C', '10C'];
+  return ['10C', '11C'];
 }
 
 function renderKidPillRow() {
@@ -3652,8 +3653,9 @@ function renderKidPillRow() {
   _kids.forEach(kid => {
     const ageLabel = kid.birthday ? ' · ' + kidsAgeLabel(kid.birthday) : '';
     const emoji = kid.emoji || '👶';
+    const safeName = kid.name.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     const isActive = _activeKidId === kid.id;
-    html += `<button class="kid-feed-pill${isActive ? ' active' : ''}" onclick="selectKidFilter('${kid.id}')" aria-label="Filter for ${kid.name}">
+    html += `<button class="kid-feed-pill${isActive ? ' active' : ''}" onclick="selectKidFilter('${kid.id}')" aria-label="Filter for ${safeName}">
       <span aria-hidden="true">${emoji}</span>${kid.name}${ageLabel}
     </button>`;
   });
