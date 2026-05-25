@@ -740,7 +740,26 @@ The vibe: *making this feel like a real app, because it is.*
 - [ ] Karma tiers — real data, real milestones, real badges
 - [ ] AI photo → listing (snap it, Claude names it)
 
+----
+
+May 25, 2026 — The One Where I Accidentally Stole the Walmart "Help" Logo
+
+## Progress Update
+[█████████████████░░░░] 90%
+✅ Prototype  ✅ Live URL   ✅ Auth         ✅ Database
+✅ Stripe     ✅ PWA        ✅ Kid Profiles  ✅ Launch
+
+So. Turns out my hand-drawn logo had some strong Walmart energy. Not ideal for an app about community generosity and sparking joy. Very ideal for a multinational retail corporation. Back to the drawing board — literally.
+I grabbed a napkin (ok, my notes app) and sketched out something I'd been mulling: three toy shapes. A G that looks like a wooden alphabet block. A circle for the dot on the i in "It." A triangle for the A in "Away." Separately they're just shapes. Together they're a toy box, a logo, and a secret little typographic puzzle. I love that for us.
+The iteration process was fast and genuinely fun. First pass: too much space between the shapes. Second pass: circle too big — it was competing with the block instead of nestling into it. Third pass: swapped the teal colours (darker on the circle, lighter on the triangle), shrunk the circle by 50%, pushed the block's bottom-right corner into the triangle's lower-left until they were basically holding hands.
+The final palette: papaya orange background, white G block (with the papaya G letter reversed out of it — little detail I love), lagoon teal triangle, lagoon-dark circle tucked right in the junction. No black anywhere. Warm, playful, and it actually looks like something a kid would want to pick up.
+Walked away with five SVG files — primary, light, dark, mark-only, and the app icon (orange background, obviously) — and swapped the old text logo out of the nav. The old one was fine. This one is ours.
+Next up: regenerate the PWA icons so the home screen version matches. One thing at a time.
+
+May 25, 2026 — Oh Also I Launched Today
+279 impressions. 10 reactions. 4 comments. A LinkedIn post that started with "vulnerability moment!!!" and ended with a screenshot of an actual working app I built in a couple of weeks with zero coding background.
+It's live. Real neighbours. Real listings. I'm not crying, you're crying.
+
 ---
 
 *Built by Keddy Pavlik. Powered by Supabase, Vercel, and the sincere belief that your neighbour wants your old snow pants.*
-
