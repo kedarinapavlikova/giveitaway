@@ -792,7 +792,7 @@ nav {
         </div>
         <div class="chat-messages" id="chat-messages"></div>
         <div class="chat-input-row">
-          <input class="chat-input" type="text" id="chat-input-box" placeholder="Message…" onkeydown="if(event.key==='Enter')sendChatMsg()">
+          <input class="chat-input" type="text" id="chat-input-box" placeholder="Message…" maxlength="1000" onkeydown="if(event.key==='Enter')sendChatMsg()">
           <button class="chat-send" onclick="sendChatMsg()">↑</button>
         </div>
       </div>
@@ -1321,7 +1321,7 @@ nav {
     <div id="auth-signup-form" style="display:none">
       <div class="form-group">
         <label class="form-label">Your name <span class="req">*</span></label>
-        <input class="form-input" type="text" id="signup-name" placeholder="First name or nickname">
+        <input class="form-input" type="text" id="signup-name" placeholder="First name or nickname" maxlength="50">
       </div>
       <div class="form-group">
         <label class="form-label">Email <span class="req">*</span></label>
@@ -1341,7 +1341,7 @@ nav {
         </select>
       </div>
       <div style="background:var(--lagoon-light);border-radius:var(--radius-xs);padding:0.75rem;font-size:0.78rem;color:var(--lagoon-dark);margin-bottom:0.75rem;line-height:1.5">
-        By joining you agree to our <button onclick="closeModal('auth-modal');showView('community')" style="background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;padding:0">Community Standards</button>. No money ever changes hands. Be kind.
+        By joining you agree to our <button onclick="closeModal('auth-modal');showView('community')" style="background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;padding:0">Community Standards</button> and <button onclick="closeModal('auth-modal');showView('terms')" style="background:none;border:none;cursor:pointer;font-size:0.78rem;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;padding:0">Terms &amp; Privacy</button>. No money ever changes hands. We collect your name, email, and neighbourhood to run the app — nothing else, ever.
       </div>
       <button class="submit-btn" style="background:var(--lagoon)" onclick="handleSignUp()">Create account</button>
     </div>
@@ -1364,7 +1364,7 @@ nav {
     <div class="auth-error" id="edit-profile-error"></div>
     <div class="form-group">
       <label class="form-label">Display name <span class="req">*</span></label>
-      <input class="form-input" type="text" id="edit-name" placeholder="Your name or nickname">
+      <input class="form-input" type="text" id="edit-name" placeholder="Your name or nickname" maxlength="50">
     </div>
     <div class="form-group">
       <label class="form-label">Neighbourhood</label>
@@ -1393,7 +1393,7 @@ nav {
     <div class="auth-error" id="edit-listing-error"></div>
     <div class="form-group">
       <label class="form-label">Item title <span class="req">*</span></label>
-      <input class="form-input" type="text" id="edit-listing-title" placeholder="e.g. Toddler runners — size 9C">
+      <input class="form-input" type="text" id="edit-listing-title" placeholder="e.g. Toddler runners — size 9C" maxlength="120">
     </div>
     <div class="form-group">
       <label class="form-label">Location <span class="req">*</span></label>
@@ -1424,7 +1424,7 @@ nav {
         <div class="karma-stat-sub" id="karma-hearts-sub">+1 today 💕</div>
       </div>
       <div class="karma-stat">
-        <div class="karma-stat-label">Streak</div>
+        <div class="karma-stat-label">Level</div>
         <div class="karma-stat-num" id="karma-streak-num" style="color:var(--lagoon)">1🔥</div>
         <div class="karma-stat-sub" id="karma-streak-sub">Keep it going!</div>
       </div>
@@ -1454,7 +1454,7 @@ nav {
     </div>
     <div class="form-group">
       <label class="form-label">Item title <span class="req">*</span></label>
-      <input class="form-input" type="text" placeholder="e.g. Bundle of 3-6m onesies" id="post-title">
+      <input class="form-input" type="text" placeholder="e.g. Bundle of 3-6m onesies" id="post-title" maxlength="120">
     </div>
     <div class="form-group">
       <label class="form-label">Category <span class="req">*</span></label>
@@ -1525,7 +1525,7 @@ nav {
     </div>
     <div class="form-group">
       <label class="form-label">Description</label>
-      <textarea class="form-textarea" placeholder="Colours, brand, how many pieces, anything helpful…" id="post-desc"></textarea>
+      <textarea class="form-textarea" placeholder="Colours, brand, how many pieces, anything helpful…" id="post-desc" maxlength="500"></textarea>
     </div>
     <button class="submit-btn" id="post-submit-btn" onclick="submitPost()">Give it away!</button>
   </div>
@@ -2017,7 +2017,7 @@ function updateAuthUI(user, profile) {
     const initials = (profile.name || 'U').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
     area.innerHTML = `
       <div style="display:flex;align-items:center;gap:8px">
-        <div class="user-avatar" title="${escHtml(profile.name)}" onclick="showView('profile')">${escHtml(initials)}</div>
+        <div class="user-avatar" title="${profile.name}" onclick="showView('profile')">${initials}</div>
         <button class="nav-btn" onclick="handleSignOut()" style="font-size:0.75rem;color:var(--gray)">Sign out</button>
       </div>`;
   } else {
@@ -2127,7 +2127,7 @@ let claimTarget = null;
 let userPostCount = 0;
 
 function highlight(text, query) {
-  const safe = escHtml(text);
+  const safe = escHtml(text || '');
   if (!query) return safe;
   const re = new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')', 'gi');
   return safe.replace(re, '<mark>$1</mark>');
@@ -2174,10 +2174,10 @@ function renderFeed(items) {
     const h = 110 + (idx * 37 % 80);
     const isISO = item.postType === 'iso';
     const imgHTML = isISO
-      ? `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--iso-blue-light) 0%,#E8EAF6 100%);font-size:${Math.round(h*0.36)}px">${escHtml(item.emoji)}</div>`
+      ? `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--iso-blue-light) 0%,#E8EAF6 100%);font-size:${Math.round(h*0.36)}px">${item.emoji}</div>`
       : item.photo
-      ? `<img src="${escHtml(item.photo)}" style="width:100%;height:${h}px;object-fit:cover;display:block" loading="lazy" onerror="this.style.display='none'">`
-      : `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--papaya-light) 0%,var(--lagoon-light) 100%);font-size:${Math.round(h*0.36)}px">${escHtml(item.emoji)}</div>`;
+      ? `<img src="${safeUrl(item.photo)}" style="width:100%;height:${h}px;object-fit:cover;display:block" loading="lazy" onerror="this.style.display='none'">`
+      : `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--papaya-light) 0%,var(--lagoon-light) 100%);font-size:${Math.round(h*0.36)}px">${item.emoji}</div>`;
     const titleHL = highlight(item.title, query);
     const descHL = highlight(item.desc, query);
     const isOwn = currentUser && item.userId === currentUser.id;
@@ -2234,7 +2234,7 @@ function renderFeed(items) {
           </div>
           <div class="card-footer">
             <div class="giver">
-              <div class="avatar" style="background:${escHtml(item.giverColor)}">${escHtml(initials)}</div>
+              <div class="avatar" style="background:${item.giverColor}">${initials}</div>
               <span class="giver-name">${escHtml(item.giver)}</span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
@@ -2681,12 +2681,17 @@ function showKarmaModal(item, totalGiven) {
     numEl.textContent = count;
     if (count >= target) clearInterval(timer);
   }, 50);
-  // Streak
+  // Giving Level — real tiers based on actual items_given, no fake math
   const streakEl = document.getElementById('karma-streak-num');
   const streakSub = document.getElementById('karma-streak-sub');
-  const weeks = Math.floor(totalGiven / 4) + 1;
-  streakEl.textContent = `${weeks}🔥`;
-  streakSub.textContent = weeks === 1 ? 'First week giving!' : `${weeks} weeks giving`;
+  let levelEmoji, levelLabel, levelSub;
+  if      (totalGiven >= 25) { levelEmoji = '🏆'; levelLabel = 'Legend';     levelSub = 'You ARE the neighbourhood.'; }
+  else if (totalGiven >= 10) { levelEmoji = '🌳'; levelLabel = 'Hero';        levelSub = 'Community gold standard.'; }
+  else if (totalGiven >= 5)  { levelEmoji = '💚'; levelLabel = 'Giver';       levelSub = "You're on a roll!"; }
+  else if (totalGiven >= 2)  { levelEmoji = '🤝'; levelLabel = 'Neighbour';   levelSub = 'Keep it going!'; }
+  else                       { levelEmoji = '🌱'; levelLabel = 'First Give!'; levelSub = 'Every legend starts here.'; }
+  streakEl.textContent = levelEmoji + ' ' + levelLabel;
+  streakSub.textContent = levelSub;
   openModal('karma-modal');
 }
 
@@ -2802,7 +2807,7 @@ async function loadProfileListings() {
     return `
     <div style="background:var(--white);border-radius:var(--radius-md);box-shadow:var(--shadow);padding:0.9rem 1rem;display:flex;align-items:center;gap:12px">
       <div style="width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,var(--papaya-light),var(--lagoon-light));display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;overflow:hidden">
-        ${item.photo_url ? `<img src="${escHtml(item.photo_url)}" style="width:48px;height:48px;object-fit:cover" onerror="this.style.display='none'">` : (EMOJIS[item.category]||'✨')}
+        ${item.photo_url ? `<img src="${safeUrl(item.photo_url)}" style="width:48px;height:48px;object-fit:cover" onerror="this.style.display='none'">` : (EMOJIS[item.category]||'✨')}
       </div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:600;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(item.title)}</div>
@@ -2904,7 +2909,7 @@ function openClaim(item) {
   document.getElementById('claim-emoji').textContent = item.photo
     ? '' : item.emoji;
   if (item.photo) {
-    document.getElementById('claim-emoji').innerHTML = `<img src="${escHtml(item.photo)}" style="width:56px;height:56px;object-fit:cover;border-radius:8px">`;
+    document.getElementById('claim-emoji').innerHTML = `<img src="${safeUrl(item.photo)}" style="width:56px;height:56px;object-fit:cover;border-radius:8px">`;
   }
   document.getElementById('claim-modal').classList.add('open');
 }
@@ -3489,11 +3494,11 @@ async function loadMessages() {
       const lastMsg = t.messages[0];
       const isMine = lastMsg.sender_id === currentUser.id;
       const time = new Date(lastMsg.created_at).toLocaleDateString('en-CA', { month:'short', day:'numeric' });
-      return `<div class="thread-item ${t.unread?'unread':''}" onclick="openThreadById('${escHtml(t.key)}')">
-        <div class="thread-avatar" style="background:${escHtml(t.color)}">${escHtml(initials)}</div>
+      return `<div class="thread-item ${t.unread?'unread':''}" onclick="openThreadById('${t.key}')">
+        <div class="thread-avatar" style="background:${t.color}">${initials}</div>
         <div class="thread-info">
           <div class="thread-name">${escHtml(t.otherName)}</div>
-          <div class="thread-item-title">${escHtml(t.listingEmoji)} ${escHtml(t.listingTitle)}</div>
+          <div class="thread-item-title">${t.listingEmoji} ${escHtml(t.listingTitle)}</div>
           <div class="thread-preview">${isMine ? 'You: ' : ''}${escHtml(lastMsg.body.slice(0,60))}${lastMsg.body.length>60?'…':''}</div>
         </div>
         <div class="thread-meta">
@@ -3534,10 +3539,10 @@ function openThreadById(key) {
     const avatarColor = isMine ? 'var(--papaya-mid)' : thread.color;
     return `
       <div class="msg-bubble-wrap ${isMine ? 'mine' : ''}">
-        <div class="bubble-avatar" style="background:${escHtml(avatarColor)}">${escHtml(avatarInitials)}</div>
+        <div class="bubble-avatar" style="background:${avatarColor}">${avatarInitials}</div>
         <div>
           <div class="bubble ${isMine ? 'mine' : 'theirs'}">${escHtml(msg.body)}</div>
-          <div class="bubble-time">${escHtml(time)}</div>
+          <div class="bubble-time">${time}</div>
         </div>
       </div>`;
   }).join('');
@@ -3566,8 +3571,15 @@ function showThreadList() {
   _activeThreadKey = null;
 }
 
+function safeUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  const u = url.trim().toLowerCase();
+  if (u.startsWith('javascript:') || u.startsWith('data:text') || u.startsWith('vbscript:')) return '';
+  return url;
+}
+
 function escHtml(str) {
-  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 async function sendChatMsg() {
@@ -3580,16 +3592,16 @@ async function sendChatMsg() {
   const thread = _threads[_activeThreadKey];
   if (!thread) return;
 
-  // Optimistically append the bubble
+  // Show a faded sending indicator while DB confirms
   const chatEl = document.getElementById('chat-messages');
-  const time = new Date().toLocaleTimeString('en-CA', { hour:'numeric', minute:'2-digit' });
   const myInitials = (currentProfile?.name || 'Me').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const sendingId = 'sending-' + Date.now();
   chatEl.innerHTML += `
-    <div class="msg-bubble-wrap mine">
-      <div class="bubble-avatar" style="background:var(--papaya-mid)">${escHtml(myInitials)}</div>
+    <div class="msg-bubble-wrap mine" id="${sendingId}" style="opacity:0.55">
+      <div class="bubble-avatar" style="background:var(--papaya-mid)">${myInitials}</div>
       <div>
         <div class="bubble mine">${escHtml(msg)}</div>
-        <div class="bubble-time">${escHtml(time)}</div>
+        <div class="bubble-time">Sending…</div>
       </div>
     </div>`;
   chatEl.scrollTop = chatEl.scrollHeight;
@@ -3608,12 +3620,39 @@ async function sendChatMsg() {
       read: false
     }).select().single();
     if (error) throw error;
-    // Add to local thread cache for immediate sync
-    if (data) thread.messages.unshift(data);
-    // Reload messages from DB so sent messages persist after navigation
-    await loadMessages();
-    // Re-open the thread so the refreshed messages are shown
-    if (_activeThreadKey) openThreadById(_activeThreadKey);
+
+    // Add to local thread cache immediately so it renders without waiting for DB round-trip
+    const confirmedMsg = data || {
+      id: 'local-' + Date.now(),
+      listing_id: listingId,
+      sender_id: currentUser.id,
+      recipient_id: recipientId,
+      body: msg,
+      read: false,
+      created_at: new Date().toISOString()
+    };
+    thread.messages.unshift(confirmedMsg);
+
+    // Remove optimistic bubble and re-render from local cache — instant, no flash
+    chatEl.innerHTML = [...thread.messages].reverse().map(m => {
+      const isMine = m.sender_id === currentUser.id;
+      const t = new Date(m.created_at).toLocaleTimeString('en-CA', { hour:'numeric', minute:'2-digit' });
+      const myInit = (currentProfile?.name || 'Me').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+      const initials = thread.otherName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+      const avatarInitials = isMine ? myInit : initials;
+      const avatarColor = isMine ? 'var(--papaya-mid)' : thread.color;
+      return `<div class="msg-bubble-wrap ${isMine ? 'mine' : ''}">
+        <div class="bubble-avatar" style="background:${avatarColor}">${avatarInitials}</div>
+        <div>
+          <div class="bubble ${isMine ? 'mine' : 'theirs'}">${escHtml(m.body)}</div>
+          <div class="bubble-time">${t}</div>
+        </div>
+      </div>`;
+    }).join('');
+    chatEl.scrollTop = chatEl.scrollHeight;
+
+    // Background sync — keeps thread list preview up to date; don't await
+    loadMessages().catch(e => console.warn('Background sync failed:', e));
   } catch(e) {
     console.error('sendChatMsg error:', e);
     showToast('Couldn\'t send — check your connection.', '#E64A19');
