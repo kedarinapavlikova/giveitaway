@@ -1404,6 +1404,23 @@ nav {
       <label class="form-label">Description</label>
       <textarea class="form-textarea" id="edit-listing-desc" rows="3" placeholder="Condition details, any wear, why you're giving it away..." style="resize:none"></textarea>
     </div>
+    <div class="form-group" id="edit-photo-section">
+      <label class="form-label">Photo</label>
+      <div id="edit-photo-current" style="display:none;margin-bottom:8px;position:relative">
+        <img id="edit-photo-preview-img" src="" style="width:100%;max-height:160px;object-fit:cover;border-radius:12px;display:block">
+        <button onclick="clearEditPhoto()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.55);color:white;border:none;border-radius:50%;width:26px;height:26px;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
+      </div>
+      <div id="edit-photo-placeholder" style="border:2px dashed var(--gray-mid);border-radius:12px;padding:1rem;text-align:center;cursor:pointer;background:var(--gray-light)" onclick="document.getElementById('edit-photo-file').click()">
+        <div style="font-size:1.4rem;margin-bottom:4px">📷</div>
+        <div style="font-size:0.8rem;color:var(--gray)">Tap to add or replace photo</div>
+      </div>
+      <input type="file" id="edit-photo-file" accept="image/*" style="display:none" onchange="previewEditPhoto(this)">
+      <div id="edit-photo-remove-wrap" style="display:none;margin-top:6px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--gray);cursor:pointer">
+          <input type="checkbox" id="edit-photo-remove-check" style="width:16px;height:16px"> Remove photo entirely
+        </label>
+      </div>
+    </div>
     <div style="display:flex;gap:10px;margin-top:0.5rem">
       <button onclick="closeModal('edit-listing-modal')" style="flex:1;background:none;border:2px solid var(--lagoon);color:var(--lagoon-dark);font-family:var(--font-body);font-size:0.9rem;font-weight:600;padding:0.65rem;border-radius:24px;cursor:pointer">Cancel</button>
       <button onclick="saveListingEdits()" style="flex:2;background:var(--papaya-mid);color:white;border:none;font-family:var(--font-body);font-size:0.9rem;font-weight:600;padding:0.65rem;border-radius:24px;cursor:pointer">Save changes</button>
@@ -2523,15 +2540,66 @@ function toggleProfileDotsMenu(id, btn) {
   setTimeout(() => document.addEventListener('click', closeAllMenus, { once: true }), 10);
 }
 
+let _editPendingPhotoFile = null;
+let _editCurrentPhotoUrl = null;
+
+function previewEditPhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  _editPendingPhotoFile = input.files[0];
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('edit-photo-preview-img').src = e.target.result;
+    document.getElementById('edit-photo-current').style.display = 'block';
+    document.getElementById('edit-photo-placeholder').style.display = 'none';
+    document.getElementById('edit-photo-remove-wrap').style.display = 'block';
+    const cb = document.getElementById('edit-photo-remove-check');
+    if (cb) cb.checked = false;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function clearEditPhoto() {
+  _editPendingPhotoFile = null;
+  document.getElementById('edit-photo-file').value = '';
+  document.getElementById('edit-photo-preview-img').src = '';
+  document.getElementById('edit-photo-current').style.display = 'none';
+  document.getElementById('edit-photo-placeholder').style.display = 'block';
+  document.getElementById('edit-photo-remove-wrap').style.display = 'none';
+  const cb = document.getElementById('edit-photo-remove-check');
+  if (cb) cb.checked = true;
+}
+
+function populateEditPhoto(photoUrl, isISO) {
+  _editPendingPhotoFile = null;
+  _editCurrentPhotoUrl = photoUrl || null;
+  document.getElementById('edit-photo-file').value = '';
+  const removeCheck = document.getElementById('edit-photo-remove-check');
+  if (removeCheck) removeCheck.checked = false;
+  const photoSection = document.getElementById('edit-photo-section');
+  if (isISO) { if (photoSection) photoSection.style.display = 'none'; return; }
+  if (photoSection) photoSection.style.display = 'block';
+  if (photoUrl) {
+    document.getElementById('edit-photo-preview-img').src = photoUrl;
+    document.getElementById('edit-photo-current').style.display = 'block';
+    document.getElementById('edit-photo-placeholder').style.display = 'none';
+    document.getElementById('edit-photo-remove-wrap').style.display = 'block';
+  } else {
+    document.getElementById('edit-photo-preview-img').src = '';
+    document.getElementById('edit-photo-current').style.display = 'none';
+    document.getElementById('edit-photo-placeholder').style.display = 'block';
+    document.getElementById('edit-photo-remove-wrap').style.display = 'none';
+  }
+}
+
 function openEditListingById(id) {
   const item = LISTINGS.find(l => (l.dbId || l.id) === id);
   if (!item) {
-    // Item might only be in DB, not local — open modal with DB fetch
     editingListingDbId = id;
     document.getElementById('edit-listing-title').value = '';
     document.getElementById('edit-listing-location').value = '';
     document.getElementById('edit-listing-desc').value = '';
     document.getElementById('edit-listing-error').classList.remove('show');
+    populateEditPhoto(null, false);
     openModal('edit-listing-modal');
     return;
   }
@@ -2541,6 +2609,7 @@ function openEditListingById(id) {
   document.getElementById('edit-listing-location').value = item.location || '';
   document.getElementById('edit-listing-desc').value = item.desc || '';
   document.getElementById('edit-listing-error').classList.remove('show');
+  populateEditPhoto(item.photo || null, item.postType === 'iso');
   openModal('edit-listing-modal');
 }
 
@@ -2600,6 +2669,7 @@ function openEditListing(idx) {
   document.getElementById('edit-listing-location').value = item.location || '';
   document.getElementById('edit-listing-desc').value = item.desc || '';
   document.getElementById('edit-listing-error').classList.remove('show');
+  populateEditPhoto(item.photo || null, item.postType === 'iso');
   openModal('edit-listing-modal');
 }
 
@@ -2620,11 +2690,21 @@ async function saveListingEdits() {
   if (!_sb) await loadSupabase();
   showLoading('Saving...');
   try {
-    const { error } = await _sb.from('listings')
-      .update({ title, location_text: location, description: desc })
-      .eq('id', dbId);
+    // Handle photo
+    let photoUrl = _editCurrentPhotoUrl;
+    const removeCheck = document.getElementById('edit-photo-remove-check');
+    const removing = removeCheck && removeCheck.checked && !_editPendingPhotoFile;
+    if (_editPendingPhotoFile) {
+      showLoading('Uploading photo...');
+      const uploaded = await uploadPhotoToStorage(_editPendingPhotoFile);
+      if (uploaded) photoUrl = uploaded;
+    } else if (removing) {
+      photoUrl = null;
+    }
+    const updatePayload = { title, location_text: location, description: desc, photo_url: photoUrl };
+    const { error } = await _sb.from('listings').update(updatePayload).eq('id', dbId);
     if (error) throw error;
-    if (item) { item.title = title; item.location = location; item.desc = desc; }
+    if (item) { item.title = title; item.location = location; item.desc = desc; item.photo = photoUrl; }
     closeModal('edit-listing-modal');
     updateFeed();
     if (document.getElementById('view-profile').style.display !== 'none') loadProfileListings();
