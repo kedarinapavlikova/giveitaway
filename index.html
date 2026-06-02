@@ -792,7 +792,7 @@ nav {
         </div>
         <div class="chat-messages" id="chat-messages"></div>
         <div class="chat-input-row">
-          <input class="chat-input" type="text" id="chat-input-box" placeholder="Message…" maxlength="1000" onkeydown="if(event.key==='Enter')sendChatMsg()">
+          <input class="chat-input" type="text" id="chat-input-box" placeholder="Message…" onkeydown="if(event.key==='Enter')sendChatMsg()">
           <button class="chat-send" onclick="sendChatMsg()">↑</button>
         </div>
       </div>
@@ -1321,7 +1321,7 @@ nav {
     <div id="auth-signup-form" style="display:none">
       <div class="form-group">
         <label class="form-label">Your name <span class="req">*</span></label>
-        <input class="form-input" type="text" id="signup-name" placeholder="First name or nickname" maxlength="50">
+        <input class="form-input" type="text" id="signup-name" placeholder="First name or nickname">
       </div>
       <div class="form-group">
         <label class="form-label">Email <span class="req">*</span></label>
@@ -1364,7 +1364,7 @@ nav {
     <div class="auth-error" id="edit-profile-error"></div>
     <div class="form-group">
       <label class="form-label">Display name <span class="req">*</span></label>
-      <input class="form-input" type="text" id="edit-name" placeholder="Your name or nickname" maxlength="50">
+      <input class="form-input" type="text" id="edit-name" placeholder="Your name or nickname">
     </div>
     <div class="form-group">
       <label class="form-label">Neighbourhood</label>
@@ -1393,7 +1393,7 @@ nav {
     <div class="auth-error" id="edit-listing-error"></div>
     <div class="form-group">
       <label class="form-label">Item title <span class="req">*</span></label>
-      <input class="form-input" type="text" id="edit-listing-title" placeholder="e.g. Toddler runners — size 9C" maxlength="120">
+      <input class="form-input" type="text" id="edit-listing-title" placeholder="e.g. Toddler runners — size 9C">
     </div>
     <div class="form-group">
       <label class="form-label">Location <span class="req">*</span></label>
@@ -1454,7 +1454,7 @@ nav {
     </div>
     <div class="form-group">
       <label class="form-label">Item title <span class="req">*</span></label>
-      <input class="form-input" type="text" placeholder="e.g. Bundle of 3-6m onesies" id="post-title" maxlength="120">
+      <input class="form-input" type="text" placeholder="e.g. Bundle of 3-6m onesies" id="post-title">
     </div>
     <div class="form-group">
       <label class="form-label">Category <span class="req">*</span></label>
@@ -1525,7 +1525,7 @@ nav {
     </div>
     <div class="form-group">
       <label class="form-label">Description</label>
-      <textarea class="form-textarea" placeholder="Colours, brand, how many pieces, anything helpful…" id="post-desc" maxlength="500"></textarea>
+      <textarea class="form-textarea" placeholder="Colours, brand, how many pieces, anything helpful…" id="post-desc"></textarea>
     </div>
     <button class="submit-btn" id="post-submit-btn" onclick="submitPost()">Give it away!</button>
   </div>
@@ -2127,10 +2127,9 @@ let claimTarget = null;
 let userPostCount = 0;
 
 function highlight(text, query) {
-  const safe = escHtml(text || '');
-  if (!query) return safe;
+  if (!query) return text;
   const re = new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')', 'gi');
-  return safe.replace(re, '<mark>$1</mark>');
+  return text.replace(re, '<mark>$1</mark>');
 }
 
 let visibleCount = 20;
@@ -2153,7 +2152,7 @@ function renderFeed(items) {
     const isCategoryFilter = activeCategory !== 'all';
     const isFiltered = isCategoryFilter || areaFilter !== 'all' || isSearch || activeConditions.size > 0 || activePickups.size > 0 || activeSizes.size > 0 || activePostedWithin;
     const msg = isSearch
-      ? `<div class="empty-state"><div class="big">🔍</div><p style="font-weight:600">No results for "${escHtml(searchQuery)}"</p><p style="font-size:0.85rem;margin-top:5px;color:var(--gray)">Try different keywords or browse all categories.</p></div>`
+      ? `<div class="empty-state"><div class="big">🔍</div><p style="font-weight:600">No results for "${searchQuery}"</p><p style="font-size:0.85rem;margin-top:5px;color:var(--gray)">Try different keywords or browse all categories.</p></div>`
       : isFiltered
       ? `<div class="empty-state"><div class="big">🌿</div><p style="font-weight:600">Nothing in this category yet!</p><p style="font-size:0.85rem;margin-top:5px">${currentUser ? 'Be the first — hit the <strong>+</strong> button!' : '<button onclick="openModal(\'auth-modal\')" style="background:none;border:none;cursor:pointer;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;font-size:0.85rem;padding:0">Sign in to post the first item.</button>'}</p></div>`
       : `<div class="empty-state"><div class="big">📦</div><p style="font-weight:600">No listings yet!</p><p style="font-size:0.85rem;margin-top:5px">${currentUser ? 'Be the first to give something away — hit the <strong>+</strong> button!' : 'Be the first! <button onclick="openModal(\'auth-modal\')" style="background:none;border:none;cursor:pointer;color:var(--lagoon-dark);font-weight:600;text-decoration:underline;font-size:0.85rem;padding:0">Sign in to post an item.</button>'}</p></div>`;
@@ -2169,15 +2168,14 @@ function renderFeed(items) {
   }
   visible.forEach((item, idx) => {
     const initials = item.giver.split(' ').map(w=>w[0]).join('').toUpperCase();
-    const sizeTags = item.sizes.map(s=>`<span class="tag tag-size">${escHtml(s)}</span>`).join('');
-    const pickupTags = item.pickup.map(p=>`<span class="tag tag-pickup">${escHtml(p)}</span>`).join('');
-    const h = 110 + (idx * 37 % 80);
+    const sizeTags = item.sizes.map(s=>`<span class="tag tag-size">${s}</span>`).join('');
+    const pickupTags = item.pickup.map(p=>`<span class="tag tag-pickup">${p}</span>`).join('');
     const isISO = item.postType === 'iso';
     const imgHTML = isISO
-      ? `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--iso-blue-light) 0%,#E8EAF6 100%);font-size:${Math.round(h*0.36)}px">${item.emoji}</div>`
+      ? `<div style="aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--iso-blue-light) 0%,#E8EAF6 100%);font-size:2.8rem">${item.emoji}</div>`
       : item.photo
-      ? `<img src="${safeUrl(item.photo)}" style="width:100%;height:${h}px;object-fit:cover;display:block" loading="lazy" onerror="this.style.display='none'">`
-      : `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--papaya-light) 0%,var(--lagoon-light) 100%);font-size:${Math.round(h*0.36)}px">${item.emoji}</div>`;
+      ? `<img src="${item.photo}" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block" loading="lazy" onerror="this.style.display='none'">`
+      : `<div style="aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--papaya-light) 0%,var(--lagoon-light) 100%);font-size:2.8rem">${item.emoji}</div>`;
     const titleHL = highlight(item.title, query);
     const descHL = highlight(item.desc, query);
     const isOwn = currentUser && item.userId === currentUser.id;
@@ -2225,17 +2223,17 @@ function renderFeed(items) {
         <div class="card-body">
           <div class="card-title">${titleHL}</div>
           ${query ? `<div class="card-desc-preview">${descHL}</div>` : ''}
-          <div class="card-location">📍 ${escHtml(item.location)}</div>
+          <div class="card-location">📍 ${item.location}</div>
           <div class="card-tags">
-            <span class="tag tag-category">${escHtml(item.category)}</span>
+            <span class="tag tag-category">${item.category}</span>
             ${sizeTags}
-            ${isISO ? '' : `<span class="tag tag-condition">${escHtml(item.condition)}</span>`}
+            ${isISO ? '' : `<span class="tag tag-condition">${item.condition}</span>`}
             ${isISO ? '' : pickupTags}
           </div>
           <div class="card-footer">
             <div class="giver">
               <div class="avatar" style="background:${item.giverColor}">${initials}</div>
-              <span class="giver-name">${escHtml(item.giver)}</span>
+              <span class="giver-name">${item.giver}</span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
               ${actionBtn}
@@ -2807,11 +2805,11 @@ async function loadProfileListings() {
     return `
     <div style="background:var(--white);border-radius:var(--radius-md);box-shadow:var(--shadow);padding:0.9rem 1rem;display:flex;align-items:center;gap:12px">
       <div style="width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,var(--papaya-light),var(--lagoon-light));display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;overflow:hidden">
-        ${item.photo_url ? `<img src="${safeUrl(item.photo_url)}" style="width:48px;height:48px;object-fit:cover" onerror="this.style.display='none'">` : (EMOJIS[item.category]||'✨')}
+        ${item.photo_url ? `<img src="${item.photo_url}" style="width:48px;height:48px;object-fit:cover" onerror="this.style.display='none'">` : (EMOJIS[item.category]||'✨')}
       </div>
       <div style="flex:1;min-width:0">
-        <div style="font-weight:600;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(item.title)}</div>
-        <div style="font-size:0.75rem;color:var(--gray);margin-top:2px">${escHtml(item.category)} · ${escHtml(item.condition)} · ${escHtml(item.neighbourhood)}</div>
+        <div style="font-weight:600;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.title}</div>
+        <div style="font-size:0.75rem;color:var(--gray);margin-top:2px">${item.category} · ${item.condition} · ${item.neighbourhood}</div>
       </div>
       <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
         ${msgBadge}
@@ -2909,7 +2907,7 @@ function openClaim(item) {
   document.getElementById('claim-emoji').textContent = item.photo
     ? '' : item.emoji;
   if (item.photo) {
-    document.getElementById('claim-emoji').innerHTML = `<img src="${safeUrl(item.photo)}" style="width:56px;height:56px;object-fit:cover;border-radius:8px">`;
+    document.getElementById('claim-emoji').innerHTML = `<img src="${item.photo}" style="width:56px;height:56px;object-fit:cover;border-radius:8px">`;
   }
   document.getElementById('claim-modal').classList.add('open');
 }
@@ -3497,9 +3495,9 @@ async function loadMessages() {
       return `<div class="thread-item ${t.unread?'unread':''}" onclick="openThreadById('${t.key}')">
         <div class="thread-avatar" style="background:${t.color}">${initials}</div>
         <div class="thread-info">
-          <div class="thread-name">${escHtml(t.otherName)}</div>
-          <div class="thread-item-title">${t.listingEmoji} ${escHtml(t.listingTitle)}</div>
-          <div class="thread-preview">${isMine ? 'You: ' : ''}${escHtml(lastMsg.body.slice(0,60))}${lastMsg.body.length>60?'…':''}</div>
+          <div class="thread-name">${t.otherName}</div>
+          <div class="thread-item-title">${t.listingEmoji} ${t.listingTitle}</div>
+          <div class="thread-preview">${isMine ? 'You: ' : ''}${lastMsg.body.slice(0,60)}${lastMsg.body.length>60?'…':''}</div>
         </div>
         <div class="thread-meta">
           <div class="thread-time">${time}</div>
@@ -3569,13 +3567,6 @@ function showThreadList() {
   document.getElementById('chat-view').style.display = 'none';
   document.getElementById('thread-list-view').style.display = 'block';
   _activeThreadKey = null;
-}
-
-function safeUrl(url) {
-  if (!url || typeof url !== 'string') return '';
-  const u = url.trim().toLowerCase();
-  if (u.startsWith('javascript:') || u.startsWith('data:text') || u.startsWith('vbscript:')) return '';
-  return url;
 }
 
 function escHtml(str) {
