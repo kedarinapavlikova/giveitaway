@@ -417,6 +417,12 @@ nav {
 .feed-supporter-strip { background: var(--lagoon); color: white; text-align: center; padding: 0.55rem 1.5rem; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: background 0.15s; line-height: 1.6; }
 .feed-supporter-strip:hover { background: var(--lagoon-dark); }
 .feed-supporter-strip strong { font-weight: 700; }
+
+.grant-banner { background: var(--papaya-light); color: var(--papaya-dark); text-align: center; padding: 0.65rem 2.75rem 0.65rem 1.5rem; font-size: 0.82rem; font-weight: 500; line-height: 1.55; position: relative; }
+.grant-banner strong { font-weight: 700; }
+.grant-banner-close { position: absolute; right: 0; top: 0; width: 44px; height: 100%; min-height: 44px; background: none; border: none; color: var(--papaya-dark); font-size: 1.05rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.grant-banner-close:hover { opacity: 0.7; }
+@media (max-width: 600px) { .grant-banner { font-size: 0.74rem; padding: 0.5rem 2.5rem 0.5rem 0.85rem; } }
 .strip-break { display: none; }
 @media (max-width: 600px) { .feed-supporter-strip { font-size: 0.72rem; padding: 0.35rem 0.75rem; } }
 .filter-chip { white-space: nowrap; flex-shrink: 0; background: var(--gray-light); border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.78rem; font-weight: 500; color: var(--charcoal); padding: 0.32rem 0.85rem; border-radius: 20px; transition: all 0.15s; display: inline-flex; align-items: center; line-height: 1.4; }
@@ -684,6 +690,26 @@ nav {
 
 <!-- FEED VIEW -->
 <div id="view-feed">
+  <div class="grant-banner" id="grant-banner" role="status">
+    <strong>🎉 We got a City of Kelowna grant!</strong> Free Back to School Swap coming this fall — details soon.
+    <button class="grant-banner-close" onclick="dismissGrantBanner()" aria-label="Dismiss announcement">✕</button>
+  </div>
+  <script>
+    (function(){
+      try {
+        if (localStorage.getItem('gia_grant_banner_dismissed') === '1') {
+          var el = document.getElementById('grant-banner');
+          if (el) el.style.display = 'none';
+        }
+      } catch (e) {}
+    })();
+    function dismissGrantBanner() {
+      var el = document.getElementById('grant-banner');
+      if (el) el.style.display = 'none';
+      try { localStorage.setItem('gia_grant_banner_dismissed', '1'); } catch (e) {}
+    }
+  </script>
+
   <div class="hero">
     <div class="hero-text">
       <h1>Free kids stuff. Real neighbours. <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="white" aria-hidden="true" style="vertical-align:-2px;display:inline-block"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></h1>
@@ -1403,23 +1429,6 @@ nav {
     <div class="form-group">
       <label class="form-label">Description</label>
       <textarea class="form-textarea" id="edit-listing-desc" rows="3" placeholder="Condition details, any wear, why you're giving it away..." style="resize:none"></textarea>
-    </div>
-    <div class="form-group" id="edit-photo-section">
-      <label class="form-label">Photo</label>
-      <div id="edit-photo-current" style="display:none;margin-bottom:8px;position:relative">
-        <img id="edit-photo-preview-img" src="" style="width:100%;max-height:160px;object-fit:cover;border-radius:12px;display:block">
-        <button onclick="clearEditPhoto()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.55);color:white;border:none;border-radius:50%;width:26px;height:26px;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
-      </div>
-      <div id="edit-photo-placeholder" style="border:2px dashed var(--gray-mid);border-radius:12px;padding:1rem;text-align:center;cursor:pointer;background:var(--gray-light)" onclick="document.getElementById('edit-photo-file').click()">
-        <div style="font-size:1.4rem;margin-bottom:4px">📷</div>
-        <div style="font-size:0.8rem;color:var(--gray)">Tap to add or replace photo</div>
-      </div>
-      <input type="file" id="edit-photo-file" accept="image/*" style="display:none" onchange="previewEditPhoto(this)">
-      <div id="edit-photo-remove-wrap" style="display:none;margin-top:6px">
-        <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--gray);cursor:pointer">
-          <input type="checkbox" id="edit-photo-remove-check" style="width:16px;height:16px"> Remove photo entirely
-        </label>
-      </div>
     </div>
     <div style="display:flex;gap:10px;margin-top:0.5rem">
       <button onclick="closeModal('edit-listing-modal')" style="flex:1;background:none;border:2px solid var(--lagoon);color:var(--lagoon-dark);font-family:var(--font-body);font-size:0.9rem;font-weight:600;padding:0.65rem;border-radius:24px;cursor:pointer">Cancel</button>
@@ -2540,66 +2549,15 @@ function toggleProfileDotsMenu(id, btn) {
   setTimeout(() => document.addEventListener('click', closeAllMenus, { once: true }), 10);
 }
 
-let _editPendingPhotoFile = null;
-let _editCurrentPhotoUrl = null;
-
-function previewEditPhoto(input) {
-  if (!input.files || !input.files[0]) return;
-  _editPendingPhotoFile = input.files[0];
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('edit-photo-preview-img').src = e.target.result;
-    document.getElementById('edit-photo-current').style.display = 'block';
-    document.getElementById('edit-photo-placeholder').style.display = 'none';
-    document.getElementById('edit-photo-remove-wrap').style.display = 'block';
-    const cb = document.getElementById('edit-photo-remove-check');
-    if (cb) cb.checked = false;
-  };
-  reader.readAsDataURL(input.files[0]);
-}
-
-function clearEditPhoto() {
-  _editPendingPhotoFile = null;
-  document.getElementById('edit-photo-file').value = '';
-  document.getElementById('edit-photo-preview-img').src = '';
-  document.getElementById('edit-photo-current').style.display = 'none';
-  document.getElementById('edit-photo-placeholder').style.display = 'block';
-  document.getElementById('edit-photo-remove-wrap').style.display = 'none';
-  const cb = document.getElementById('edit-photo-remove-check');
-  if (cb) cb.checked = true;
-}
-
-function populateEditPhoto(photoUrl, isISO) {
-  _editPendingPhotoFile = null;
-  _editCurrentPhotoUrl = photoUrl || null;
-  document.getElementById('edit-photo-file').value = '';
-  const removeCheck = document.getElementById('edit-photo-remove-check');
-  if (removeCheck) removeCheck.checked = false;
-  const photoSection = document.getElementById('edit-photo-section');
-  if (isISO) { if (photoSection) photoSection.style.display = 'none'; return; }
-  if (photoSection) photoSection.style.display = 'block';
-  if (photoUrl) {
-    document.getElementById('edit-photo-preview-img').src = photoUrl;
-    document.getElementById('edit-photo-current').style.display = 'block';
-    document.getElementById('edit-photo-placeholder').style.display = 'none';
-    document.getElementById('edit-photo-remove-wrap').style.display = 'block';
-  } else {
-    document.getElementById('edit-photo-preview-img').src = '';
-    document.getElementById('edit-photo-current').style.display = 'none';
-    document.getElementById('edit-photo-placeholder').style.display = 'block';
-    document.getElementById('edit-photo-remove-wrap').style.display = 'none';
-  }
-}
-
 function openEditListingById(id) {
   const item = LISTINGS.find(l => (l.dbId || l.id) === id);
   if (!item) {
+    // Item might only be in DB, not local — open modal with DB fetch
     editingListingDbId = id;
     document.getElementById('edit-listing-title').value = '';
     document.getElementById('edit-listing-location').value = '';
     document.getElementById('edit-listing-desc').value = '';
     document.getElementById('edit-listing-error').classList.remove('show');
-    populateEditPhoto(null, false);
     openModal('edit-listing-modal');
     return;
   }
@@ -2609,7 +2567,6 @@ function openEditListingById(id) {
   document.getElementById('edit-listing-location').value = item.location || '';
   document.getElementById('edit-listing-desc').value = item.desc || '';
   document.getElementById('edit-listing-error').classList.remove('show');
-  populateEditPhoto(item.photo || null, item.postType === 'iso');
   openModal('edit-listing-modal');
 }
 
@@ -2669,7 +2626,6 @@ function openEditListing(idx) {
   document.getElementById('edit-listing-location').value = item.location || '';
   document.getElementById('edit-listing-desc').value = item.desc || '';
   document.getElementById('edit-listing-error').classList.remove('show');
-  populateEditPhoto(item.photo || null, item.postType === 'iso');
   openModal('edit-listing-modal');
 }
 
@@ -2690,21 +2646,11 @@ async function saveListingEdits() {
   if (!_sb) await loadSupabase();
   showLoading('Saving...');
   try {
-    // Handle photo
-    let photoUrl = _editCurrentPhotoUrl;
-    const removeCheck = document.getElementById('edit-photo-remove-check');
-    const removing = removeCheck && removeCheck.checked && !_editPendingPhotoFile;
-    if (_editPendingPhotoFile) {
-      showLoading('Uploading photo...');
-      const uploaded = await uploadPhotoToStorage(_editPendingPhotoFile);
-      if (uploaded) photoUrl = uploaded;
-    } else if (removing) {
-      photoUrl = null;
-    }
-    const updatePayload = { title, location_text: location, description: desc, photo_url: photoUrl };
-    const { error } = await _sb.from('listings').update(updatePayload).eq('id', dbId);
+    const { error } = await _sb.from('listings')
+      .update({ title, location_text: location, description: desc })
+      .eq('id', dbId);
     if (error) throw error;
-    if (item) { item.title = title; item.location = location; item.desc = desc; item.photo = photoUrl; }
+    if (item) { item.title = title; item.location = location; item.desc = desc; }
     closeModal('edit-listing-modal');
     updateFeed();
     if (document.getElementById('view-profile').style.display !== 'none') loadProfileListings();
