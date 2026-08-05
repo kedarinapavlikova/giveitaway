@@ -417,12 +417,6 @@ nav {
 .feed-supporter-strip { background: var(--lagoon); color: white; text-align: center; padding: 0.55rem 1.5rem; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: background 0.15s; line-height: 1.6; }
 .feed-supporter-strip:hover { background: var(--lagoon-dark); }
 .feed-supporter-strip strong { font-weight: 700; }
-
-.grant-banner { background: var(--papaya-light); color: var(--papaya-dark); text-align: center; padding: 0.65rem 2.75rem 0.65rem 1.5rem; font-size: 0.82rem; font-weight: 500; line-height: 1.55; position: relative; }
-.grant-banner strong { font-weight: 700; }
-.grant-banner-close { position: absolute; right: 0; top: 0; width: 44px; height: 100%; min-height: 44px; background: none; border: none; color: var(--papaya-dark); font-size: 1.05rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.grant-banner-close:hover { opacity: 0.7; }
-@media (max-width: 600px) { .grant-banner { font-size: 0.74rem; padding: 0.5rem 2.5rem 0.5rem 0.85rem; } }
 .strip-break { display: none; }
 @media (max-width: 600px) { .feed-supporter-strip { font-size: 0.72rem; padding: 0.35rem 0.75rem; } }
 .filter-chip { white-space: nowrap; flex-shrink: 0; background: var(--gray-light); border: none; cursor: pointer; font-family: var(--font-body); font-size: 0.78rem; font-weight: 500; color: var(--charcoal); padding: 0.32rem 0.85rem; border-radius: 20px; transition: all 0.15s; display: inline-flex; align-items: center; line-height: 1.4; }
@@ -665,6 +659,11 @@ nav {
   </div>
 </nav>
 
+<div id="event-banner" style="display:none;background:var(--lagoon);color:white;padding:0.65rem 1.25rem;align-items:center;justify-content:center;gap:10px;text-align:center;flex-wrap:wrap;position:relative;font-size:0.85rem">
+  <span>🎒 <strong>Back to School Swap</strong> · Sat, Aug 15 · 3–5pm · 644 Lequime Rd &mdash; free garage sale, face painting, kids' yoga & more!</span>
+  <button onclick="dismissEventBanner()" aria-label="Dismiss announcement" style="background:none;border:none;color:white;font-size:1.1rem;line-height:1;cursor:pointer;padding:0 4px;position:absolute;right:10px;top:50%;transform:translateY(-50%);opacity:0.85">&times;</button>
+</div>
+
 <div class="bottom-nav" style="position:fixed">
   <button class="tab-btn active" id="tab-browse" onclick="showView('feed')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -690,26 +689,6 @@ nav {
 
 <!-- FEED VIEW -->
 <div id="view-feed">
-  <div class="grant-banner" id="grant-banner" role="status">
-    <strong>🎉 We got a City of Kelowna grant!</strong> Free Back to School Swap coming this fall — details soon.
-    <button class="grant-banner-close" onclick="dismissGrantBanner()" aria-label="Dismiss announcement">✕</button>
-  </div>
-  <script>
-    (function(){
-      try {
-        if (localStorage.getItem('gia_grant_banner_dismissed') === '1') {
-          var el = document.getElementById('grant-banner');
-          if (el) el.style.display = 'none';
-        }
-      } catch (e) {}
-    })();
-    function dismissGrantBanner() {
-      var el = document.getElementById('grant-banner');
-      if (el) el.style.display = 'none';
-      try { localStorage.setItem('gia_grant_banner_dismissed', '1'); } catch (e) {}
-    }
-  </script>
-
   <div class="hero">
     <div class="hero-text">
       <h1>Free kids stuff. Real neighbours. <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="white" aria-hidden="true" style="vertical-align:-2px;display:inline-block"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></h1>
@@ -3337,9 +3316,28 @@ function toggleConditionTooltip() {
 }
 
 // ── INIT ──────────────────────────────────────────────────
+const _eventBannerKey = 'gia_dismissed_backtoschool2026';
+const _eventBannerExpiry = new Date('2026-08-16T00:00:00-07:00'); // day after event, Pacific time
+
+function checkEventBanner() {
+  try {
+    if (new Date() >= _eventBannerExpiry) return; // event's over, stay hidden
+    if (localStorage.getItem(_eventBannerKey)) return; // already dismissed
+    const banner = document.getElementById('event-banner');
+    if (banner) banner.style.display = 'flex';
+  } catch(e) {}
+}
+
+function dismissEventBanner() {
+  const banner = document.getElementById('event-banner');
+  if (banner) banner.style.display = 'none';
+  try { localStorage.setItem(_eventBannerKey, '1'); } catch(e) {}
+}
+
 async function initApp() {
   // Show feed immediately with sample data while DB loads
   updateFeed();
+  checkEventBanner();
 
   // Load Supabase first (won't block if CDN fails)
   await loadSupabase();
