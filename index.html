@@ -390,6 +390,9 @@ nav {
 .tag-chip:hover { border-color: var(--papaya-mid); }
 .tag-chip.selected { background: var(--papaya-light); border-color: var(--papaya-mid); color: var(--tag-size-fg); }
 .supporter-banner { background: var(--lagoon-light); border: 1px solid #B2DFDB; border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.event-banner { background: var(--lagoon); color: #fff; padding: 0.6rem 1rem; display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex-wrap: wrap; text-align: center; font-size: 0.9rem; }
+.event-banner button { background: none; border: none; color: #fff; opacity: 0.75; font-size: 1rem; cursor: pointer; padding: 0 2px; line-height: 1; }
+.event-banner button:hover { opacity: 1; }
 @media (max-width: 600px) { .supporter-banner { flex-direction: column; align-items: stretch; text-align: center; padding: 0.85rem 1rem; gap: 0.6rem; } .supporter-banner > button { order: -1; } }
 .supporter-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 700; padding: 2px 9px; border-radius: 20px; letter-spacing: 0.03em; vertical-align: middle; margin-left: 5px; }
 .badge-neighbour { background: var(--lagoon-light); color: var(--lagoon-dark); border: 1px solid var(--lagoon); }
@@ -642,6 +645,11 @@ nav {
 </head>
 <body>
 
+<div class="event-banner" id="event-banner" style="display:none">
+  <span>📅 Back to School Swap postponed due to smoke. New date coming soon (September)!</span>
+  <button onclick="dismissEventBanner()" aria-label="Dismiss">✕</button>
+</div>
+
 <nav>
   <div class="logo" onclick="showView('feed')">Give<em>It</em><span>Away</span></div>
   <div class="nav-links">
@@ -658,11 +666,6 @@ nav {
     <button class="post-btn" onclick="openPostModal()">+ Post Item</button>
   </div>
 </nav>
-
-<div id="event-banner" style="display:none;background:var(--lagoon);color:white;padding:0.65rem 1.25rem;align-items:center;justify-content:center;gap:10px;text-align:center;flex-wrap:wrap;position:relative;font-size:0.85rem">
-  <span>🎒 <strong>Back to School Swap</strong> · Sat, Aug 15 · 3–5pm · 644 Lequime Rd &mdash; free garage sale, face painting, kids' yoga & more!</span>
-  <button onclick="dismissEventBanner()" aria-label="Dismiss announcement" style="background:none;border:none;color:white;font-size:1.1rem;line-height:1;cursor:pointer;padding:0 4px;position:absolute;right:10px;top:50%;transform:translateY(-50%);opacity:0.85">&times;</button>
-</div>
 
 <div class="bottom-nav" style="position:fixed">
   <button class="tab-btn active" id="tab-browse" onclick="showView('feed')">
@@ -3316,22 +3319,19 @@ function toggleConditionTooltip() {
 }
 
 // ── INIT ──────────────────────────────────────────────────
-const _eventBannerKey = 'gia_dismissed_backtoschool2026';
-const _eventBannerExpiry = new Date('2026-08-16T00:00:00-07:00'); // day after event, Pacific time
-
 function checkEventBanner() {
   try {
-    if (new Date() >= _eventBannerExpiry) return; // event's over, stay hidden
-    if (localStorage.getItem(_eventBannerKey)) return; // already dismissed
     const banner = document.getElementById('event-banner');
-    if (banner) banner.style.display = 'flex';
+    if (!banner) return;
+    const dismissed = localStorage.getItem('gia_dismissed_backtoschool2026');
+    if (!dismissed) banner.style.display = 'flex';
   } catch(e) {}
 }
 
 function dismissEventBanner() {
+  try { localStorage.setItem('gia_dismissed_backtoschool2026', '1'); } catch(e) {}
   const banner = document.getElementById('event-banner');
   if (banner) banner.style.display = 'none';
-  try { localStorage.setItem(_eventBannerKey, '1'); } catch(e) {}
 }
 
 async function initApp() {
