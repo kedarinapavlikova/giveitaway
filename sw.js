@@ -1,7 +1,7 @@
 // GiveItAway Service Worker
 // Caches the shell so the app loads fast (and partially offline)
 
-const CACHE_NAME = 'giveitaway-v1';
+const CACHE_NAME = 'giveitaway-v2'; // bump this number whenever you want to force-clear old caches
 
 // Files to cache on install (the app shell)
 const SHELL_ASSETS = [
@@ -57,7 +57,25 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Cache-first for everything else (shell, fonts, icons)
+  // Never touch our serverless API calls (Stripe, notifications)
+  if (url.pathname.startsWith('/api/')) return;
+
+  // Network-first for the app page itself, so people always get the newest version.
+  // Falls back to the cached copy only when offline.
+  if (event.request.mode === 'navigate' || url.pathname === '/' || url.pathname.endsWith('.html')) {
+    event.respondWith(
+      fetch(event.request).then(response => {
+        if (response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      }).catch(() => caches.match(event.request).then(c => c || caches.match('/index.html')))
+    );
+    return;
+  }
+
+  // Cache-first for everything else (fonts, icons)
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;

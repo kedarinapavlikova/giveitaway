@@ -651,7 +651,7 @@ nav {
     <button class="nav-btn" id="nav-about" onclick="showView('about')">About</button>
   </div>
   <div style="display:flex;align-items:center;gap:6px">
-    <div id="nav-auth-area">
+    <div id="nav-auth-area" style="min-width:64px;visibility:hidden" aria-busy="true">
       <button class="nav-auth-btn" onclick="openModal('auth-modal')">Sign in</button>
     </div>
     <button class="nav-support-btn" onclick="openModal('supporter-modal')">✦ Support</button>
@@ -2006,6 +2006,8 @@ async function loadUserProfile(user) {
 
 function updateAuthUI(user, profile) {
   const area = document.getElementById('nav-auth-area');
+  area.style.visibility = 'visible';
+  area.removeAttribute('aria-busy');
   const authNavItems = ['nav-msgs', 'nav-profile', 'tab-msgs', 'tab-profile'];
 
   if (user && profile) {
@@ -3318,22 +3320,21 @@ async function initApp() {
   // Load Supabase first (won't block if CDN fails)
   await loadSupabase();
 
-  // Restore last view — but always start on feed for first-time visitors
-  try {
-    const saved = localStorage.getItem('gia_view');
-    const restorable = ['messages', 'profile', 'about'];
-    if (saved && restorable.includes(saved)) showView(saved);
-  } catch(e) {}
-
   if (_sb) {
     try {
-      // Check for existing session
-      const { data: { session } } = await _sb.auth.getSession();
+      // Check for existing session (5s cap so a slow server can't freeze the app)
+      const sessionTimeout = new Promise(resolve => setTimeout(() => resolve({ data: { session: null } }), 5000));
+      const { data: { session } } = await Promise.race([_sb.auth.getSession(), sessionTimeout]);
       if (session?.user) await loadUserProfile(session.user);
 
-      _sb.auth.onAuthStateChange(async (event, session) => {
+      // IMPORTANT: never await Supabase calls directly inside this callback.
+      // It deadlocks the auth client and freezes sign-in. Defer with setTimeout.
+      _sb.auth.onAuthStateChange((event, session) => {
         if (event === 'SIGNED_IN' && session?.user) {
-          await loadUserProfile(session.user);
+          setTimeout(() => {
+            if (currentUser && currentUser.id === session.user.id) return; // already loaded (sign-in button, tab refocus)
+            loadUserProfile(session.user);
+          }, 0);
         } else if (event === 'SIGNED_OUT') {
           currentUser = null; currentProfile = null;
           updateAuthUI(null);
@@ -3342,6 +3343,17 @@ async function initApp() {
     } catch(e) {
       console.error('Auth init error:', e);
     }
+  }
+
+  // Auth state is now known: show the right nav, then restore last view
+  if (!currentUser || !currentProfile) updateAuthUI(currentUser, currentProfile);
+  try {
+    const saved = localStorage.getItem('gia_view');
+    const needsLogin = ['messages', 'profile'];
+    if (saved === 'about' || (saved && needsLogin.includes(saved) && currentUser)) showView(saved);
+  } catch(e) {}
+
+  if (_sb) {
 
     // Load listings silently — works for both logged in AND anonymous users
     try {
