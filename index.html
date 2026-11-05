@@ -3235,6 +3235,12 @@ function formatCard(input) {
 
 async function completeSupport() {
   if (!selectedTier) return;
+  // Supporters must be signed in so Stripe can link the payment to their profile
+  if (!currentUser) {
+    closeModal('supporter-modal');
+    requireAuth('become a supporter');
+    return;
+  }
   const btn = document.getElementById('stripe-checkout-btn');
   btn.disabled = true;
   btn.textContent = 'Redirecting to Stripe...';
@@ -3242,7 +3248,7 @@ async function completeSupport() {
     const res = await fetch('/api/create-checkout-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tier: selectedTier })
+      body: JSON.stringify({ tier: selectedTier, userId: currentUser.id, email: currentUser.email })
     });
     const data = await res.json();
     if (data.url) {
@@ -3281,12 +3287,7 @@ function handlePaymentReturn() {
     if (banner) banner.style.display = 'none';
     if (active) active.style.display = 'block';
     if (label) label.textContent = `${t.name} · ${t.price} · Thank you so much.`;
-    // Persist to DB
-    if (_sb && currentUser) {
-      _sb.from('profiles').update({ supporter_tier: tier }).eq('id', currentUser.id).then(({ error }) => {
-        if (error) console.error('Could not save supporter tier:', error);
-      });
-    }
+    // Supporter status is saved by the Stripe webhook (supabase/functions/stripe-webhook), not here
     window.history.replaceState({}, '', '/');
   } else if (payment === 'cancelled') {
     showToast('No worries — you can support anytime. 💚', 'var(--gray)');
